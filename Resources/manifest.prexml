@@ -1,0 +1,70 @@
+<?xml version="1.0" encoding="UTF-8" ?>
+<manifest xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/shopware/master/src/Core/Framework/App/Manifest/Schema/manifest-2.0.xsd">
+    <meta>
+        <name>{{app_name}}</name>
+        <label>{{app_label}}</label>
+        <description>{{app_description}}</description>
+        <author>{{app_author}}</author>
+        <copyright>{{app_copyright}}</copyright>
+        <version>{{app_version}}</version>
+        <license>{{app_license}}</license>
+    </meta>
+    <setup>
+        <registrationUrl>{{registration_url}}</registrationUrl>
+        <secret>{{app_secret}}</secret>
+    </setup>
+
+    <webhooks>
+        <webhook name="appActivate" url="{{base_url}}/activate" event="app.activated"/>
+        <webhook name="appDeactivated" url="{{base_url}/deactivate" event="app.deactivated"/>
+        <webhook name="appDelete" url="{{base_url}}/delete" event="app.deleted"/>
+    </webhooks>
+
+    <admin>
+        <action-button 
+            action="ping" 
+            entity="order" 
+            view="detail" 
+            url="{{base_url}}/ewt-foundation/ping">
+            <label>Ewt Foundation Ping</label>
+        </action-button>    
+    </admin>
+
+    <permissions>
+        <permission>product:read</permission>
+        <permission>product:create</permission>
+        <permission>product:update</permission>
+        <permission>product:delete</permission>
+        <permission>product:write</permission>
+        <permission>order:read</permission>
+        <permission>order:create</permission>
+        <permission>order:update</permission>
+        <permission>order:delete</permission>
+        <permission>order:write</permission>
+    </permissions>
+
+    <custom-fields>
+        <custom-field-set>
+            <name>travel_order_fields</name>
+            <label>Travel Order Information</label>
+            <label lang="en-GB">Travel Order Information</label>
+            <related-entities>
+                <order/>
+            </related-entities>
+            <fields>
+                <text name="travel_order_special_instructions">
+                    <label>Special Instructions</label>
+                    <label lang="en-GB">Special Instructions</label>
+                </text>
+                <text name="travel_order_additional_notes">
+                    <label>Additional Notes</label>
+                    <label lang="en-GB">Additional Notes</label>
+                </text>
+                <datetime name="travel_order_updated_at">
+                    <label>Last Updated</label>
+                    <label lang="en-GB">Last Updated</label>
+                </datetime>
+            </fields>
+        </custom-field-set>
+    </custom-fields>
+</manifest>
