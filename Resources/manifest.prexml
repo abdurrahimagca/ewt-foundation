@@ -27,7 +27,9 @@
             view="detail" 
             url="{{base_url}}/ewt-foundation/ping">
             <label>Ewt Foundation Ping</label>
-        </action-button>    
+        </action-button>   
+
+        <base-app-url>{{public_page_url}}</base-app-url> 
     </admin>
 
     <permissions>
@@ -42,25 +44,33 @@
         <permission>order:delete</permission>
         <permission>order:write</permission>
     </permissions>
+   
+
 
     <custom-fields>
         <custom-field-set>
-            <name>travel_order_fields</name>
-            <label>Travel Order Information</label>
-            <label lang="en-GB">Travel Order Information</label>
+            <name>ewt_foundation_order_fields</name>
+            <label>Ewt Foundation Order Fields</label>
+            <label lang="en-GB">Ewt Foundation Order Fields</label>
             <related-entities>
                 <order/>
             </related-entities>
             <fields>
-                <text name="travel_order_special_instructions">
+                <number name="ewt_foundation_order_number_of_travelers">
+                    <label>Number of Travelers</label>
+                    <label lang="en-GB">Number of Travelers</label>
+                </number>
+
+
+                <text name="ewt_foundation_order_special_instructions">
                     <label>Special Instructions</label>
                     <label lang="en-GB">Special Instructions</label>
                 </text>
-                <text name="travel_order_additional_notes">
+                <text name="ewt_foundation_order_additional_notes">
                     <label>Additional Notes</label>
                     <label lang="en-GB">Additional Notes</label>
                 </text>
-                <datetime name="travel_order_updated_at">
+                <datetime name="ewt_foundation_order_updated_at">
                     <label>Last Updated</label>
                     <label lang="en-GB">Last Updated</label>
                 </datetime>

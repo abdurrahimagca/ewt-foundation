@@ -16,16 +16,21 @@
   "dependencies": {
     "@hono/node-server": "^1.11.4",
     "@shopware-ag/app-server-sdk": "^1.1.16",
+    "@vitejs/plugin-vue": "^5.2.1",
     "better-sqlite3": "^11.2.1",
     "dotenv": "^16.4.7",
+    "express": "^4.21.2",
     "hono": "^4.4.7",
     "prettier": "^3.5.2"
   },
   "devDependencies": {
+    "@hono/vite-ssg": "^0.1.1",
     "@types/better-sqlite3": "^7.6.12",
+    "@types/express": "^5.0.0",
     "@types/node": "^22.13.5",
     "ts-node": "^10.9.2",
     "tsx": "^4.19.3",
-    "typescript": "^5.7.3"
+    "typescript": "^5.7.3",
+    "vite": "^6.1.1"
   }
 }

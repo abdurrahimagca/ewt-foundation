@@ -7,7 +7,7 @@ const app = new Hono();
 
 app.use(logger());
 app.route("/", shopware);
-app.route("public/ewt-foundation", appPublic);
+app.route("/public/ewt-foundation", appPublic);
 
 serve(app, (info) => {
   console.log(`Listening on http://localhost:${info.port}`);
