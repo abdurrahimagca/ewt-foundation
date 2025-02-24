@@ -6,7 +6,7 @@ import { serve } from "@hono/node-server";
 const app = new Hono();
 
 app.use(logger());
-app.route("/", shopware);
+app.route("/app", shopware);
 app.route("/public/ewt-foundation", appPublic);
 
 serve(app, (info) => {

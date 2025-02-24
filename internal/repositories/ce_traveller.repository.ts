@@ -22,6 +22,12 @@ class CeTravelerRepository extends EntityRepository<CeTraveler> {
 
         return (await this.repository.search(criteria)).data;
     }
+    
+    async healthCheck(): Promise<CeTraveler[]> {
+        const criteria = new Criteria([]);
+        const searchResult = await this.repository.search(criteria);
+        return searchResult.data
+    }
 
     async createTravelerByOrderId(orderId: string, traveler: CeTraveler): Promise<void> {
         const criteria = new Criteria();

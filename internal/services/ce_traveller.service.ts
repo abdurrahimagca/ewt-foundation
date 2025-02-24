@@ -25,6 +25,9 @@ class CeTravellerService {
     async deleteTravelerByOrderId(orderId: string): Promise<void> {
         return await this.travellerRepository.deleteTravelerByOrderId(orderId);
     }
+    async healthCheck(): Promise<CeTraveler[]> {
+        return await this.travellerRepository.healthCheck();
+    }
 }
 
 export default CeTravellerService;

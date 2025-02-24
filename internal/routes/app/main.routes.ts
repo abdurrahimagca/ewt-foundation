@@ -1,18 +1,21 @@
 import { Hono } from "hono";
+import { createNotificationResponse } from "@shopware-ag/app-server-sdk/helper/app-actions";
 import {
-  createModalResponse,
-  createNotificationResponse,
-} from "@shopware-ag/app-server-sdk/helper/app-actions";
-import { AppServer, Context, SimpleShop } from "@shopware-ag/app-server-sdk";
+  AppServer,
+  Context,
+  HttpClient,
+  SimpleShop,
+} from "@shopware-ag/app-server-sdk";
 import { configureAppServer } from "@shopware-ag/app-server-sdk/integration/hono";
 import { type ShopInterface } from "@shopware-ag/app-server-sdk";
 import { BetterSqlite3Repository } from "@shopware-ag/app-server-sdk/integration/better-sqlite3";
 import * as dotenv from "dotenv";
 import CeTravellerService from "../../services/ce_traveller.service";
-import { HttpClientResponse } from "@shopware-ag/app-server-sdk";
-import { fileURLToPath } from "url";
-import path, { dirname } from "path";
-import { promises as fs } from "fs";
+import { cors } from "hono/cors";
+import {
+  ActionButtonRequest,
+  BrowserAppModuleRequest,
+} from "@shopware-ag/app-server-sdk/types";
 
 dotenv.config();
 const APP_NAME = process.env.APP_NAME;
@@ -20,8 +23,10 @@ const APP_SECRET = process.env.APP_SECRET;
 if (!APP_NAME || !APP_SECRET) {
   throw new Error("APP_NAME and APP_SECRET must be set in .env file");
 }
-
+import { logger } from "hono/logger";
+import OrderService from "../../services/order.service";
 const shopware = new Hono();
+
 declare module "hono" {
   interface ContextVariableMap {
     app: AppServer;
@@ -29,25 +34,72 @@ declare module "hono" {
     context: Context;
   }
 }
+shopware.use(logger());
+
 configureAppServer(shopware, {
-  
   appName: APP_NAME,
   appSecret: APP_SECRET,
   shopRepository: new BetterSqlite3Repository("shopware.db"),
-  registerConfirmationUrl: "/register/confirm",
+  registerConfirmationUrl: "/app/register/confirm",
   appIframeEnable: true,
   appIframePath: "/app/ewt-foundation/module/index",
 });
-shopware.use("*", (c, next) => {
-  c.header("Access-Control-Allow-Origin", "*");
-  c.header("Access-Control-Allow-Methods", "GET,POST,PUT,DELETE,OPTIONS");
-  c.header("Access-Control-Allow-Headers", "Content-Type, Authorization");
-  return next();
-});
+shopware.use("/*", cors());
+shopware.use(
+  "/*",
+  cors({
+    origin: "*",
+    allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowHeaders: ["shopware-app-shop-id", "shopware-app-token"],
+  }),
+);
 
-shopware.post("/app/ewt-foundation/ping", () => {
+shopware.post("/ewt-foundation/ping", () => {
   return createNotificationResponse("success", "Pong");
 });
+shopware.get("/ewt-foundation/ping", (c) => {
+  return c.json({ message: "pong" });
+});
+shopware.post("/ewt-foundation/orders/ping", async (c) => {
+  try {
+    // Get the required headers
+    const shopId = c.req.header("shopware-app-shop-id");
+    const shopwareAppToken = c.req.header("shopware-app-token");
+
+    if (!shopId || !shopwareAppToken) {
+      return c.json(
+        {
+          error:
+            "Missing required headers: shopware-app-shop-id and shopware-app-token",
+        },
+        400,
+      );
+    }
+
+    const app = c.get("app") as AppServer;
+    const shop = await app.repository.getShopById(shopId);
+
+    if (!shop) {
+      return c.json({ error: "Shop not found" }, 404);
+    }
+
+    const client = new HttpClient(shop);
+    const orderService = new OrderService(client);
+    const order = await orderService.getOrderByOrderNumber("10000");
+
+    return c.json({ message: "pong", order });
+  } catch (error) {
+    console.error("[ERROR]: Failed to process request:", error);
+    return c.json(
+      {
+        error: "Internal server error",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
+      error.status ??  500,
+    );
+  }
+});
+
 shopware.post("/ewt-foundation/ce-traveller/:orderId", async (c) => {
   const ctx = c.get("context") as Context<SimpleShop, ShopInterface>;
   const orderId = c.req.param("orderId");
@@ -56,34 +108,5 @@ shopware.post("/ewt-foundation/ce-traveller/:orderId", async (c) => {
     await ceTravellerService.getTravelersAndFlightInfoByOrderId(orderId);
   return c.json(order);
 });
-shopware.get("/app/ewt-foundation/module/index", async (c) => {
-  console.log("[INFo] req received");
-  console.log("context: ", c.get("context"));
-  const ctx = c.get("context") as Context<SimpleShop, ShopInterface>;
 
-  const shop = c.get("shop") as ShopInterface;
-  const app = c.get("app") as AppServer;
-
-    console.log("[INFO] context: ", ctx);
-    console.log("[INFO] shop: ", shop);
-    console.log("[INFO] app: ", app);
-
-  // AppServer'dan Context Çözümlemesi
-  app.contextResolver.fromBrowser(c.req.raw);
-
-  // index.html Dosyasını Okuma
-  const indexHtml = await fs.readFile(
-    path.join(__dirname, "../../views/index.html"),
-    "utf-8",
-  );
-
-  // Content-Type ve Security Policy Ayarları
-  c.header("Content-Type", "text/html");
-  c.header("Content-Security-Policy", "frame-ancestors 'self'");
-
-  // Response'u İmzalama ve Döndürme
-  const Response = c.html(indexHtml);
-  const signedResponse = app.signer.signResponse(Response, shop.getShopSecret());
-  return signedResponse;
-});
 export default shopware;

@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import fs from "fs";
 import { fileURLToPath } from 'url';
 import { dirname, join } from "path";
-
+import { AppServer } from "@shopware-ag/app-server-sdk";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
@@ -21,5 +21,6 @@ global.get("/index", async (c) => {
   }
   return c.html(html.toString());
 });
+
 
 export default global;
