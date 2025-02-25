@@ -3,28 +3,40 @@ import { EntityRepository } from "@shopware-ag/app-server-sdk/helper/admin-api";
 import { Criteria } from "@shopware-ag/app-server-sdk/helper/criteria";
 
 type Order = {
-    id: string;
-    name: string;
-    price: number;
-    order_number: string;
-}
+  id: string;
+  name: string;
+  price: number;
+  order_number: string;
+};
 
-class OrderRepository extends EntityRepository<Order>{
-    private readonly repository: EntityRepository<Order>;
-    constructor(client: HttpClient) {
-        super(client, 'order');
-        this.repository = new EntityRepository<Order>(client, 'order');
-    }
+class OrderRepository extends EntityRepository<Order> {
+  private readonly repository: EntityRepository<Order>;
+  constructor(client: HttpClient) {
+    super(client, "order");
+    this.repository = new EntityRepository<Order>(client, "order");
+  }
 
-    async getOrderByOrderNumber(orderNumber: string): Promise<Order[]> {
-        const criteria = new Criteria();
-        criteria.addFilter({
-            field: 'orderNumber',
-            type: 'equals',
-            value: orderNumber
-        });
-        return (await this.repository.search(criteria)).data;
-    }
+  async getOrderByOrderNumber(orderNumber: string): Promise<Order[]> {
+    const criteria = new Criteria();
+    criteria.addFilter({
+      field: "orderNumber",
+      type: "equals",
+      value: orderNumber,
+    });
+    criteria.fields = ["id", "name", "price", "order_number"];
+    return (await this.repository.search(criteria)).data;
+  }
 
+  async getOrderByOrderId(orderId: string): Promise<Order[]> {
+    const criteria = new Criteria();
+    criteria.addFilter({
+      field: "id",
+      type: "equals",
+      value: orderId,
+    });
+    
+    
+    return (await this.repository.search(criteria)).data;
+  }
 }
 export default OrderRepository;

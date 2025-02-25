@@ -4,7 +4,7 @@ import { HttpClient } from '@shopware-ag/app-server-sdk';
 import { Criteria } from '@shopware-ag/app-server-sdk/helper/criteria';
 
 
-class CeTravelerRepository extends EntityRepository<CeTraveler> {
+class CeTravellerRepository extends EntityRepository<CeTraveler> {
     private readonly repository: EntityRepository<CeTraveler>;
     constructor(client: HttpClient) {
         super(client, 'ce_traveler');
@@ -62,4 +62,4 @@ class CeTravelerRepository extends EntityRepository<CeTraveler> {
     }
 }
 
-export default CeTravelerRepository;
+export default CeTravellerRepository;

@@ -1,3 +1,4 @@
+import { EntitySearchResult } from "@shopware-ag/app-server-sdk/helper/admin-api";
 import CeFlightInfoRepository from "../repositories/ce_flight_info.repository";
 import { CeFlightInfo } from "../types/ce_traveller";
 import { HttpClient } from "@shopware-ag/app-server-sdk";
@@ -8,7 +9,7 @@ class CeFlightInfoService {
         this.flightInfoRepository = new CeFlightInfoRepository(client);
     }
 
-    async getFlightInfoByOrderId(orderId: string): Promise<CeFlightInfo> {
+    async getFlightInfoByOrderId(orderId: string): Promise<EntitySearchResult<CeFlightInfo>> {
          return await this.flightInfoRepository.getFlightInfoByOrderId(orderId);
     }
 

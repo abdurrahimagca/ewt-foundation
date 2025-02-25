@@ -6,16 +6,18 @@ import { AppServer } from "@shopware-ag/app-server-sdk";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const global = new Hono();
+const GLOBAL_ROUTE = new Hono();
 
-global.get("/ping", (c) => {
+GLOBAL_ROUTE.get("/ping", (c) => {
   return c.json({
     message: "pong",
   });
 });
 
-global.get("/index", async (c) => {
-  const html = fs.readFileSync(join(__dirname, "../../../views/main/index.html"));
+GLOBAL_ROUTE.get("/index", async (c) => {
+  const html = fs.readFileSync(
+    join(__dirname, "../../../views/main/index.html"),
+  );
   if (!html) {
     return c.html("<h1>404</h1>", 404);
   }
@@ -23,4 +25,4 @@ global.get("/index", async (c) => {
 });
 
 
-export default global;
+export default GLOBAL_ROUTE;

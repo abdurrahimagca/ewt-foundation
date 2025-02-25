@@ -1,4 +1,4 @@
-import { EntityRepository } from "@shopware-ag/app-server-sdk/helper/admin-api";
+import { EntityRepository, EntitySearchResult } from "@shopware-ag/app-server-sdk/helper/admin-api";
 import { CeFlightInfo } from "../types/ce_traveller";
 import { HttpClient } from "@shopware-ag/app-server-sdk";
 import { Criteria } from "@shopware-ag/app-server-sdk/helper/criteria";
@@ -10,14 +10,14 @@ class CeFlightInfoRepository extends EntityRepository<CeFlightInfo> {
         super(client, 'ce_flight_info');
     }
 
-    async getFlightInfoByOrderId(orderId: string): Promise<CeFlightInfo> {
+    async getFlightInfoByOrderId(orderId: string): Promise<EntitySearchResult<CeFlightInfo>> {
         const criteria = new Criteria();
         criteria.addFilter({
             field: 'order_id',
             type: 'equals',
             value: orderId
         });
-        return (await this.repository.search(criteria)).data[0];
+        return (await this.repository.search(criteria));
     }
 
     async createFlightInfoByOrderId(orderId: string, flightInfo: CeFlightInfo): Promise<void> {
