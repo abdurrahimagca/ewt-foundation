@@ -1,78 +1,27 @@
 <entities xmlns="https://shopware.com/schemas/v1/custom-entity-schema">
 
-    <!-- Flight Information Entity (Sadece 1 Kere Kaydedilir) -->
+    <entity name="ce_traveller">
+        <fields>
+           <text name="name" store-api-aware="true" />
+           <text name="surname" store-api-aware="true" />
+           <date name="birthdate" store-api-aware="true" />
+           <email name="email" store-api-aware="true" />
+           <text name="phone" store-api-aware="true" />
+           <text name="passport_number" store-api-aware="true" />
+           <many-to-one store-api-aware="true" name="order_id" reference="order" on-delete="cascade"/>
+        </fields>
+    </entity>
     <entity name="ce_flight_info">
         <fields>
-            <!-- Uçuş Bilgileri -->
-            <date name="arrival_date">
-                <label>Arrival Date</label>
-                <label lang="en-GB">Arrival Date</label>
-            </date>
-            <date name="return_date">
-                <label>Return Date</label>
-                <label lang="en-GB">Return Date</label>
-            </date>
-            <text name="arrival_airport">
-                <label>Arrival Airport</label>
-                <label lang="en-GB">Arrival Airport</label>
-            </text>
-            <text name="departure_airport">
-                <label>Departure Airport</label>
-                <label lang="en-GB">Departure Airport</label>
-            </text>
-            <text name="airline">
-                <label>Airline</label>
-                <label lang="en-GB">Airline</label>
-            </text>
-            <text name="flight_number">
-                <label>Flight Number</label>
-                <label lang="en-GB">Flight Number</label>
-            </text>
-            <time name="arrival_time">
-                <label>Arrival Time</label>
-                <label lang="en-GB">Arrival Time</label>
-            </time>
-            <time name="departure_time">
-                <label>Departure Time</label>
-                <label lang="en-GB">Departure Time</label>
-            </time>
-            <!-- Order ile Bağlantı -->
-            <reference name="order_id" entity="order" required="true">
-                <on-delete>cascade</on-delete>
-            </reference>
+            <date name="arrival_date" store-api-aware="true" />
+            <date name="return_date" store-api-aware="true" />
+            <text name="arrival_airport" store-api-aware="true" />
+            <text name="departure_airport" store-api-aware="true" />
+            <text name="airline" store-api-aware="true" />
+            <text name="flight_number" store-api-aware="true" />
+            <many-to-one store-api-aware="true" name="order_id" reference="order" on-delete="cascade"/>
         </fields>
     </entity>
-
-    <!-- Traveler Information Entity (Number of Travelers kadar dinamik kayıt) -->
-    <entity name="ce_traveler">
-        <fields>
-            <!-- Traveler Information -->
-            <text name="fullname">
-                <label>Full Name</label>
-                <label lang="en-GB">Full Name</label>
-            </text>
-            <date name="birthdate">
-                <label>Date of Birth</label>
-                <label lang="en-GB">Date of Birth</label>
-            </date>
-            <text name="email">
-                <label>Email</label>
-                <label lang="en-GB">Email</label>
-            </text>
-            <text name="phone">
-                <label>Phone Number</label>
-                <label lang="en-GB">Phone Number</label>
-            </text>
-            <text name="passport_number">
-                <label>Passport Number</label>
-                <label lang="en-GB">Passport Number</label>
-            </text>
-            
-            <!-- Relationship to Flight Info (Many-to-One) -->
-            <reference name="flight_info_id" entity="ce_flight_info" required="true">
-                <on-delete>cascade</on-delete>
-            </reference>
-        </fields>
-    </entity>
+           
 
 </entities>

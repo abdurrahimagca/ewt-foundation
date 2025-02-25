@@ -13,7 +13,7 @@ export interface CeFlightInfo {
 }
 
 // Traveler Information Entity Type
-export interface CeTraveler {
+export interface CeTraveller {
     id: string;
     fullname: string;
     birthdate: string; // Date format: YYYY-MM-DD
