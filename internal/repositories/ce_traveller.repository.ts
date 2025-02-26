@@ -1,5 +1,5 @@
-import { EntityRepository } from "@shopware-ag/app-server-sdk/helper/admin-api";
-import { CeTraveller } from "../types/ce_traveller";
+import { EntityRepository, EntitySearchResult } from "@shopware-ag/app-server-sdk/helper/admin-api";
+import { CeTraveller } from "../types/ce_types";
 import { HttpClient } from "@shopware-ag/app-server-sdk";
 import { Criteria } from "@shopware-ag/app-server-sdk/helper/criteria";
 
@@ -10,37 +10,23 @@ class CeTravellerRepository extends EntityRepository<CeTraveller> {
     this.repository = new EntityRepository<CeTraveller>(client, "ce_traveller");
   }
 
-  async getTravelersAndFlightInfoByOrderId(
-    orderId: string,
-  ): Promise<CeTraveller[]> {
+  async getTravelersByOrderId(orderId: string): Promise<EntitySearchResult<CeTraveller>> {
     const criteria = new Criteria();
-
     criteria.addFilter({
-      field: "order_id",
+      field: "orderId",
       type: "equals",
       value: orderId,
     });
 
-    return (await this.repository.search(criteria)).data;
+    return (await this.repository.search(criteria));
   }
 
-  async healthCheck(): Promise<CeTraveller[]> {
-    const criteria = new Criteria([]);
-    const searchResult = await this.repository.search(criteria);
-    return searchResult.data;
-  }
-
-  async createTravelerByOrderId(
+  async createTravelersByOrderId(
     orderId: string,
-    traveler: CeTraveller,
+    traveler: CeTraveller[],
   ): Promise<void> {
-    const criteria = new Criteria();
-    criteria.addFilter({
-      field: "order_id",
-      type: "equals",
-      value: orderId,
-    });
-    return await this.repository.upsert([traveler]);
+    
+    return await this.repository.upsert(traveler);
   }
 
   async updateTravelerByOrderId(
@@ -49,7 +35,7 @@ class CeTravellerRepository extends EntityRepository<CeTraveller> {
   ): Promise<void> {
     const criteria = new Criteria();
     criteria.addFilter({
-      field: "order_id",
+      field: "orderId",
       type: "equals",
       value: orderId,
     });
@@ -59,11 +45,21 @@ class CeTravellerRepository extends EntityRepository<CeTraveller> {
   async deleteTravelerByOrderId(orderId: string): Promise<void> {
     return await this.repository.deleteByFilters([
       {
-        field: "order_id",
+        field: "orderId",
         type: "equals",
         value: orderId,
       },
     ]);
+  }
+  async getTravelerWithOrder(orderId: string): Promise<EntitySearchResult<CeTraveller>> {
+    const criteria = new Criteria();
+    criteria.addFilter({
+      field: "orderId",
+      type: "equals",
+      value: orderId,
+    });
+    criteria.addAssociation("order");
+    return await this.repository.search(criteria);
   }
 }
 

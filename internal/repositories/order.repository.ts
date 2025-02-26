@@ -1,13 +1,10 @@
 import { HttpClient } from "@shopware-ag/app-server-sdk";
-import { EntityRepository } from "@shopware-ag/app-server-sdk/helper/admin-api";
+import {
+  EntityRepository,
+  EntitySearchResult,
+} from "@shopware-ag/app-server-sdk/helper/admin-api";
 import { Criteria } from "@shopware-ag/app-server-sdk/helper/criteria";
-
-type Order = {
-  id: string;
-  name: string;
-  price: number;
-  order_number: string;
-};
+import { Order } from "../types/ce_types";
 
 class OrderRepository extends EntityRepository<Order> {
   private readonly repository: EntityRepository<Order>;
@@ -16,27 +13,29 @@ class OrderRepository extends EntityRepository<Order> {
     this.repository = new EntityRepository<Order>(client, "order");
   }
 
-  async getOrderByOrderNumber(orderNumber: string): Promise<Order[]> {
+  async getOrderByOrderNumber(
+    orderNumber: string,
+  ): Promise<EntitySearchResult<Order>> {
     const criteria = new Criteria();
     criteria.addFilter({
       field: "orderNumber",
       type: "equals",
       value: orderNumber,
     });
-    criteria.fields = ["id", "name", "price", "order_number"];
-    return (await this.repository.search(criteria)).data;
+    criteria.fields = ["id", "name", "price"];
+    return await this.repository.search(criteria);
   }
 
-  async getOrderByOrderId(orderId: string): Promise<Order[]> {
+  async getOrderByOrderId(orderId: string): Promise<EntitySearchResult<Order>> {
     const criteria = new Criteria();
     criteria.addFilter({
       field: "id",
       type: "equals",
       value: orderId,
     });
-    
-    
-    return (await this.repository.search(criteria)).data;
+
+    return await this.repository.search(criteria);
   }
+  
 }
 export default OrderRepository;

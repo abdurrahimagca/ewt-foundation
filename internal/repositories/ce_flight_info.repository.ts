@@ -2,7 +2,7 @@ import {
   EntityRepository,
   EntitySearchResult,
 } from "@shopware-ag/app-server-sdk/helper/admin-api";
-import { CeFlightInfo } from "../types/ce_traveller";
+import { CeFlightInfo } from "../types/ce_types";
 import { HttpClient } from "@shopware-ag/app-server-sdk";
 import { Criteria } from "@shopware-ag/app-server-sdk/helper/criteria";
 
@@ -12,40 +12,35 @@ class CeFlightInfoRepository extends EntityRepository<CeFlightInfo> {
     super(client, "ce_flight_info");
     this.repository = new EntityRepository(client, "ce_flight_info");
   }
-  
 
-  async getFlightInfoByOrderId(
+  async getFlightsInfoByOrderId(
     orderId: string,
   ): Promise<EntitySearchResult<CeFlightInfo>> {
     const criteria = new Criteria();
     criteria.addFilter({
-      field: "order_id",
+      field: "orderId",
       type: "equals",
       value: orderId,
     });
+
     return await this.repository.search(criteria);
   }
-  async healthCheck(): Promise<CeFlightInfo[]> {
-    const criteria = new Criteria();
-    criteria.setLimit(1);
 
-    const searchResult = await this.repository.search(criteria);
-    return searchResult.data;
-  }
-
-  async createFlightInfoByOrderId(
+  async createFlightsInfoByOrderId(
     orderId: string,
-    flightInfo: CeFlightInfo,
+    flightInfo: CeFlightInfo[],
   ): Promise<void> {
-    flightInfo.order_id = orderId;
-    return await this.repository.upsert([flightInfo]);
+    flightInfo.map((info) => {
+      info.orderId = orderId;
+    });
+    return await this.repository.upsert(flightInfo);
   }
 
   async updateFlightInfoByOrderId(
     orderId: string,
     flightInfo: CeFlightInfo,
   ): Promise<void> {
-    flightInfo.order_id = orderId;
+    flightInfo.orderId = orderId;
     return await this.repository.upsert([flightInfo]);
   }
 
@@ -57,6 +52,19 @@ class CeFlightInfoRepository extends EntityRepository<CeFlightInfo> {
         value: orderId,
       },
     ]);
+  }
+  async getFlightInfoWithOrder(
+    orderId: string,
+  ): Promise<EntitySearchResult<CeFlightInfo>> {
+    const criteria = new Criteria();
+    criteria.addFilter({
+      field: "orderId",
+      type: "equals",
+      value: orderId,
+    });
+    criteria.addAssociation("order");
+
+    return await this.repository.search(criteria);
   }
 }
 
