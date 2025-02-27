@@ -30,6 +30,14 @@
         </action-button>   
 
         <base-app-url>{{public_page_url}}</base-app-url> 
+         <module name="exampleModule"
+                source="http://localhost:3000/public/ewt-foundation/module/order"
+                parent="sw-product"
+                position="50"
+        >
+            <label>Example module</label>
+            <label lang="de-DE">Beispiel Modul</label>
+        </module>
     </admin>
 
     <permissions>

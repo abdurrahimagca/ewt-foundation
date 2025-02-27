@@ -4,19 +4,160 @@
     <title>EWT Foundation</title>
   </head>
   <body>
-    <div id="app">
-      <h1>Ewt Foundation app</h1>
-      <button>click me</button>
-    </div>
+    <div id="app"></div>
     <script src="https://unpkg.com/@shopware-ag/meteor-admin-sdk/cdn"></script>
+
     <script>
       window.onload = function () {
         window.parent.postMessage("sw-app-loaded", "*");
       };
-      sw.notification.dispatch({
-        title: "My first notification",
-        message: "This was really easy to do",
-      });
+
+      if (sw.location.is(sw.location.MAIN_HIDDEN)) {
+        // Add tab bar item
+        sw.ui.tabs("sw-order-detail").addTabItem({
+          label: "Travel Order Details",
+          componentSectionId: "ce-order-view",
+        });
+
+        // Add component to the new created section
+        sw.ui.componentSection.add({
+          component: "card",
+          positionId: "ce-order-view",
+          props: {
+            title: "Travellers",
+            locationId: "ce-traveller-view-tab-card",
+          },
+        });
+
+        sw.ui.componentSection.add({
+          component: "card",
+          positionId: "ce-order-view",
+          props: {
+            title: "Flight Info",
+            locationId: "ce-flight-order-view-tab-card",
+          },
+        });
+      }
+      if (sw.location.is("ce-flight-order-view-tab-card")) {
+        sw.location.startAutoResizer();
+        try {
+          sw.data
+            .get({
+              id: "sw-order-detail-base__order",
+              selectors: ["id"],
+            })
+            .then((order) => {
+              document.body.innerHTML = `
+                <div style="font-family: Arial, sans-serif; padding: 20px;">
+                  <h2 style="color: #142432; margin-bottom: 20px;">Flight Information</h2>
+                  <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                    <p style="color: #6c757d; margin: 0;">Order Reference</p>
+                    <p style="font-weight: bold; margin: 5px 0 15px 0;">#${order.id}</p>
+                  </div>`;
+
+              const repository = sw.data.repository("ce_flight_info");
+              const criteria = new sw.data.Classes.Criteria();
+              criteria.addFilter(
+                sw.data.Classes.Criteria.equals("orderId", order.id),
+              );
+              repository.search(criteria).then((result) => {
+                result.forEach((element) => {
+                  const target = element.value ?? element;
+                  document.body.innerHTML += `
+                    <div style="background: white; border: 1px solid #e9ecef; border-radius: 8px; padding: 20px; margin-top: 20px;">
+                      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                        <div>
+                          <p style="color: #6c757d; margin: 0;">Arrival Date</p>
+                          <p style="font-weight: bold; margin: 5px 0;">${new Date(target.arrivalDate).toLocaleDateString()}</p>
+                        </div>
+                        <div>
+                          <p style="color: #6c757d; margin: 0;">Return Date</p>
+                          <p style="font-weight: bold; margin: 5px 0;">${new Date(target.returnDate).toLocaleDateString()}</p>
+                        </div>
+                        <div>
+                          <p style="color: #6c757d; margin: 0;">Departure Airport</p>
+                          <p style="font-weight: bold; margin: 5px 0;">${target.departureAirport}</p>
+                        </div>
+                        <div>
+                          <p style="color: #6c757d; margin: 0;">Arrival Airport</p>
+                          <p style="font-weight: bold; margin: 5px 0;">${target.arrivalAirport}</p>
+                        </div>
+                        <div>
+                          <p style="color: #6c757d; margin: 0;">Airline</p>
+                          <p style="font-weight: bold; margin: 5px 0;">${target.airline}</p>
+                        </div>
+                      </div>
+                    </div>
+                  `;
+                });
+              });
+            });
+        } catch (e) {
+          console.log(e);
+        }
+      }
+      if (sw.location.is("ce-traveller-view-tab-card")) {
+        sw.location.startAutoResizer();
+        try {
+          sw.data
+            .get({
+              id: "sw-order-detail-base__order",
+              selectors: ["id"],
+            })
+            .then((order) => {
+              document.body.innerHTML = `
+                <div style="font-family: Arial, sans-serif; padding: 20px;">
+                  <h2 style="color: #142432; margin-bottom: 20px;">Traveller Information</h2>
+                  <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
+                    <p style="color: #6c757d; margin: 0;">Order Reference</p>
+                    <p style="font-weight: bold; margin: 5px 0 15px 0;">#${order.id}</p>
+                  </div>`;
+
+              const repository = sw.data.repository("ce_traveller");
+              const criteria = new sw.data.Classes.Criteria();
+              criteria.addFilter(
+                sw.data.Classes.Criteria.equals("orderId", order.id),
+              );
+              repository.search(criteria).then((result) => {
+                result.forEach((element) => {
+                  const target = element.value ?? element;
+                  document.body.innerHTML += `
+                    <div style="background: white; border: 1px solid #e9ecef; border-radius: 8px; padding: 20px; margin-top: 20px;">
+                      <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+                        <div>
+                          <p style="color: #6c757d; margin: 0;">Traveller ID</p>
+                          <p style="font-weight: bold; margin: 5px 0;">#${target.id}</p>
+                        </div>
+                        <div>
+                          <p style="color: #6c757d; margin: 0;">Full Name</p>
+                          <p style="font-weight: bold; margin: 5px 0;">${target.name}</p>
+                        </div>
+                        <div>
+                          <p style="color: #6c757d; margin: 0;">Email Address</p>
+                          <p style="font-weight: bold; margin: 5px 0;">${target.email}</p>
+                        </div>
+                        <div>
+                          <p style="color: #6c757d; margin: 0;">Phone Number</p>
+                          <p style="font-weight: bold; margin: 5px 0;">${target.phone}</p>
+                        </div>
+                        <div>
+                          <p style="color: #6c757d; margin: 0;">Passport Number</p>
+                          <p style="font-weight: bold; margin: 5px 0;">${target.passportNumber}</p>
+                        </div>
+                        <div>
+                          <p style="color: #6c757d; margin: 0;">Birth Date</p>
+                          <p style="font-weight: bold; margin: 5px 0;">${new Date(target.birthdate).toLocaleDateString()}</p>
+                        </div>
+                      </div>
+                    </div>
+                  `;
+                });
+              });
+            });
+        } catch (e) {
+          console.log(e);
+        }
+      }
     </script>
   </body>
 </html>

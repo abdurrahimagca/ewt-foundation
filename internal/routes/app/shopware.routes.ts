@@ -3,6 +3,7 @@ import { Hono } from "hono";
 import {
   AppServer,
   Context,
+  SimpleShop,
   type ShopInterface,
 } from "@shopware-ag/app-server-sdk";
 import { configureAppServer } from "@shopware-ag/app-server-sdk/integration/hono";
@@ -39,13 +40,16 @@ SHOPWARE_ROUTE.post("/app/ping", async () => {
 });
 ///*** END OF  /app routes */
 
-
 //**CE ROUTES */
 import CE_TRAVELLER_ROUTE from "./ce_traveller.routes";
 import CE_FLIGHT_INFO_ROUTE from "./ce_flight_info.routes";
+
 SHOPWARE_ROUTE.route("/ewt-foundation/ce-traveller", CE_TRAVELLER_ROUTE);
 SHOPWARE_ROUTE.route("/ewt-foundation/ce-flight-info", CE_FLIGHT_INFO_ROUTE);
 //**END OF CE ROUTES */
+//***Admin Routes Expremential */
+import ADMIN_ROUTE from "./admin.routes";
+SHOPWARE_ROUTE.route("/app/admin", ADMIN_ROUTE);
 
 export default SHOPWARE_ROUTE;
 ///*****END OF SHOPWARE APP */
