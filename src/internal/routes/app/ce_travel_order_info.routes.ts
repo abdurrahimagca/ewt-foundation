@@ -1,11 +1,10 @@
 import { Hono } from "hono";
-import { validatorMw } from "../../middlewares/validator";
-import { apiShopTransformMw } from "../../middlewares/storefront-api";
+import { apiShopTransformMw } from "../../middlewares/storefront-api.js";
 import {
   ceTravelOrderInfoSchema,
   shopwareId,
-} from "../../types/ce_travel_order_info";
-import CeTravelOrderInfoService from "../../services/ce_travel_order_info.service";
+} from "../../types/ce_travel_order_info.js";
+import CeTravelOrderInfoService from "../../services/ce_travel_order_info.service.js";
 const TRAVEL_ORDER_INFO = new Hono();
 
 TRAVEL_ORDER_INFO.use("/*", apiShopTransformMw);

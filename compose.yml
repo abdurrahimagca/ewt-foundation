@@ -1,0 +1,23 @@
+services:
+  app:
+    environment:
+      - NODE_ENV=production
+      - PORT=3000
+      - HOST=0.0.0.0
+    build:
+      context: .
+      dockerfile: Dockerfile
+    expose:
+      - 3000
+    command: ["node", "dist/index.js"]
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.app.entrypoints=websecure"
+      - "traefik.http.routers.app.tls.certresolver=cloudflare"
+      - "traefik.http.routers.app.rule=Host(`ewt-foundation.homelab-kaleici.space`)"
+      - "traefik.http.routers.app.tls=true"
+      - "traefik.http.routers.app.service=app"
+      - "traefik.http.services.app.loadbalancer.server.port=3000"
+      - "traefik.http.middlewares.app-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
+      - "traefik.http.middlewares.app-headers.headers.customrequestheaders.X-Origin=ewt-foundation.homelab-kaleici.space"
+      - "traefik.http.routers.app.middlewares=app-headers"

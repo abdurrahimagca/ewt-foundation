@@ -1,7 +1,7 @@
 import { HttpClient, ShopInterface } from "@shopware-ag/app-server-sdk";
 import { Criteria } from "@shopware-ag/app-server-sdk/helper/criteria";
-import CeTravelOrderInfoRepository from "../repositories/ce_travel_order_info.repository";
-import { CeTravelOrderInfo } from "../types/ce_travel_order_info";
+import CeTravelOrderInfoRepository from "../repositories/ce_travel_order_info.repository.js";
+import { CeTravelOrderInfo } from "../types/ce_travel_order_info.js";
 
 class CeTravelOrderInfoService {
   private readonly client: HttpClient;

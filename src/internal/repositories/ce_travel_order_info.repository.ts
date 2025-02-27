@@ -2,7 +2,7 @@ import {
   EntityRepository,
   EntitySearchResult,
 } from "@shopware-ag/app-server-sdk/helper/admin-api";
-import { CeTravelOrderInfo } from "../types/ce_travel_order_info";
+import { CeTravelOrderInfo } from "../types/ce_travel_order_info.js";
 import { HttpClient } from "@shopware-ag/app-server-sdk";
 import { Criteria } from "@shopware-ag/app-server-sdk/helper/criteria";
 

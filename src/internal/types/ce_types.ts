@@ -48,7 +48,6 @@ export type CeTraveller = z.infer<typeof ceTravellerSchema>;
 export type CeFlightInfo = z.infer<typeof ceFlightInfoSchema>;
 export type Combined = z.infer<typeof combinedSchema>;
 
-
 export type Order = {
   id: string;
   name: string;

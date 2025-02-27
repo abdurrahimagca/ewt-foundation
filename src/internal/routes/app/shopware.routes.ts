@@ -40,11 +40,11 @@ SHOPWARE_ROUTE.post("/app/ping", async () => {
 ///*** END OF  /app routes */
 
 //**CE ROUTES */
-import TRAVEL_ORDER_INFO from "./ce_travel_order_info.routes";
+import TRAVEL_ORDER_INFO from "./ce_travel_order_info.routes.js";
 SHOPWARE_ROUTE.route("/ce", TRAVEL_ORDER_INFO);
 //**END OF CE ROUTES */
 //***Admin Routes Expremential */
-import ADMIN_ROUTE from "./admin.routes";
+import ADMIN_ROUTE from "./admin.routes.js";
 
 SHOPWARE_ROUTE.route("/app/admin", ADMIN_ROUTE);
 

@@ -52,7 +52,7 @@ export const ceTravelOrderInfoSchema = z.object({
   transfer: z.optional(shopwareId),
   travellers: z.array(ceTravellerSchema),
   flightInfo: z.optional(ceFlightInfoSchema),
-  orderId: shopwareId
+  orderId: shopwareId,
 });
 
 // Combined Schema

@@ -1,14 +1,19 @@
 import { Hono } from "hono";
 import fs from "fs";
-import { join } from "path";
 import { fileURLToPath } from "url";
-import { dirname } from "path";
-
+import { dirname, join } from "path";
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
-const ADMIN_ROUTES = new Hono();
-ADMIN_ROUTES.get("/index", async (c) => {
+const GLOBAL_ROUTE = new Hono();
+
+GLOBAL_ROUTE.get("/ping", (c) => {
+  return c.json({
+    message: "pong",
+  });
+});
+
+GLOBAL_ROUTE.get("/index", async (c) => {
   const html = fs.readFileSync(
     join(__dirname, "../../../views/main/index.html"),
   );
@@ -17,4 +22,5 @@ ADMIN_ROUTES.get("/index", async (c) => {
   }
   return c.html(html.toString());
 });
-export default ADMIN_ROUTES;
+
+export default GLOBAL_ROUTE;
