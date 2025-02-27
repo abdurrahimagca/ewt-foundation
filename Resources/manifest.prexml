@@ -10,36 +10,24 @@
         <license>{{app_license}}</license>
     </meta>
     <setup>
-        <registrationUrl>{{registration_url}}</registrationUrl>
+        <registrationUrl>{{base_url}}/app/register</registrationUrl>
         <secret>{{app_secret}}</secret>
     </setup>
-
     <webhooks>
-        <webhook name="appActivate" url="{{base_url}}/activate" event="app.activated"/>
-        <webhook name="appDeactivated" url="{{base_url}/deactivate" event="app.deactivated"/>
-        <webhook name="appDelete" url="{{base_url}}/delete" event="app.deleted"/>
+        <webhook name="appActivate" url="{{base_url}}/app/activate" event="app.activated"/>
+        <webhook name="appDeactivated" url="{{base_url}/app/deactivate" event="app.deactivated"/>
+        <webhook name="appDelete" url="{{base_url}}/app/delete" event="app.deleted"/>
     </webhooks>
-
     <admin>
         <action-button 
             action="ping" 
             entity="order" 
             view="detail" 
-            url="{{base_url}}/ewt-foundation/ping">
+            url="{{base_url}}/{{ping_path}}">
             <label>Ewt Foundation Ping</label>
         </action-button>   
-
-        <base-app-url>{{public_page_url}}</base-app-url> 
-         <module name="exampleModule"
-                source="http://localhost:3000/public/ewt-foundation/module/order"
-                parent="sw-product"
-                position="50"
-        >
-            <label>Example module</label>
-            <label lang="de-DE">Beispiel Modul</label>
-        </module>
+        <base-app-url>{{base_url}}/{{app_page_path}}</base-app-url> 
     </admin>
-
     <permissions>
         <permission>product:read</permission>
         <permission>product:create</permission>
@@ -51,25 +39,21 @@
         <permission>order:update</permission>
         <permission>order:delete</permission>
         <permission>order:write</permission>
+        <permission>sales_channel:read</permission>
+        <permission>language:read</permission>
+        <permission>currency:read</permission>
+        <permission>country:read</permission>
+        <permission>customer:read</permission>
     </permissions>
-   
-
-
     <custom-fields>
         <custom-field-set>
-            <name>ewt_foundation_order_fields</name>
+            <name>travel_order_fields</name>
             <label>Ewt Foundation Order Fields</label>
             <label lang="en-GB">Ewt Foundation Order Fields</label>
             <related-entities>
                 <order/>
             </related-entities>
             <fields>
-                <number name="ewt_foundation_order_number_of_travelers">
-                    <label>Number of Travelers</label>
-                    <label lang="en-GB">Number of Travelers</label>
-                </number>
-
-
                 <text name="ewt_foundation_order_special_instructions">
                     <label>Special Instructions</label>
                     <label lang="en-GB">Special Instructions</label>
@@ -78,10 +62,6 @@
                     <label>Additional Notes</label>
                     <label lang="en-GB">Additional Notes</label>
                 </text>
-                <datetime name="ewt_foundation_order_updated_at">
-                    <label>Last Updated</label>
-                    <label lang="en-GB">Last Updated</label>
-                </datetime>
             </fields>
         </custom-field-set>
     </custom-fields>

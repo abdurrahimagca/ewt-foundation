@@ -16,6 +16,7 @@
   "dependencies": {
     "@hono/node-server": "^1.11.4",
     "@shopware-ag/app-server-sdk": "^1.1.16",
+    "@shopware-ag/meteor-admin-sdk": "^5.7.5",
     "@vitejs/plugin-vue": "^5.2.1",
     "better-sqlite3": "^11.2.1",
     "dotenv": "^16.4.7",

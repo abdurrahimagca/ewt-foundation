@@ -1,5 +1,19 @@
-<entities xmlns="https://shopware.com/schemas/v1/custom-entity-schema">
-
+<?xml version="1.0" encoding="utf-8" ?>
+<entities xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/shopware/trunk/src/Core/System/CustomEntity/Xml/entity-1.0.xsd">
+    <entity name="ce_travel_order_info">
+        <fields>
+            <text name="identifier_code" store-api-aware="true" />
+            <int name="number_of_travellers" store-api-aware="true" />
+            <boolean name="is_hotel" store-api-aware="true" />
+            <many-to-one name="hotel" store-api-aware="true" reference="product" on-delete="cascade"/>
+            <boolean name="is_transfer" store-api-aware="true" />
+            <many-to-one name="transfer" store-api-aware="true" reference="product" on-delete="cascade"/>
+            <one-to-many name="travellers" store-api-aware="true" reference="ce_traveller" on-delete="cascade"/>
+            <one-to-one name="flight_info" store-api-aware="true" reference="ce_flight_info" on-delete="cascade"/>
+            <text name="order_reference" store-api-aware="true" />
+            <one-to-one store-api-aware="true" name="order" reference="order" on-delete="cascade"/>
+        </fields>
+    </entity>
     <entity name="ce_traveller">
         <fields>
            <text name="name" store-api-aware="true" />
@@ -8,7 +22,6 @@
            <email name="email" store-api-aware="true" />
            <text name="phone" store-api-aware="true" />
            <text name="passport_number" store-api-aware="true" />
-           <many-to-one store-api-aware="true" name="order_id" reference="order" on-delete="cascade"/>
         </fields>
     </entity>
     <entity name="ce_flight_info">
@@ -19,9 +32,6 @@
             <text name="departure_airport" store-api-aware="true" />
             <text name="airline" store-api-aware="true" />
             <text name="flight_number" store-api-aware="true" />
-            <many-to-one store-api-aware="true" name="order_id" reference="order" on-delete="cascade"/>
         </fields>
     </entity>
-           
-
 </entities>

@@ -25,7 +25,7 @@ app.use(
   }),
 );
 app.route("/", SHOPWARE_ROUTE);
-app.route("/public/ewt-foundation", GLOBAL_ROUTE);
+app.route("/public/", GLOBAL_ROUTE);
 
 serve(app, (info) => {
   console.log(`Listening on http://localhost:${info.port}`);

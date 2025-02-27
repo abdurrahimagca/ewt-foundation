@@ -9,7 +9,6 @@ import {
 import { configureAppServer } from "@shopware-ag/app-server-sdk/integration/hono";
 import { BetterSqlite3Repository } from "@shopware-ag/app-server-sdk/integration/better-sqlite3";
 import * as dotenv from "dotenv";
-
 dotenv.config();
 const APP_NAME = process.env.APP_NAME;
 const APP_SECRET = process.env.APP_SECRET;
@@ -41,14 +40,12 @@ SHOPWARE_ROUTE.post("/app/ping", async () => {
 ///*** END OF  /app routes */
 
 //**CE ROUTES */
-import CE_TRAVELLER_ROUTE from "./ce_traveller.routes";
-import CE_FLIGHT_INFO_ROUTE from "./ce_flight_info.routes";
-
-SHOPWARE_ROUTE.route("/ewt-foundation/ce-traveller", CE_TRAVELLER_ROUTE);
-SHOPWARE_ROUTE.route("/ewt-foundation/ce-flight-info", CE_FLIGHT_INFO_ROUTE);
+import TRAVEL_ORDER_INFO from "./ce_travel_order_info.routes";
+SHOPWARE_ROUTE.route("/ce", TRAVEL_ORDER_INFO);
 //**END OF CE ROUTES */
 //***Admin Routes Expremential */
 import ADMIN_ROUTE from "./admin.routes";
+
 SHOPWARE_ROUTE.route("/app/admin", ADMIN_ROUTE);
 
 export default SHOPWARE_ROUTE;

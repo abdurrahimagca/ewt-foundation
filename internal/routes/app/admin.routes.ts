@@ -8,7 +8,7 @@ const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const ADMIN_ROUTES = new Hono();
-ADMIN_ROUTES.get("/index.html", async (c) => {
+ADMIN_ROUTES.get("/index", async (c) => {
   const html = fs.readFileSync(
     join(__dirname, "../../../views/main/index.html"),
   );
