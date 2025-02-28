@@ -89,7 +89,8 @@ jobs:
             cd ~/ewt-foundation || exit 1
 
             echo ">>> Pulling latest changes with rebase"
-            git pull --rebase
+            git fetch origin
+            git reset --hard origin/main
 
             echo ">>> Checking Docker status"
             docker-compose -f compose.yml ps
