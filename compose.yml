@@ -9,11 +9,13 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    ports:
-      - 3000:3000
+    expose:
+      - 3000
     volumes:
       - ./src/data:/app/src/data
     user: "1000:1000"
+    networks:
+      - traefik-public
     entrypoint: >
       /bin/sh -c "
         mkdir -p /app/src/data &&
@@ -29,3 +31,6 @@ services:
       traefik.http.routers.ewt-foundation.tls: "true"
       traefik.http.routers.ewt-foundation.tls.certresolver: "cloudflare"
       traefik.http.middlewares.ewt-foundation-headers.headers.sslredirect: "true"
+networks:
+  traefik-public:
+    external: true
