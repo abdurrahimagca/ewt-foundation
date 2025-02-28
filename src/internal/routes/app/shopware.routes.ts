@@ -27,7 +27,7 @@ declare module "hono" {
 configureAppServer(SHOPWARE_ROUTE, {
   appName: APP_NAME,
   appSecret: APP_SECRET,
-  shopRepository: new BetterSqlite3Repository("shopware.db"),
+  shopRepository: new BetterSqlite3Repository("src/data/shopware.db"),
   appIframeEnable: true,
 });
 

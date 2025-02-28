@@ -9,7 +9,7 @@ import { Criteria } from "@shopware-ag/app-server-sdk/helper/criteria";
 class CeTravelOrderInfoRepository extends EntityRepository<CeTravelOrderInfo> {
   private readonly repository: EntityRepository<CeTravelOrderInfo>;
   private readonly criteria: Criteria;
-  constructor(client: HttpClient, criteria) {
+  constructor(client: HttpClient, criteria: Criteria) {
     super(client, "ce_travel_order_info");
     this.repository = new EntityRepository<CeTravelOrderInfo>(
       client,

@@ -14,8 +14,14 @@ export const apiShopTransformMw = async (c: Context, next: Next) => {
         400,
       );
     }
+    console.log("shopId", shopId);
+    console.log("shopwareAppToken", shopwareAppToken);
+
     const app = c.get("app") as AppServer;
+    console.log("app", app);
+
     const shop = await app.repository.getShopById(shopId);
+    console.log("shop", shop);
     if (!shop) {
       return c.json({ error: "Shop not found" }, 404);
     }

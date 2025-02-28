@@ -10,11 +10,11 @@ if (location.is("ce-traveller-view-tab-card")) {
       .then((order) => {
         // Başlık ve Order ID Bilgisi
         document.body.innerHTML = `
-        <div style="font-family: Arial, sans-serif; padding: 20px;">
-          <h2 style="color: #142432; margin-bottom: 20px;">Travel Order Information</h2>
-          <div style="background: #f8f9fa; padding: 15px; border-radius: 8px;">
-            <p style="color: #6c757d; margin: 0;">Order Reference</p>
-            <p style="font-weight: bold; margin: 5px 0 15px 0;">#${order.id}</p>
+        <div class="container">
+          <h2 class="title">Travel Order Information</h2>
+          <div class="order-reference">
+            <p class="info-label">Order Reference</p>
+            <p class="info-value">#${order.id}</p>
           </div>
         </div>`;
 
@@ -35,24 +35,24 @@ if (location.is("ce-traveller-view-tab-card")) {
 
               // Order Summary Bölümü
               document.body.innerHTML += `
-            <div style="background: white; border: 1px solid #e9ecef; border-radius: 8px; padding: 20px; margin-top: 20px;">
-              <h3 style="color: #142432; margin-bottom: 15px;">Order Summary</h3>
-              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+            <div class="info-card">
+              <h3 class="title">Order Summary</h3>
+              <div class="info-grid">
                 <div>
-                  <p style="color: #6c757d; margin: 0;">Identifier Code</p>
-                  <p style="font-weight: bold; margin: 5px 0;">${travelOrder.identifierCode}</p>
+                  <p class="info-label">Identifier Code</p>
+                  <p class="info-value">${travelOrder.identifierCode}</p>
                 </div>
                 <div>
-                  <p style="color: #6c757d; margin: 0;">Number of Travellers</p>
-                  <p style="font-weight: bold; margin: 5px 0;">${travelOrder.numberOfTravellers}</p>
+                  <p class="info-label">Number of Travellers</p>
+                  <p class="info-value">${travelOrder.numberOfTravellers}</p>
                 </div>
                 <div>
-                  <p style="color: #6c757d; margin: 0;">Hotel Included</p>
-                  <p style="font-weight: bold; margin: 5px 0;">${travelOrder.isHotel ? "Yes" : "No"}</p>
+                  <p class="info-label">Hotel Included</p>
+                  <p class="info-value">${travelOrder.isHotel ? "Yes" : "No"}</p>
                 </div>
                 <div>
-                  <p style="color: #6c757d; margin: 0;">Transfer Included</p>
-                  <p style="font-weight: bold; margin: 5px 0;">${travelOrder.isTransfer ? "Yes" : "No"}</p>
+                  <p class="info-label">Transfer Included</p>
+                  <p class="info-value">${travelOrder.isTransfer ? "Yes" : "No"}</p>
                 </div>
               </div>
             </div>
@@ -61,32 +61,32 @@ if (location.is("ce-traveller-view-tab-card")) {
               // Flight Information Bölümü
               if (travelOrder.flightInfo) {
                 document.body.innerHTML += `
-            <div style="background: white; border: 1px solid #e9ecef; border-radius: 8px; padding: 20px; margin-top: 20px;">
-              <h3 style="color: #142432; margin-bottom: 15px;">Flight Information</h3>
-              <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px;">
+            <div class="info-card">
+              <h3 class="title">Flight Information</h3>
+              <div class="info-grid">
                 <div>
-                  <p style="color: #6c757d; margin: 0;">Arrival Date</p>
-                  <p style="font-weight: bold; margin: 5px 0;">${new Date(travelOrder.flightInfo.arrivalDate).toLocaleDateString()}</p>
+                  <p class="info-label">Arrival Date</p>
+                  <p class="info-value">${new Date(travelOrder.flightInfo.arrivalDate).toLocaleDateString()}</p>
                 </div>
                 <div>
-                  <p style="color: #6c757d; margin: 0;">Return Date</p>
-                  <p style="font-weight: bold; margin: 5px 0;">${new Date(travelOrder.flightInfo.returnDate).toLocaleDateString()}</p>
+                  <p class="info-label">Return Date</p>
+                  <p class="info-value">${new Date(travelOrder.flightInfo.returnDate).toLocaleDateString()}</p>
                 </div>
                 <div>
-                  <p style="color: #6c757d; margin: 0;">Departure Airport</p>
-                  <p style="font-weight: bold; margin: 5px 0;">${travelOrder.flightInfo.departureAirport}</p>
+                  <p class="info-label">Departure Airport</p>
+                  <p class="info-value">${travelOrder.flightInfo.departureAirport}</p>
                 </div>
                 <div>
-                  <p style="color: #6c757d; margin: 0;">Arrival Airport</p>
-                  <p style="font-weight: bold; margin: 5px 0;">${travelOrder.flightInfo.arrivalAirport}</p>
+                  <p class="info-label">Arrival Airport</p>
+                  <p class="info-value">${travelOrder.flightInfo.arrivalAirport}</p>
                 </div>
                 <div>
-                  <p style="color: #6c757d; margin: 0;">Airline</p>
-                  <p style="font-weight: bold; margin: 5px 0;">${travelOrder.flightInfo.airline}</p>
+                  <p class="info-label">Airline</p>
+                  <p class="info-value">${travelOrder.flightInfo.airline}</p>
                 </div>
                 <div>
-                  <p style="color: #6c757d; margin: 0;">Flight Number</p>
-                  <p style="font-weight: bold; margin: 5px 0;">${travelOrder.flightInfo.flightNumber}</p>
+                  <p class="info-label">Flight Number</p>
+                  <p class="info-value">${travelOrder.flightInfo.flightNumber}</p>
                 </div>
               </div>
             </div>
@@ -96,32 +96,32 @@ if (location.is("ce-traveller-view-tab-card")) {
               // Traveller Information Bölümü
               if (travelOrder.travellers && travelOrder.travellers.length > 0) {
                 document.body.innerHTML += `
-            <div style="background: white; border: 1px solid #e9ecef; border-radius: 8px; padding: 20px; margin-top: 20px;">
-              <h3 style="color: #142432; margin-bottom: 15px;">Traveller Information</h3>
+            <div class="info-card">
+              <h3 class="title">Traveller Information</h3>
             `;
 
                 travelOrder.travellers.forEach((traveller) => {
                   document.body.innerHTML += `
-                <div style="display: grid; grid-template-columns: repeat(2, 1fr); gap: 15px; border-bottom: 1px solid #e9ecef; padding-bottom: 10px; margin-bottom: 10px;">
+                <div class="traveller-item">
                   <div>
-                    <p style="color: #6c757d; margin: 0;">Full Name</p>
-                    <p style="font-weight: bold; margin: 5px 0;">${traveller.name} ${traveller.surname}</p>
+                    <p class="info-label">Full Name</p>
+                    <p class="info-value">${traveller.name} ${traveller.surname}</p>
                   </div>
                   <div>
-                    <p style="color: #6c757d; margin: 0;">Email Address</p>
-                    <p style="font-weight: bold; margin: 5px 0;">${traveller.email}</p>
+                    <p class="info-label">Email Address</p>
+                    <p class="info-value">${traveller.email}</p>
                   </div>
                   <div>
-                    <p style="color: #6c757d; margin: 0;">Phone Number</p>
-                    <p style="font-weight: bold; margin: 5px 0;">${traveller.phone}</p>
+                    <p class="info-label">Phone Number</p>
+                    <p class="info-value">${traveller.phone}</p>
                   </div>
                   <div>
-                    <p style="color: #6c757d; margin: 0;">Passport Number</p>
-                    <p style="font-weight: bold; margin: 5px 0;">${traveller.passportNumber}</p>
+                    <p class="info-label">Passport Number</p>
+                    <p class="info-value">${traveller.passportNumber}</p>
                   </div>
                   <div>
-                    <p style="color: #6c757d; margin: 0;">Birth Date</p>
-                    <p style="font-weight: bold; margin: 5px 0;">${new Date(traveller.birthdate).toLocaleDateString()}</p>
+                    <p class="info-label">Birth Date</p>
+                    <p class="info-value">${new Date(traveller.birthdate).toLocaleDateString()}</p>
                   </div>
                 </div>
               `;
@@ -132,7 +132,7 @@ if (location.is("ce-traveller-view-tab-card")) {
             } else {
               console.error("No travel order found for this order");
               document.body.innerHTML += `
-                    <div style="padding: 20px; color: red;">
+                    <div class="error-message">
                       No travel order information found for this order.
                     </div>
                   `;

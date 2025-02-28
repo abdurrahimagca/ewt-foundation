@@ -21,7 +21,7 @@ app.use("*", cors());
 app.use(
   "*",
   cors({
-    origin: process.env.NODE_ENV === "development" ? "*" : "https://ewt-foundation.homelab-kaleici.space",
+    origin: "*",
     allowMethods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowHeaders: [
       "Content-Type",
@@ -39,10 +39,6 @@ app.route("/", SHOPWARE_ROUTE);
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || "0.0.0.0";
 
-
-serve(
-  app,
-  () => {
-    console.log(`Server running at http://${HOST}:${PORT}`);
-  },
-);
+serve(app, () => {
+  console.log(`Server running at http://${HOST}:${PORT}`);
+});
