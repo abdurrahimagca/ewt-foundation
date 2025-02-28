@@ -12,7 +12,7 @@ services:
     expose:
       - 3000
     volumes:
-      - ./dist/src/data:/app/dist/src/data
+      - ./src/data:/app/src/data
     user: "1000:1000"
     networks:
       - traefik-public

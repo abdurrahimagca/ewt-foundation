@@ -60,8 +60,8 @@ RUN apt-get update && apt-get install -y \
 RUN groupadd -r appgroup && useradd -r -g appgroup appuser
 
 # Create necessary directories
-RUN mkdir -p /app/dist/src/data && \
-    chown -R appuser:appgroup /app/dist/src/data
+RUN mkdir -p /app/src/data && \
+    chown -R appuser:appgroup /app/src/data
 
 # Create and set permissions for .npm cache directory
 RUN mkdir -p /home/appuser/.npm && \
