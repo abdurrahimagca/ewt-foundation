@@ -80,25 +80,38 @@ jobs:
           SSH_IP: ${{ secrets.SSH_IP }}
         run: |
           set -e
+
+          echo ">>> Connecting to server and deploying application"
           ssh -o StrictHostKeyChecking=no $SSH_USER@$SSH_IP << EOF
+            set -e
+
+            echo ">>> Navigating to project directory"
             cd ~/ewt-foundation || exit 1
 
-            # Login to GitHub Container Registry
+            echo ">>> Pulling latest changes with rebase"
+            git pull --rebase
+
+            echo ">>> Checking Docker status"
+            docker-compose -f compose.yml ps
+
+            echo ">>> Logging into GitHub Container Registry"
             echo "${GH_TOKEN}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
-            # Pull the latest image
-            docker compose pull
+            echo ">>> Pulling the latest Docker image"
+            docker-compose -f compose.yml pull
 
-            # Stop existing containers
-            docker compose down
+            echo ">>> Stopping existing containers"
+            docker-compose -f compose.yml down
 
-            # Remove old containers and clear cache
+            echo ">>> Pruning unused Docker resources"
             docker system prune -af
 
-            # Start service
-            docker compose up -d
+            echo ">>> Starting containers with the latest image"
+            docker-compose -f compose.yml up -d
 
-            # Verify deployment
-            docker compose ps
-            docker compose logs --tail=50
+            echo ">>> Checking running containers"
+            docker-compose -f compose.yml ps
+
+            echo ">>> Showing recent logs"
+            docker-compose -f compose.yml logs --tail=50
           EOF
