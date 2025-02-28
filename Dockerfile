@@ -1,41 +1,48 @@
 # Build stage
 FROM node:22-bullseye-slim AS builder
 
+# Set the working directory
 WORKDIR /app
 
-# Install dependencies for better-sqlite3 compatibility
+# Install dependencies for better-sqlite3 compatibility in one layer
 RUN apt-get update && apt-get install -y \
-  python3 \
-  make \
-  g++ \
-  gcc \
-  musl-dev \
-  libstdc++6 \
-  sqlite3 \
-  libgcc-s1
+    python3 \
+    make \
+    g++ \
+    gcc \
+    musl-dev \
+    libstdc++6 \
+    sqlite3 \
+    libgcc-s1 \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
 # Create a non-root user and set permissions
 RUN groupadd -r appgroup && useradd -r -g appgroup appuser && \
-    mkdir -p /home/appuser && \
+    mkdir -p /home/appuser/.npm && \
     chown -R appuser:appgroup /home/appuser && \
-    chown appuser:appgroup /app
+    chown -R appuser:appgroup /app
 
 # Switch to non-root user
 USER appuser
 
-# Copy package files
-COPY package*.json ./
+# Set npm cache directory to avoid permission issues
+ENV NPM_CONFIG_CACHE=/home/appuser/.npm
 
-# Install dependencies
-RUN npm install --legacy-peer-deps && \
+# Copy package files and install dependencies
+COPY --chown=appuser:appgroup package*.json ./
+COPY --chown=appuser:appgroup vite.config.js ./
+
+# Install dependencies and rebuild better-sqlite3
+RUN npm ci --legacy-peer-deps --frozen-lockfile --no-cache && \
     npm rebuild better-sqlite3 --build-from-source
 
-# Copy source code with correct ownership
+# Copy source code
 COPY --chown=appuser:appgroup ./src ./src
+COPY --chown=appuser:appgroup index.ts ./
 COPY --chown=appuser:appgroup tsconfig.json ./
 COPY --chown=appuser:appgroup .env* ./
 
-# Build the application
+# Build frontend and backend
 RUN npm run build
 
 # Production stage
@@ -43,28 +50,40 @@ FROM node:22-bullseye-slim
 
 WORKDIR /app
 
-# Install only production dependencies
+# Install only the necessary production dependencies
 RUN apt-get update && apt-get install -y \
-  sqlite3 \
-  libstdc++6 \
-  libgcc-s1
+    sqlite3 \
+    libstdc++6 \
+    && apt-get clean && rm -rf /var/lib/apt/lists/*
 
-# Create a non-root user
-RUN groupadd -r appgroup && useradd -r -g appgroup appuser && \
-    mkdir -p /home/appuser && \
-    chown -R appuser:appgroup /home/appuser && \
-    chown appuser:appgroup /app
+# Create and use non-root user
+RUN groupadd -r appgroup && useradd -r -g appgroup appuser
 
-# Copy only necessary files from builder
+# Create necessary directories
+RUN mkdir -p /app/src/data && \
+    chown -R appuser:appgroup /app/src/data
+
+# Create and set permissions for .npm cache directory
+RUN mkdir -p /home/appuser/.npm && \
+    chown -R appuser:appgroup /home/appuser/.npm
+
+# Set the correct ownership for /app
+RUN chown -R appuser:appgroup /app
+
+# Copy only the necessary files from builder stage
 COPY --from=builder --chown=appuser:appgroup /app/dist ./dist
-COPY --from=builder --chown=appuser:appgroup /app/node_modules ./node_modules
+COPY --from=builder --chown=appuser:appgroup /app/html ./html
 COPY --from=builder --chown=appuser:appgroup /app/package*.json ./
+COPY --from=builder --chown=appuser:appgroup /app/.env ./
+
+# Set npm cache directory to avoid permission issues
+ENV NPM_CONFIG_CACHE=/home/appuser/.npm
 
 # Switch to non-root user
 USER appuser
 
-# Set production environment
-ENV NODE_ENV=production
+# Install only production dependencies
+RUN npm ci --only=production --legacy-peer-deps
 
-# Start the application
-CMD ["npm", "run", "build"]
+# Run the application
+CMD ["node", "dist/index.js"]

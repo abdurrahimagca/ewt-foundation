@@ -7,17 +7,16 @@ services:
     build:
       context: .
       dockerfile: Dockerfile
-    expose:
-      - 3000
+    ports:
+      - 3000:3000
+    volumes:
+      - ./src/data:/app/src/data
     command: ["node", "dist/index.js"]
-    labels:
-      - "traefik.enable=true"
-      - "traefik.http.routers.app.entrypoints=websecure"
-      - "traefik.http.routers.app.tls.certresolver=cloudflare"
-      - "traefik.http.routers.app.rule=Host(`ewt-foundation.homelab-kaleici.space`)"
-      - "traefik.http.routers.app.tls=true"
-      - "traefik.http.routers.app.service=app"
-      - "traefik.http.services.app.loadbalancer.server.port=3000"
-      - "traefik.http.middlewares.app-headers.headers.customrequestheaders.X-Forwarded-Proto=https"
-      - "traefik.http.middlewares.app-headers.headers.customrequestheaders.X-Origin=ewt-foundation.homelab-kaleici.space"
-      - "traefik.http.routers.app.middlewares=app-headers"
+  labels:
+    - "traefik.enable=true"
+    - "traefik.http.routers.ewt-foundation.rule=Host(`ewt-foundation.homelab-kaleici.space`)"
+    - "traefik.http.routers.ewt-foundation.entrypoints=websecure"
+    - "traefik.http.services.ewt-foundation.loadbalancer.server.port=3000"
+    - "traefik.http.routers.ewt-foundation.tls=true"
+    - "traefik.http.routers.ewt-foundation.tls.certresolver=cloudflare"
+    - "traefik.http.middlewares.ewt-foundation-headers.headers.sslredirect=true"
