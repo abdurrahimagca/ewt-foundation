@@ -7,6 +7,13 @@ import { cors } from "hono/cors";
 import { AddressInfo } from "node:net";
 
 const app = new Hono();
+
+// Debug middleware for main app
+app.use("*", async (c, next) => {
+  console.log("Main app handling path:", c.req.path);
+  await next();
+});
+
 if (process.env.NODE_ENV === "development") {
   app.use(logger());
 }
@@ -27,18 +34,15 @@ app.use(
     ],
   }),
 );
+app.route("/public", GLOBAL_ROUTE);
 app.route("/", SHOPWARE_ROUTE);
-app.route("/public/", GLOBAL_ROUTE);
 const PORT = process.env.PORT || 3000;
 const HOST = process.env.HOST || "0.0.0.0";
-const INFO = {
-  address: HOST,
-  port: PORT,
-};
+
 
 serve(
   app,
-  (INFO) => {
-    console.log(`Listening on ${INFO.address}:${INFO.port}`);
+  () => {
+    console.log(`Server running at http://${HOST}:${PORT}`);
   },
 );

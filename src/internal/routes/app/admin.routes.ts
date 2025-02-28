@@ -1,20 +1,31 @@
 import { Hono } from "hono";
-import fs from "fs";
+import { serveStatic } from "@hono/node-server/serve-static";
 import { join } from "path";
 import { fileURLToPath } from "url";
 import { dirname } from "path";
+import fs from "fs";
 
 const __filename = fileURLToPath(import.meta.url);
 const __dirname = dirname(__filename);
 
 const ADMIN_ROUTES = new Hono();
-ADMIN_ROUTES.get("/index", async (c) => {
-  const html = fs.readFileSync(
-    join(__dirname, "../../../views/main/index.html"),
-  );
-  if (!html) {
-    return c.html("<h1>404</h1>", 404);
+
+// Tüm Klasörü Statik Olarak Sunma
+ADMIN_ROUTES.use(
+  "/assets/*",
+  serveStatic({ root: join(__dirname, "../../../frontend/dist/assets") }),
+);
+
+// Query Parametreleri ile Gelen İstekleri index.html'ye Yönlendirme
+ADMIN_ROUTES.get("/*", (c) => {
+  const htmlPath = join(__dirname, "../../../frontend/dist/index.html");
+
+  if (fs.existsSync(htmlPath)) {
+    const html = fs.readFileSync(htmlPath);
+    return c.html(html.toString());
+  } else {
+    return c.html("<h1>404 - Page Not Found</h1>", 404);
   }
-  return c.html(html.toString());
 });
+
 export default ADMIN_ROUTES;

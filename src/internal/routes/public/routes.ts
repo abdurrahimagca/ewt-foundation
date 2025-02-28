@@ -1,10 +1,5 @@
 import { Hono } from "hono";
-import fs from "fs";
-import { fileURLToPath } from "url";
-import { dirname, join } from "path";
-const __filename = fileURLToPath(import.meta.url);
-const __dirname = dirname(__filename);
-
+import { serveStatic } from "@hono/node-server/serve-static";
 const GLOBAL_ROUTE = new Hono();
 
 GLOBAL_ROUTE.get("/ping", (c) => {
@@ -12,15 +7,18 @@ GLOBAL_ROUTE.get("/ping", (c) => {
     message: "pong",
   });
 });
-
-GLOBAL_ROUTE.get("/index", async (c) => {
-  const html = fs.readFileSync(
-    join(__dirname, "../../../views/main/index.html"),
-  );
-  if (!html) {
-    return c.html("<h1>404</h1>", 404);
-  }
-  return c.html(html.toString());
+GLOBAL_ROUTE.get("/page/ping", (c) => {
+  return c.json({
+    message: "pong",
+  });
 });
+
+GLOBAL_ROUTE.use(
+  "/frontend/*",
+  serveStatic({
+    root: "html",
+    rewriteRequestPath: (path) => path.replace(/^\/public\/frontend/, ""),
+  })
+);
 
 export default GLOBAL_ROUTE;
