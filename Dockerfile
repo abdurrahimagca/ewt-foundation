@@ -74,7 +74,6 @@ RUN chown -R appuser:appgroup /app
 COPY --from=builder --chown=appuser:appgroup /app/dist ./dist
 COPY --from=builder --chown=appuser:appgroup /app/html ./html
 COPY --from=builder --chown=appuser:appgroup /app/package*.json ./
-COPY --from=builder --chown=appuser:appgroup /app/.env ./
 
 # Set npm cache directory to avoid permission issues
 ENV NPM_CONFIG_CACHE=/home/appuser/.npm

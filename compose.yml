@@ -4,6 +4,8 @@ services:
       - NODE_ENV=production
       - PORT=3000
       - HOST=0.0.0.0
+    env_file:
+      - .env
     build:
       context: .
       dockerfile: Dockerfile
