@@ -12,11 +12,11 @@ services:
     volumes:
       - ./src/data:/app/src/data
     command: ["node", "dist/index.js"]
-  labels:
-    - "traefik.enable=true"
-    - "traefik.http.routers.ewt-foundation.rule=Host(`ewt-foundation.homelab-kaleici.space`)"
-    - "traefik.http.routers.ewt-foundation.entrypoints=websecure"
-    - "traefik.http.services.ewt-foundation.loadbalancer.server.port=3000"
-    - "traefik.http.routers.ewt-foundation.tls=true"
-    - "traefik.http.routers.ewt-foundation.tls.certresolver=cloudflare"
-    - "traefik.http.middlewares.ewt-foundation-headers.headers.sslredirect=true"
+    labels:
+      traefik.enable: "true"
+      traefik.http.routers.ewt-foundation.rule: "Host(`ewt-foundation.homelab-kaleici.space`)"
+      traefik.http.routers.ewt-foundation.entrypoints: "websecure"
+      traefik.http.services.ewt-foundation.loadbalancer.server.port: "3000"
+      traefik.http.routers.ewt-foundation.tls: "true"
+      traefik.http.routers.ewt-foundation.tls.certresolver: "cloudflare"
+      traefik.http.middlewares.ewt-foundation-headers.headers.sslredirect: "true"
