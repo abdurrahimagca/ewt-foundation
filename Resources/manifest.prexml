@@ -15,7 +15,7 @@
     </setup>
     <webhooks>
         <webhook name="appActivate" url="{{base_url}}/app/activate" event="app.activated"/>
-        <webhook name="appDeactivated" url="{{base_url}/app/deactivate" event="app.deactivated"/>
+        <webhook name="appDeactivated" url="{{base_url}}/app/deactivate" event="app.deactivated"/>
         <webhook name="appDelete" url="{{base_url}}/app/delete" event="app.deleted"/>
     </webhooks>
     <admin>
