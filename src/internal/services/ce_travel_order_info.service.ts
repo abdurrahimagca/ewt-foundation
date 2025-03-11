@@ -20,18 +20,18 @@ class CeTravelOrderInfoService {
     });
     criteria.addAssociation("travellers");
     criteria.addAssociation("flightInfo");
-    criteria.addAssociation("hotel");
-    criteria.addAssociation("transfer");
     const repository = new CeTravelOrderInfoRepository(this.client, criteria);
     const result = await repository.searchOrderTravelInfo();
     return result.data;
   }
   async createOrderTravelInfoService(data: CeTravelOrderInfo[]): Promise<void> {
+    data.forEach((item) => {
+      item.identifierCode = `EWT${item.orderId.slice(0, 8)}`;
+    });
     const repository = new CeTravelOrderInfoRepository(
       this.client,
       new Criteria(),
     );
-
     await repository.createOrderTravelInfo(data);
   }
 }

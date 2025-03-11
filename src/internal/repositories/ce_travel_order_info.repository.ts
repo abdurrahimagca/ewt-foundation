@@ -23,7 +23,7 @@ class CeTravelOrderInfoRepository extends EntityRepository<CeTravelOrderInfo> {
     return await this.repository.search(this.criteria);
   }
   async createOrderTravelInfo(data: CeTravelOrderInfo[]): Promise<void> {
-    return await this.repository.upsert(data);
+    await this.repository.upsert(data);
   }
   async updateOrderTravelInfo(data: CeTravelOrderInfo): Promise<void> {
     return await this.repository.upsert([data]);

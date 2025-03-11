@@ -41,19 +41,7 @@ if (location.is("ce-traveller-view-tab-card")) {
                 <div>
                   <p class="info-label">Identifier Code</p>
                   <p class="info-value">${travelOrder.identifierCode}</p>
-                </div>
-                <div>
-                  <p class="info-label">Number of Travellers</p>
-                  <p class="info-value">${travelOrder.numberOfTravellers}</p>
-                </div>
-                <div>
-                  <p class="info-label">Hotel Included</p>
-                  <p class="info-value">${travelOrder.isHotel ? "Yes" : "No"}</p>
-                </div>
-                <div>
-                  <p class="info-label">Transfer Included</p>
-                  <p class="info-value">${travelOrder.isTransfer ? "Yes" : "No"}</p>
-                </div>
+                </div> 
               </div>
             </div>
           `;

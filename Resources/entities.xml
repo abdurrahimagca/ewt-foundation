@@ -3,14 +3,8 @@
     <entity name="ce_travel_order_info">
         <fields>
             <text name="identifier_code" store-api-aware="true" />
-            <int name="number_of_travellers" store-api-aware="true" />
-            <boolean name="is_hotel" store-api-aware="true" />
-            <many-to-one name="hotel" store-api-aware="true" reference="product" on-delete="cascade"/>
-            <boolean name="is_transfer" store-api-aware="true" />
-            <many-to-one name="transfer" store-api-aware="true" reference="product" on-delete="cascade"/>
             <one-to-many name="travellers" store-api-aware="true" reference="ce_traveller" on-delete="cascade"/>
-            <one-to-one name="flight_info" store-api-aware="true" reference="ce_flight_info" on-delete="cascade"/>
-            <text name="order_reference" store-api-aware="true" />
+            <one-to-one name="flight_info" store-api-aware="true" reference="ce_flight_info" on-delete="cascade"/> 
             <one-to-one store-api-aware="true" name="order" reference="order" on-delete="cascade"/>
         </fields>
     </entity>

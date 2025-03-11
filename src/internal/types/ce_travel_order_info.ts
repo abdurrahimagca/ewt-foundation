@@ -44,12 +44,7 @@ export const ceFlightInfoSchema = z.object({
 
 // CeTravelOrderInfo Schema
 export const ceTravelOrderInfoSchema = z.object({
-  identifierCode: z.string().min(1, "Identifier code is required"),
-  numberOfTravellers: z.number().min(1, "At least one traveller is required"),
-  isHotel: z.boolean(),
-  hotelId: z.optional(shopwareId),
-  isTransfer: z.boolean(),
-  transfer: z.optional(shopwareId),
+  identifierCode: z.string().optional(),
   travellers: z.array(ceTravellerSchema),
   flightInfo: z.optional(ceFlightInfoSchema),
   orderId: shopwareId,
