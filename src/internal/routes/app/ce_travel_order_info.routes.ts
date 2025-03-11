@@ -26,28 +26,42 @@ TRAVEL_ORDER_INFO.get("/travel-order-info/:orderId", async (c) => {
 });
 
 TRAVEL_ORDER_INFO.post("/travel-order-info", async (c) => {
-  const shop = c.get("shop");
-  const body = await c.req.json();
-  const result = ceTravelOrderInfoSchema.safeParse(body);
-  if (!result.success) {
+  try {
+    const shop = c.get("shop");
+    const body = await c.req.json();
+
+    const result = ceTravelOrderInfoSchema.safeParse(body);
+    if (!result.success) {
+      return c.json(
+        {
+          error: "Invalid request body",
+          details: result.error.flatten(), // Hataları daha detaylı göster
+        },
+        400,
+      );
+    }
+
+    await new CeTravelOrderInfoService(shop).createOrderTravelInfoService([
+      result.data,
+    ]);
+
     return c.json(
       {
-        error: "Invalid request body",
-        "error occurred cause of": result.error,
+        message: "Travel order info created successfully",
+        status: 201,
       },
-      400,
+      201,
+    );
+  } catch (error) {
+    console.error("Error in /travel-order-info:", error);
+    return c.json(
+      {
+        error: "Internal server error",
+        details: error instanceof Error ? error.message : "Unknown error",
+      },
+      500,
     );
   }
-
-  await new CeTravelOrderInfoService(shop).createOrderTravelInfoService([
-    result.data,
-  ]);
-  return c.json(
-    {
-      message: "Travel order info created successfully",
-      status: 201,
-    },
-    201,
-  );
 });
+
 export default TRAVEL_ORDER_INFO;

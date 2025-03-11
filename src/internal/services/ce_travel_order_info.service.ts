@@ -33,6 +33,7 @@ class CeTravelOrderInfoService {
       new Criteria(),
     );
     await repository.createOrderTravelInfo(data);
+    
   }
 }
 export default CeTravelOrderInfoService;
