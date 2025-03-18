@@ -13,11 +13,15 @@ import {
   CeTravelOrderInfo,
   ceTravelOrderInfoSchema,
 } from "../../internal/types/ce_travel_order_info";
+import { merge } from "lodash";
 
 const orderId = ref<string | undefined>(undefined);
 const error = ref<string | undefined>(undefined);
 const isLoading = ref<boolean>(false);
 const travelOrderInfo = ref<CeTravelOrderInfo[] | undefined>(undefined);
+const entity = ref<EntityCollection<"ce_travel_order_info"> | null | undefined>(
+  undefined,
+);
 
 onMounted(async () => {
   try {
@@ -45,13 +49,13 @@ onMounted(async () => {
     criteria.addAssociation("bundleInfo.rooms");
     criteria.addAssociation("bundleInfo.additionalProducts");
 
-    const resultOfEntitySearch = await repo.search(criteria);
-    if (resultOfEntitySearch === null) {
+    entity.value = await repo.search(criteria);
+    if (entity.value === null) {
       throw new Error("no data found");
     }
     const parseResult = z
       .array(ceTravelOrderInfoSchema)
-      .safeParse(resultOfEntitySearch);
+      .safeParse(entity.value);
     if (!parseResult.success) {
       error.value = JSON.stringify(parseResult.error, null, 2);
       throw new Error("Invalid data");
@@ -66,30 +70,8 @@ onMounted(async () => {
   }
 });
 
-function isEntityCollection(
-  value: any,
-): value is EntityCollection<"ce_travel_order_info"> {
-  return (
-    value && value.entity && value.source && value.context && value.criteria
-  );
-}
-
 async function upsertUpdatedData() {
-  if (
-    !travelOrderInfo.value ||
-    !orderId.value ||
-    travelOrderInfo.value.length === 0 ||
-    error.value
-  ) {
-    return;
-  }
-
-  if (!isEntityCollection(travelOrderInfo.value)) {
-    throw new Error("Invalid travel order info data");
-  }
-
-  const repo = data.repository("ce_travel_order_info");
-  await repo.saveAll(travelOrderInfo.value);
+  console.log("travelOrderInfo.value", travelOrderInfo.value);
 }
 </script>
 
@@ -128,7 +110,14 @@ async function upsertUpdatedData() {
         <!-- Flight Information -->
         <div class="section" v-if="travelOrderData.flightInfo">
           <h3>Flight Details</h3>
-          <FlightCard :flight-info="travelOrderData.flightInfo" />
+          <FlightCard
+            :flight-info="travelOrderData.flightInfo"
+            @update="
+              (updatedFlightInfo) =>
+                (travelOrderData.flightInfo = updatedFlightInfo)
+                
+            "
+          />
         </div>
 
         <!-- Bundle Information -->
@@ -136,6 +125,9 @@ async function upsertUpdatedData() {
           <h3>Bundle Information</h3>
           <BundleInfo :bundleInfo="travelOrderData.bundleInfo" />
         </div>
+
+        <!-- Save Button -->
+        <button @click="upsertUpdatedData">Save Changes</button>
       </div>
     </template>
   </div>

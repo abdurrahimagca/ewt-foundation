@@ -1,26 +1,53 @@
 <script lang="ts" setup>
-import { defineProps } from "vue";
+import { defineProps, defineEmits, reactive, watch } from "vue";
 import { CeTravelOrderInfo } from "../../../internal/types/ce_travel_order_info";
 
 const props = defineProps<{
   flightInfo: NonNullable<CeTravelOrderInfo["flightInfo"]>;
 }>();
+
+const emit = defineEmits(["update"]);
+
+// flightInfo'yu reactive nesne olarak oluştur
+const localFlightInfo = reactive({ ...props.flightInfo });
+
+watch(
+  () => props.flightInfo,
+  (newValue) => {
+    Object.assign(localFlightInfo, newValue);
+  },
+  { deep: true, immediate: true },
+);
+
+watch(
+  localFlightInfo,
+  (newValue) => {
+    emit("update", { ...newValue });
+  },
+  { deep: true },
+);
 </script>
 
 <template>
   <div class="flight-card">
-    <p><strong>Airline:</strong> {{ flightInfo.airline }}</p>
-    <p><strong>Flight Number:</strong> {{ flightInfo.flightNumber }}</p>
+    <div>
+      <label><strong>Airline:</strong></label>
+      <input v-model="localFlightInfo.airline" />
+    </div>
+    <div>
+      <label><strong>Flight Number:</strong></label>
+      <input v-model="localFlightInfo.flightNumber" />
+    </div>
     <div class="flight-dates">
       <div class="flight-date">
-        <p><strong>Departure:</strong></p>
-        <p>{{ flightInfo.departureAirport }}</p>
-        <p>{{ flightInfo.returnDate }}</p>
+        <label><strong>Departure:</strong></label>
+        <input v-model="localFlightInfo.departureAirport" />
+        <input type="text" v-model="localFlightInfo.arrivalDate" />
       </div>
       <div class="flight-date">
-        <p><strong>Return:</strong></p>
-        <p>{{ flightInfo.arrivalAirport }}</p>
-        <p>{{ flightInfo.arrivalDate }}</p>
+        <label><strong>Return:</strong></label>
+        <input v-model="localFlightInfo.arrivalAirport" />
+        <input type="text" v-model="localFlightInfo.returnDate" />
       </div>
     </div>
   </div>
@@ -43,5 +70,13 @@ const props = defineProps<{
 
 .flight-date {
   text-align: center;
+}
+
+input {
+  width: 100%;
+  padding: 8px;
+  margin-top: 4px;
+  border: 1px solid #ccc;
+  border-radius: 4px;
 }
 </style>
