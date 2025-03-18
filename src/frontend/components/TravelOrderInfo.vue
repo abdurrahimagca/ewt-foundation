@@ -76,95 +76,189 @@ async function upsertUpdatedData() {
 
 <template>
   <div class="travel-order-container">
-    <h2>Travel Order Info</h2>
-    <button @click="upsertUpdatedData" class="save-button">Save Changes</button>
-  </div>
-  <div v-if="isLoading" class="loading">Loading...</div>
-  <div v-if="error" class="error">{{ error }}</div>
-  <div v-if="entityData" class="section">
-    <h3>Identifier Code:</h3>
-    <p>{{ entityData.identifierCode }}</p>
-    <GenericInfoDisplay :data="entityData.genericInfo" title="Metadata" />
-    <h3>Travellers</h3>
-    <TravellerCard :traveller="entityData.travellers" />
-    <div v-if="entityData.flightInfo">
-      <h3>Flight Info</h3>
-      <FlightCard :flightInfo="entityData.flightInfo" />
+    <div class="header">
+      <h2>Travel Order Info</h2>
     </div>
-    <div v-if="entityData.bundleInfo">
-      <h3>Bundle Info</h3>
-      <BundleInfo :bundleInfo="entityData.bundleInfo" />
+
+    <div v-if="isLoading" class="status-message loading">
+      <span class="loading-spinner">⌛</span> Loading...
+    </div>
+
+    <div v-if="error" class="status-message error">
+      <span class="error-icon">⚠️</span>
+      {{ error }}
+    </div>
+
+    <div v-if="entityData" class="content">
+      <div class="info-card">
+        <h3>Identifier Code</h3>
+        <p class="identifier-code">{{ entityData.identifierCode }}</p>
+      </div>
+
+      <div class="info-card">
+        <GenericInfoDisplay :data="entityData.genericInfo" title="Metadata" />
+      </div>
+
+      <div class="info-section">
+        <h3>Travellers</h3>
+        <TravellerCard :traveller="entityData.travellers" />
+      </div>
+
+      <div v-if="entityData.flightInfo" class="info-section">
+        <h3>Flight Info</h3>
+        <FlightCard :flightInfo="entityData.flightInfo" />
+      </div>
+
+      <div v-if="entityData.bundleInfo" class="info-section">
+        <h3>Bundle Info</h3>
+        <BundleInfo :bundleInfo="entityData.bundleInfo" />
+      </div>
+      <button @click="upsertUpdatedData" class="save-button">
+        <span class="save-icon">💾</span>
+        Save Changes
+      </button>
     </div>
   </div>
 </template>
 
 <style scoped>
 .travel-order-container {
-  padding: 20px;
+  padding: 24px;
   max-width: 1200px;
   margin: 0 auto;
+  background-color: #f8f9fa;
+  height: auto;
+  border-radius: 12px;
 }
 
-.section {
+.header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   margin-bottom: 24px;
+  padding-bottom: 16px;
+  border-bottom: 1px solid #e1e1e1;
 }
 
 h2 {
   color: #2c3e50;
-  margin-bottom: 16px;
+  margin: 0;
+  font-size: 1.75rem;
+  font-weight: 600;
 }
 
 h3 {
   color: #2c3e50;
-  margin-bottom: 16px;
+  margin: 0 0 16px 0;
+  font-size: 1.25rem;
+  font-weight: 600;
+}
+
+.save-button {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  background-color: #4a90e2;
+  color: white;
+  padding: 10px 20px;
+  border: none;
+  border-radius: 8px;
+  cursor: pointer;
+  font-size: 0.95rem;
+  font-weight: 500;
+  transition: all 0.3s ease;
+}
+
+.save-button:hover {
+  background-color: #357abd;
+  transform: translateY(-1px);
+}
+
+.save-icon {
+  font-size: 1.1rem;
+}
+
+.status-message {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  padding: 16px;
+  border-radius: 8px;
+  margin-bottom: 24px;
+  font-weight: 500;
 }
 
 .loading {
-  text-align: center;
-  padding: 20px;
+  background-color: #e3f2fd;
+  color: #1976d2;
 }
 
 .error {
-  color: #dc3545;
-  padding: 20px;
-  background: #fff;
-  border-radius: 8px;
-  text-align: center;
+  background-color: #ffebee;
+  color: #d32f2f;
 }
 
-.no-order {
-  text-align: center;
-  padding: 20px;
+.loading-spinner {
+  animation: spin 1s linear infinite;
 }
 
-.identifier {
-  color: #6c757d;
-  font-size: 0.9em;
+@keyframes spin {
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.content {
+  display: flex;
+  flex-direction: column;
+  gap: 24px;
+}
+
+.info-card {
+  background: #ffffff;
+  border-radius: 12px;
+  padding: 24px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+  border: 1px solid #f0f0f0;
+}
+
+.info-section {
+  background: transparent;
+  padding: 24px;
+  border-radius: 12px;
+}
+
+.identifier-code {
+  font-family: monospace;
+  font-size: 1.1rem;
+  color: #666;
+  margin: 8px 0 0 0;
+  padding: 8px 12px;
+  background: #f8f9fa;
+  border-radius: 6px;
+  display: inline-block;
 }
 
 .products-container {
   display: grid;
   grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-  gap: 16px;
+  gap: 20px;
 }
 
 @media (max-width: 768px) {
+  .travel-order-container {
+    padding: 16px;
+  }
+
+  .header {
+    flex-direction: column;
+    gap: 16px;
+    align-items: stretch;
+    text-align: center;
+  }
+
   .products-container {
     grid-template-columns: 1fr;
   }
-}
-
-.save-button {
-  background-color: #189eff;
-  color: white;
-  padding: 8px 16px;
-  border: none;
-  border-radius: 4px;
-  cursor: pointer;
-  margin-bottom: 16px;
-}
-
-.save-button:hover {
-  background-color: #0080ff;
 }
 </style>

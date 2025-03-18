@@ -62,10 +62,17 @@ const formatDateForSave = (dateString: string): string => {
 <style scoped>
 .traveller-card {
   background: #ffffff;
-  border-radius: 8px;
-  padding: 16px;
-  margin-bottom: 16px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  border-radius: 12px;
+  padding: 24px;
+  margin-bottom: 20px;
+  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
+  border: 1px solid #f0f0f0;
+  transition: all 0.3s ease;
+}
+
+.traveller-card:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
 }
 
 .traveller-info p {
@@ -73,38 +80,37 @@ const formatDateForSave = (dateString: string): string => {
 }
 
 .input-group {
-  margin-bottom: 12px;
+  margin-bottom: 16px;
 }
 
 .input-group label {
   display: block;
-  margin-bottom: 4px;
+  margin-bottom: 8px;
+  font-size: 0.9rem;
+  color: #666;
+  font-weight: 500;
 }
 
 input {
   width: 100%;
-  padding: 8px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
+  padding: 10px 12px;
+  border: 1px solid #e1e1e1;
+  border-radius: 8px;
   font-size: 14px;
+  transition: all 0.3s ease;
+  background-color: #f8f9fa;
 }
 
 input:focus {
   outline: none;
-  border-color: #189eff;
+  border-color: #4a90e2;
+  background-color: #ffffff;
+  box-shadow: 0 0 0 3px rgba(74, 144, 226, 0.1);
 }
 
 input[type="datetime-local"] {
   width: 100%;
-  padding: 8px;
-  margin-top: 4px;
-  border: 1px solid #ddd;
-  border-radius: 4px;
-  font-size: 14px;
-}
-
-input[type="datetime-local"]:focus {
-  outline: none;
-  border-color: #189eff;
+  padding: 9px 12px;
+  color: #333;
 }
 </style>
