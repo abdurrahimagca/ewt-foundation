@@ -20,5 +20,5 @@
     "types": ["node"]
   },
   "include": ["src", "index.ts", ".env"],
-  "exclude": ["node_modules", "dist", "Resources", "frontend"]
+  "exclude": ["src/frontend", "node_modules", "dist", "Resources", "frontend"]
 }

@@ -4,11 +4,10 @@
     <entity name="ce_travel_order_info">
         <fields>
             <text name="identifier_code" store-api-aware="true" />
-            <json name="generic_info" store-api-aware="true" />
-            <one-to-many name="travellers" store-api-aware="true" reference="ce_traveller" on-delete="set-null"/>
-            <one-to-one name="flight_info" store-api-aware="true" reference="ce_flight_info" on-delete="set-null"/> 
-            <one-to-one store-api-aware="true" name="order" reference="order" on-delete="set-null"/>
-            <one-to-one name="bundle_info" store-api-aware="true" reference="ce_travel_order_bundle_info" on-delete="set-null"/>
+            <one-to-many name="travellers" store-api-aware="true" reference="ce_traveller" on-delete="cascade"/>
+            <one-to-one name="flight_info" store-api-aware="true" reference="ce_flight_info" on-delete="cascade"/> 
+            <one-to-one store-api-aware="true" name="order" reference="order" on-delete="cascade"/>
+            <one-to-one name="bundle_info" store-api-aware="true" reference="ce_travel_order_bundle_info" on-delete="cascade"/>
         </fields>
     </entity>
 
@@ -37,7 +36,7 @@
     <entity name="ce_travel_order_bundle_info">
         <fields>
             <one-to-many name="rooms" reference="ce_travel_order_bundle_info_room_selection" store-api-aware="true" on-delete="set-null" />
-            <one-to-many name="additional_products" reference="ce_additional_generic_product_info" store-api-aware="true" on-delete="set-null" />
+            <one-to-many name="additional_products" reference="product" store-api-aware="true" on-delete="set-null" />
         </fields>
     </entity>
 
@@ -50,28 +49,19 @@
         </fields>
     </entity>
 
-    <entity name="ce_additional_generic_product_info">
-        <fields>
-                <text name="product_name" store-api-aware="true" />
-                <json name="additional_info" store-api-aware="true" />
-                <float name="product_price" store-api-aware="true" />
-                <int name="product_quantity" store-api-aware="true" />
-        </fields>
-    </entity>
-
     <entity name="ce_travel_product_config">
         <fields>
-            <one-to-one name="product" store-api-aware="true" reference="product" on-delete="set-null"/>
-            <one-to-many name="bundles" store-api-aware="true" reference="ce_bundle" on-delete="set-null"/>
-            <one-to-one name="child_discount" reference="ce_child_discount" store-api-aware="true" on-delete="set-null" />
+            <one-to-one name="product" store-api-aware="true" reference="product" on-delete="cascade"/>
+            <one-to-many name="bundles" store-api-aware="true" reference="ce_bundle" on-delete="cascade"/>
+            <one-to-one name="child_discount" reference="ce_child_discount" store-api-aware="true" on-delete="cascade" />
         </fields>
     </entity>
 
     <entity name="ce_bundle">
         <fields>
-            <one-to-one name="bundle_product" store-api-aware="true" reference="product" on-delete="set-null"/>
-            <one-to-one name="rules" store-api-aware="true" reference="ce_sale_rules" on-delete="set-null"/>
-            <one-to-one name="hotel_bundle" store-api-aware="true" reference="ce_hotel_bundle" on-delete="set-null"/>
+            <one-to-one name="bundle_product" store-api-aware="true" reference="product" on-delete="cascade"/>
+            <one-to-one name="rules" store-api-aware="true" reference="ce_sale_rules" on-delete="cascade"/>
+            <one-to-one name="hotel_bundle" store-api-aware="true" reference="ce_hotel_bundle" on-delete="cascade"/>
         </fields>
     </entity>
 
@@ -85,9 +75,9 @@
 
     <entity name="ce_room_bundle">
         <fields>
-            <one-to-one name="room" store-api-aware="true" reference="product" on-delete="set-null"/>
-            <one-to-many name="room_extra" store-api-aware="true" reference="product" on-delete="set-null"/>
-            <one-to-one name="room_rules" store-api-aware="true" reference="ce_room_rules" on-delete="set-null"/>
+            <one-to-one name="room" store-api-aware="true" reference="product" on-delete="cascade"/>
+            <one-to-many name="room_extra" store-api-aware="true" reference="product" on-delete="cascade"/>
+            <one-to-one name="room_rules" store-api-aware="true" reference="ce_room_rules" on-delete="cascade"/>
         </fields>
     </entity>
 

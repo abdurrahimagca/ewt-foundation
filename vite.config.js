@@ -1,11 +1,13 @@
 import { defineConfig } from "vite";
+import vue from "@vitejs/plugin-vue";
 
 export default defineConfig({
-  root: "./src/frontend", // index.html'nin bulunduğu klasör
+  plugins: [vue()],
+  root: "./src/frontend",
   build: {
-    outDir: "../../html", // Çıkış klasörü
-    assetsDir: "assets", // Assetlerin bulunduğu klasör
-    emptyOutDir: true, // Her build öncesinde klasörü temizle
+    outDir: "../../dist",
+    assetsDir: "assets",
+    emptyOutDir: true, 
     rollupOptions: {
       output: {
         assetFileNames: "assets/[name]-[hash][extname]",
@@ -14,5 +16,5 @@ export default defineConfig({
       },
     },
   },
-  base: "/public/frontend/",
+  base: "/public/frontend/", 
 });

@@ -14,11 +14,11 @@ export const apiShopTransformMw = async (c: Context, next: Next) => {
         400,
       );
     }
-    console.log("shopId", shopId);
-    console.log("shopwareAppToken", shopwareAppToken);
+    //console.log("shopId", shopId);
+    //console.log("shopwareAppToken", shopwareAppToken);
 
     const app = c.get("app") as AppServer;
-    console.log("app", app);
+    // console.log("app", app);
 
     const shop = await app.repository.getShopById(shopId);
     console.log("shop", shop);
@@ -30,7 +30,9 @@ export const apiShopTransformMw = async (c: Context, next: Next) => {
   } catch (error) {
     return c.json(
       {
-        error: "Internal server error",
+        error: "Internal server error, shop transform middleware",
+        message: error instanceof Error ? error.message : "Unknown error",
+        details: error instanceof Error ? error.stack : "No stack trace",
       },
       500,
     );

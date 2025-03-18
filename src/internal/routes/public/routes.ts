@@ -16,9 +16,9 @@ GLOBAL_ROUTE.get("/page/ping", (c) => {
 GLOBAL_ROUTE.use(
   "/frontend/*",
   serveStatic({
-    root: "html",
+    root: "dist",
     rewriteRequestPath: (path) => path.replace(/^\/public\/frontend/, ""),
-  })
+  }),
 );
 
 export default GLOBAL_ROUTE;

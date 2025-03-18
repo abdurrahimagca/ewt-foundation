@@ -23,10 +23,31 @@ class CeTravelOrderInfoRepository extends EntityRepository<CeTravelOrderInfo> {
     return await this.repository.search(this.criteria);
   }
   async createOrderTravelInfo(data: CeTravelOrderInfo[]): Promise<void> {
+    const criteria = new Criteria();
+    criteria.addFilter({
+      field: "orderId",
+      type: "equals",
+      value: data[0].orderId,
+    });
+    const result = await this.repository.search(criteria);
+    if (result.total > 0) {
+      throw new Error("Order Info already exists for this order");
+    }
+
     await this.repository.upsert(data);
   }
-  async updateOrderTravelInfo(data: CeTravelOrderInfo): Promise<void> {
-    return await this.repository.upsert([data]);
+  async updateOrderTravelInfo(data: Partial<CeTravelOrderInfo>): Promise<void> {
+    if (!data) {
+      throw new Error("Data cannot be empty");
+    }
+    const cleanedData = JSON.parse(JSON.stringify(data));
+    await this.repository.upsert([cleanedData]);
+  }
+
+  async deleteOrderTravelInfo(orderId: string): Promise<void> {
+    await this.repository.deleteByFilters([
+      { field: "orderId", type: "equals", value: orderId },
+    ]);
   }
 }
 export default CeTravelOrderInfoRepository;
