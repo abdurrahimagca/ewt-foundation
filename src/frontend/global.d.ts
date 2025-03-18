@@ -16,30 +16,27 @@ declare namespace EntitySchema {
     ce_child_discount: ce_child_discount;
   }
 
-  // Traveller Entity
   interface ce_traveller {
     id: string;
     name: string;
     surname: string;
-    birthdate: string; // ISO 8601 Date
+    birthdate: string;
     email: string;
     phone?: string;
     passportNumber?: string;
   }
 
-  // Travel Order Info Entity
   interface ce_travel_order_info {
     id: string;
     identifierCode?: string;
     genericInfo: Record<string, unknown>;
     orderId: string;
     orderNumber?: string;
-    bundleInfo?: EntityCollection<"ce_travel_order_bundle_info">;
+    bundleInfo?: Entity<"ce_travel_order_bundle_info">;
     travellers: EntityCollection<"ce_travellers">;
-    flightInfo?: EntityCollection<"ce_flight_info">;
+    flightInfo?: Entity<"ce_flight_info">;
   }
 
-  // Flight Info Entity
   interface ce_flight_info {
     id: string;
     arrivalDate: string;
@@ -50,14 +47,12 @@ declare namespace EntitySchema {
     flightNumber: string;
   }
 
-  // Travel Order Bundle Info Entity
   interface ce_travel_order_bundle_info {
     id: string;
-    rooms: EntityCollection<"ce_travel_order_bundle_info_room_selection">;
+    rooms: Entity<"ce_travel_order_bundle_info_room_selection">;
     additionalProducts: EntityCollection<"ce_additional_generic_product_info">;
   }
 
-  // Travel Order Room Selection
   interface ce_travel_order_bundle_info_room_selection {
     id: string;
     roomName: string;
@@ -66,7 +61,6 @@ declare namespace EntitySchema {
     roomQuantity: number;
   }
 
-  // Additional Generic Product Info Entity
   interface ce_additional_generic_product_info {
     id: string;
     productName: string;
@@ -75,23 +69,20 @@ declare namespace EntitySchema {
     productQuantity: number;
   }
 
-  // Travel Product Config Entity
   interface ce_travel_product_config {
     id: string;
-    product: string;
+    product: Entity<"product">;
     bundles: EntityCollection<"ce_bundle">;
-    childDiscount?: EntityCollection<"ce_child_discount">;
+    childDiscount?: Entity<"ce_child_discount">;
   }
 
-  // Bundle Entity
   interface ce_bundle {
     id: string;
-    bundleProduct: string;
-    rules?: EntityCollection<"ce_sale_rules">;
-    hotelBundle?: EntityCollection<"ce_hotel_bundle">;
+    bundleProduct: Entity<"product">;
+    rules?: Entity<"ce_sale_rules">;
+    hotelBundle?: Entity<"ce_hotel_bundle">;
   }
 
-  // Hotel Bundle Entity
   interface ce_hotel_bundle {
     id: string;
     minRoomSelection: number;
@@ -99,34 +90,30 @@ declare namespace EntitySchema {
     rooms: EntityCollection<"ce_room_bundle">;
   }
 
-  // Room Bundle Entity
   interface ce_room_bundle {
     id: string;
-    room: string;
+    room: Entity<"product">;
     roomExtra: EntityCollection<"product">;
-    roomRules?: EntityCollection<"ce_room_rules">;
+    roomRules?: Entity<"ce_room_rules">;
   }
 
-  // Room Rules Entity
   interface ce_room_rules {
     id: string;
     minAdults: number;
     maxAdults: number;
     minChildren: number;
     maxChildren: number;
-    supplement?: EntityCollection<"ce_room_supplement">;
+    supplement?: Entity<"ce_room_supplement">;
   }
 
-  // Room Supplement Entity
   interface ce_room_supplement {
     id: string;
     supplementName: string;
     applyIfAdults: number;
     applyIfChildren: number;
-    supplementProduct?: string;
+    supplementProduct?: Entity<"product">;
   }
 
-  // Sale Rules Entity
   interface ce_sale_rules {
     id: string;
     ruleName: string;
@@ -136,7 +123,6 @@ declare namespace EntitySchema {
     maxQuantityAgainstParentProductQuantity: number;
   }
 
-  // Child Discount Entity
   interface ce_child_discount {
     id: string;
     discountPercentage: number;

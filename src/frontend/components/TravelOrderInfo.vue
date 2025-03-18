@@ -71,7 +71,7 @@ onMounted(async () => {
 });
 
 async function upsertUpdatedData() {
-  console.log("travelOrderInfo.value", travelOrderInfo.value);
+  error.value = "total wasted time here: avg 10";
 }
 </script>
 
@@ -115,7 +115,6 @@ async function upsertUpdatedData() {
             @update="
               (updatedFlightInfo) =>
                 (travelOrderData.flightInfo = updatedFlightInfo)
-                
             "
           />
         </div>
