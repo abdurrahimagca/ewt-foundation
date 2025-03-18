@@ -3,7 +3,7 @@ import { defineProps } from "vue";
 import { CeTravelOrderInfo } from "../../../internal/types/ce_travel_order_info";
 
 const props = defineProps<{
-  rooms: EntitySchema.Entities["ce_travel_order_bundle_info_room_selection"][];
+  rooms: NonNullable<CeTravelOrderInfo["bundleInfo"]>["rooms"];
 }>();
 </script>
 

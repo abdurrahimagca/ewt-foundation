@@ -8,13 +8,16 @@ import GenericInfoDisplay from "./common/GenericInfoDisplay.vue";
 import AdditionalProductCard from "./travelOrderInfo/AdditionalProductCard.vue";
 import { z } from "zod";
 import EntityCollection from "@shopware-ag/meteor-admin-sdk/es/_internals/data/EntityCollection";
+import BundleInfo from "./travelOrderInfo/BundleInfo.vue";
+import {
+  CeTravelOrderInfo,
+  ceTravelOrderInfoSchema,
+} from "../../internal/types/ce_travel_order_info";
 
 const orderId = ref<string | undefined>(undefined);
 const error = ref<string | undefined>(undefined);
 const isLoading = ref<boolean>(false);
-const travelOrderInfo = ref<
-  EntitySchema.Entities["ce_travel_order_info"][] | null
->(null);
+const travelOrderInfo = ref<CeTravelOrderInfo[] | undefined>(undefined);
 
 onMounted(async () => {
   try {
@@ -46,8 +49,15 @@ onMounted(async () => {
     if (resultOfEntitySearch === null) {
       throw new Error("no data found");
     }
-    travelOrderInfo.value = resultOfEntitySearch;
-    console.log(JSON.stringify(travelOrderInfo.value, null, 2));
+    const parseResult = z
+      .array(ceTravelOrderInfoSchema)
+      .safeParse(resultOfEntitySearch);
+    if (!parseResult.success) {
+      error.value = JSON.stringify(parseResult.error, null, 2);
+      throw new Error("Invalid data");
+    }
+    //  console.log(JSON.stringify(travelOrderInfo.value, null, 2));
+    travelOrderInfo.value = parseResult.data;
   } catch (e) {
     error.value = e as string;
   } finally {
@@ -65,7 +75,12 @@ function isEntityCollection(
 }
 
 async function upsertUpdatedData() {
-  if (!travelOrderInfo.value || !orderId.value || travelOrderInfo.value.length === 0 || error.value) {
+  if (
+    !travelOrderInfo.value ||
+    !orderId.value ||
+    travelOrderInfo.value.length === 0 ||
+    error.value
+  ) {
     return;
   }
 
@@ -96,7 +111,7 @@ async function upsertUpdatedData() {
         </div>
 
         <!-- Generic Info Section -->
-        <div class="section">
+        <div v-if="travelOrderData.genericInfo" class="section">
           <h2>Generic Information</h2>
           <GenericInfoDisplay :data="travelOrderData.genericInfo" />
         </div>
@@ -119,20 +134,7 @@ async function upsertUpdatedData() {
         <!-- Bundle Information -->
         <div class="section" v-if="travelOrderData.bundleInfo">
           <h3>Bundle Information</h3>
-          <div v-for="(item, index) in travelOrderData.bundleInfo" :key="index">
-            <div v-if="item.rooms">
-              <RoomInfo :rooms="item.rooms" />
-            </div>
-            <div v-if="item.additionalProducts">
-              <div class="products-container">
-                <AdditionalProductCard
-                  v-for="product in item.additionalProducts"
-                  :key="product.id"
-                  :product="product"
-                />
-              </div>
-            </div>
-          </div>
+          <BundleInfo :bundleInfo="travelOrderData.bundleInfo" />
         </div>
       </div>
     </template>

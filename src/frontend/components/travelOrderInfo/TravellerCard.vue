@@ -3,7 +3,7 @@ import { defineProps } from "vue";
 import { CeTravelOrderInfo } from "../../../internal/types/ce_travel_order_info";
 
 const props = defineProps<{
-  traveller: EntitySchema.Entities["ce_travel_order_info"]["travellers"]; 
+  traveller: CeTravelOrderInfo["travellers"];
 }>();
 
 const formatDate = (dateString: string) => {

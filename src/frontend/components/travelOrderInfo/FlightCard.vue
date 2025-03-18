@@ -3,24 +3,24 @@ import { defineProps } from "vue";
 import { CeTravelOrderInfo } from "../../../internal/types/ce_travel_order_info";
 
 const props = defineProps<{
-  flightInfo: EntitySchema.Entities["ce_travel_order_info"]["flightInfo"];
+  flightInfo: NonNullable<CeTravelOrderInfo["flightInfo"]>;
 }>();
 </script>
 
 <template>
-  <div class="flight-card" v-for="(flight, index) in flightInfo" :key="index">
-    <p><strong>Airline:</strong> {{ flight.airline }}</p>
-    <p><strong>Flight Number:</strong> {{ flight.flightNumber }}</p>
+  <div class="flight-card">
+    <p><strong>Airline:</strong> {{ flightInfo.airline }}</p>
+    <p><strong>Flight Number:</strong> {{ flightInfo.flightNumber }}</p>
     <div class="flight-dates">
       <div class="flight-date">
         <p><strong>Departure:</strong></p>
-        <p>{{ flight.departureAirport }}</p>
-        <p>{{ flight.returnDate }}</p>
+        <p>{{ flightInfo.departureAirport }}</p>
+        <p>{{ flightInfo.returnDate }}</p>
       </div>
       <div class="flight-date">
         <p><strong>Return:</strong></p>
-        <p>{{ flight.arrivalAirport }}</p>
-        <p>{{ flight.arrivalDate }}</p>
+        <p>{{ flightInfo.arrivalAirport }}</p>
+        <p>{{ flightInfo.arrivalDate }}</p>
       </div>
     </div>
   </div>

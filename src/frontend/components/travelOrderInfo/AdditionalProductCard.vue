@@ -1,10 +1,10 @@
 <script lang="ts" setup>
+import { CeTravelOrderInfo } from "../../../internal/types/ce_travel_order_info";
 import GenericInfoDisplay from "../common/GenericInfoDisplay.vue";
 
 defineProps<{
-  product: EntitySchema.Entities["ce_additional_generic_product_info"];
+  product: NonNullable<CeTravelOrderInfo["bundleInfo"]>["additionalProducts"][0];
 }>();
-
 </script>
 
 <template>
