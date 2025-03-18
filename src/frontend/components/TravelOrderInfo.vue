@@ -1,27 +1,16 @@
 <script lang="ts" setup>
-import { data, location } from "@shopware-ag/meteor-admin-sdk";
+import { data, location, notification } from "@shopware-ag/meteor-admin-sdk";
 import { onMounted, ref } from "vue";
+import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
+import GenericInfoDisplay from "./common/GenericInfoDisplay.vue";
 import TravellerCard from "./travelOrderInfo/TravellerCard.vue";
 import FlightCard from "./travelOrderInfo/FlightCard.vue";
-import RoomInfo from "./travelOrderInfo/RoomInfo.vue";
-import GenericInfoDisplay from "./common/GenericInfoDisplay.vue";
-import AdditionalProductCard from "./travelOrderInfo/AdditionalProductCard.vue";
-import { z } from "zod";
-import EntityCollection from "@shopware-ag/meteor-admin-sdk/es/_internals/data/EntityCollection";
 import BundleInfo from "./travelOrderInfo/BundleInfo.vue";
-import {
-  CeTravelOrderInfo,
-  ceTravelOrderInfoSchema,
-} from "../../internal/types/ce_travel_order_info";
-import { merge } from "lodash";
 
 const orderId = ref<string | undefined>(undefined);
 const error = ref<string | undefined>(undefined);
 const isLoading = ref<boolean>(false);
-const travelOrderInfo = ref<CeTravelOrderInfo[] | undefined>(undefined);
-const entity = ref<EntityCollection<"ce_travel_order_info"> | null | undefined>(
-  undefined,
-);
+const entityData = ref<Entity<"ce_travel_order_info"> | undefined>(undefined);
 
 onMounted(async () => {
   try {
@@ -49,19 +38,17 @@ onMounted(async () => {
     criteria.addAssociation("bundleInfo.rooms");
     criteria.addAssociation("bundleInfo.additionalProducts");
 
-    entity.value = await repo.search(criteria);
-    if (entity.value === null) {
+    const repoSearchResult = await repo.search(criteria);
+    if (repoSearchResult === null || repoSearchResult.first() === null) {
       throw new Error("no data found");
     }
-    const parseResult = z
-      .array(ceTravelOrderInfoSchema)
-      .safeParse(entity.value);
-    if (!parseResult.success) {
-      error.value = JSON.stringify(parseResult.error, null, 2);
-      throw new Error("Invalid data");
+    const firstResult = repoSearchResult.first();
+
+    if (firstResult !== null) {
+      entityData.value = firstResult;
+    } else {
+      throw new Error("No valid entity data found");
     }
-    //  console.log(JSON.stringify(travelOrderInfo.value, null, 2));
-    travelOrderInfo.value = parseResult.data;
   } catch (e) {
     error.value = e as string;
   } finally {
@@ -71,64 +58,43 @@ onMounted(async () => {
 });
 
 async function upsertUpdatedData() {
-  error.value = "total wasted time here: avg 10";
+  try {
+    const repo = data.repository("ce_travel_order_info");
+    if (!entityData.value) {
+      throw new Error("No entity data found");
+    }
+    await repo.save(entityData.value);
+    notification.dispatch({
+      title: "Success",
+      message: "Data saved successfully",
+    });
+  } catch (e) {
+    error.value = e as string;
+  }
 }
 </script>
 
 <template>
   <div class="travel-order-container">
-    <div v-if="isLoading" class="loading">Loading...</div>
-    <div v-else-if="error" class="error">{{ error }}</div>
-    <div v-else-if="!orderId" class="no-order">
-      <p>No order ID found. Please switch tabs.</p>
+    <h2>Travel Order Info</h2>
+    <button @click="upsertUpdatedData" class="save-button">Save Changes</button>
+  </div>
+  <div v-if="isLoading" class="loading">Loading...</div>
+  <div v-if="error" class="error">{{ error }}</div>
+  <div v-if="entityData" class="section">
+    <h3>Identifier Code:</h3>
+    <p>{{ entityData.identifierCode }}</p>
+    <GenericInfoDisplay :data="entityData.genericInfo" title="Metadata" />
+    <h3>Travellers</h3>
+    <TravellerCard :traveller="entityData.travellers" />
+    <div v-if="entityData.flightInfo">
+      <h3>Flight Info</h3>
+      <FlightCard :flightInfo="entityData.flightInfo" />
     </div>
-    <template v-else-if="travelOrderInfo">
-      <div v-for="(travelOrderData, index) in travelOrderInfo" :key="index">
-        <!-- Header Section -->
-        <div class="section">
-          <h2>Travel Order Information</h2>
-          <p class="identifier">
-            TravelOrderCode: {{ travelOrderData.identifierCode }}
-          </p>
-        </div>
-
-        <!-- Generic Info Section -->
-        <div v-if="travelOrderData.genericInfo" class="section">
-          <h2>Generic Information</h2>
-          <GenericInfoDisplay :data="travelOrderData.genericInfo" />
-        </div>
-
-        <!-- Travellers Section -->
-        <div class="section">
-          <h3>Travellers</h3>
-          <TravellerCard
-            :key="travelOrderData.id"
-            :traveller="travelOrderData.travellers"
-          />
-        </div>
-
-        <!-- Flight Information -->
-        <div class="section" v-if="travelOrderData.flightInfo">
-          <h3>Flight Details</h3>
-          <FlightCard
-            :flight-info="travelOrderData.flightInfo"
-            @update="
-              (updatedFlightInfo) =>
-                (travelOrderData.flightInfo = updatedFlightInfo)
-            "
-          />
-        </div>
-
-        <!-- Bundle Information -->
-        <div class="section" v-if="travelOrderData.bundleInfo">
-          <h3>Bundle Information</h3>
-          <BundleInfo :bundleInfo="travelOrderData.bundleInfo" />
-        </div>
-
-        <!-- Save Button -->
-        <button @click="upsertUpdatedData">Save Changes</button>
-      </div>
-    </template>
+    <div v-if="entityData.bundleInfo">
+      <h3>Bundle Info</h3>
+      <BundleInfo :bundleInfo="entityData.bundleInfo" />
+    </div>
   </div>
 </template>
 
@@ -186,5 +152,19 @@ h3 {
   .products-container {
     grid-template-columns: 1fr;
   }
+}
+
+.save-button {
+  background-color: #189eff;
+  color: white;
+  padding: 8px 16px;
+  border: none;
+  border-radius: 4px;
+  cursor: pointer;
+  margin-bottom: 16px;
+}
+
+.save-button:hover {
+  background-color: #0080ff;
 }
 </style>

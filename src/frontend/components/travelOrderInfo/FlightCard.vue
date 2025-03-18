@@ -1,53 +1,64 @@
 <script lang="ts" setup>
-import { defineProps, defineEmits, reactive, watch } from "vue";
-import { CeTravelOrderInfo } from "../../../internal/types/ce_travel_order_info";
+import { defineProps } from "vue";
 
 const props = defineProps<{
-  flightInfo: NonNullable<CeTravelOrderInfo["flightInfo"]>;
+  flightInfo: EntitySchema.Entities["ce_flight_info"];
 }>();
 
-const emit = defineEmits(["update"]);
+// Helper functions for date formatting
+const formatDateForInput = (dateString: string): string => {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  return date.toISOString().slice(0, 16); // Format: YYYY-MM-DDTHH:mm
+};
 
-// flightInfo'yu reactive nesne olarak oluştur
-const localFlightInfo = reactive({ ...props.flightInfo });
-
-watch(
-  () => props.flightInfo,
-  (newValue) => {
-    Object.assign(localFlightInfo, newValue);
-  },
-  { deep: true, immediate: true },
-);
-
-watch(
-  localFlightInfo,
-  (newValue) => {
-    emit("update", { ...newValue });
-  },
-  { deep: true },
-);
+const formatDateForSave = (dateString: string): string => {
+  if (!dateString) return "";
+  const date = new Date(dateString);
+  return date.toISOString(); // Format: YYYY-MM-DDTHH:mm:ss.sssZ
+};
 </script>
 
 <template>
   <div class="flight-card">
-    <div>
+    <div class="input-group">
       <label><strong>Airline:</strong></label>
-      <input v-model="localFlightInfo.airline" />
+      <input v-model="flightInfo.airline" />
     </div>
-    <div>
+    <div class="input-group">
       <label><strong>Flight Number:</strong></label>
-      <input v-model="localFlightInfo.flightNumber" />
+      <input v-model="flightInfo.flightNumber" />
     </div>
     <div class="flight-dates">
       <div class="flight-date">
-        <label><strong>Departure:</strong></label>
-        <input v-model="localFlightInfo.departureAirport" />
-        <input type="text" v-model="localFlightInfo.arrivalDate" />
+        <label><strong>Departure Airport:</strong></label>
+        <input v-model="flightInfo.departureAirport" />
+        <label><strong>Departure Date:</strong></label>
+        <input
+          type="datetime-local"
+          :value="formatDateForInput(flightInfo.arrivalDate)"
+          @input="
+            (e) =>
+              (flightInfo.arrivalDate = formatDateForSave(
+                (e.target as HTMLInputElement).value,
+              ))
+          "
+        />
       </div>
       <div class="flight-date">
-        <label><strong>Return:</strong></label>
-        <input v-model="localFlightInfo.arrivalAirport" />
-        <input type="text" v-model="localFlightInfo.returnDate" />
+        <label><strong>Return Airport:</strong></label>
+        <input v-model="flightInfo.arrivalAirport" />
+        <label><strong>Return Date:</strong></label>
+        <input
+          type="datetime-local"
+          :value="formatDateForInput(flightInfo.returnDate)"
+          @input="
+            (e) =>
+              (flightInfo.returnDate = formatDateForSave(
+                (e.target as HTMLInputElement).value,
+              ))
+          "
+        />
       </div>
     </div>
   </div>
@@ -63,20 +74,54 @@ watch(
 }
 
 .flight-dates {
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: 16px;
   margin-top: 16px;
 }
 
 .flight-date {
-  text-align: center;
+  text-align: left;
+}
+
+label {
+  display: block;
+  margin-bottom: 4px;
 }
 
 input {
   width: 100%;
   padding: 8px;
   margin-top: 4px;
-  border: 1px solid #ccc;
+  border: 1px solid #ddd;
   border-radius: 4px;
+  font-size: 14px;
+}
+
+input:focus {
+  outline: none;
+  border-color: #189eff;
+}
+
+div {
+  margin-bottom: 12px;
+}
+
+.input-group {
+  margin-bottom: 16px;
+}
+
+input[type="datetime-local"] {
+  width: 100%;
+  padding: 8px;
+  margin-top: 4px;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+  font-size: 14px;
+}
+
+input[type="datetime-local"]:focus {
+  outline: none;
+  border-color: #189eff;
 }
 </style>

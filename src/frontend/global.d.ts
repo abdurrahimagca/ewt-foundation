@@ -49,7 +49,7 @@ declare namespace EntitySchema {
 
   interface ce_travel_order_bundle_info {
     id: string;
-    rooms: Entity<"ce_travel_order_bundle_info_room_selection">;
+    rooms: EntityCollection<"ce_travel_order_bundle_info_room_selection">;
     additionalProducts: EntityCollection<"ce_additional_generic_product_info">;
   }
 
