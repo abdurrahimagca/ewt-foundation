@@ -1,5 +1,6 @@
 declare namespace EntitySchema {
   interface Entities {
+    product: product;
     ce_travellers: ce_traveller;
     ce_travel_order_info: ce_travel_order_info;
     ce_flight_info: ce_flight_info;
@@ -7,15 +8,18 @@ declare namespace EntitySchema {
     ce_travel_order_bundle_info_room_selection: ce_travel_order_bundle_info_room_selection;
     ce_additional_generic_product_info: ce_additional_generic_product_info;
     ce_travel_product_config: ce_travel_product_config;
-    ce_bundle: ce_bundle;
-    ce_hotel_bundle: ce_hotel_bundle;
-    ce_room_bundle: ce_room_bundle;
-    ce_room_rules: ce_room_rules;
-    ce_room_supplement: ce_room_supplement;
-    ce_sale_rules: ce_sale_rules;
-    ce_child_discount: ce_child_discount;
+    ce_travel_product_config_hotel_bundle: ce_travel_product_config_hotel_bundle;
+    ce_travel_product_config_room_bundle: ce_travel_product_config_room_bundle;
+    ce_travel_product_config_room_bundle_rule: ce_travel_product_config_room_bundle_rule;
+    ce_travel_product_config_room_bundle_supplement_rule: ce_travel_product_config_room_bundle_supplement_rule;
+    ce_travel_product_config_child_discount: ce_travel_product_config_child_discount;
+    ce_travel_product_config_generic_product_bundle: ce_travel_product_config_generic_product_bundle;
   }
-
+  interface product {
+    id: string;
+    name: string;
+    available: boolean;
+  }
   interface ce_traveller {
     id: string;
     name: string;
@@ -71,42 +75,38 @@ declare namespace EntitySchema {
 
   interface ce_travel_product_config {
     id: string;
-    product: Entity<"product">;
-    bundles: EntityCollection<"ce_bundle">;
-    childDiscount?: Entity<"ce_child_discount">;
+    product?: Entity<"product">;
+    hotelBundle?: Entity<"ce_travel_product_config_hotel_bundle">;
+    childDiscount?: Entity<"ce_travel_product_config_child_discount">;
+    genericProductBundle?: Entity<"ce_travel_product_config_generic_product_bundle">;
   }
 
-  interface ce_bundle {
-    id: string;
-    bundleProduct: Entity<"product">;
-    rules?: Entity<"ce_sale_rules">;
-    hotelBundle?: Entity<"ce_hotel_bundle">;
-  }
-
-  interface ce_hotel_bundle {
+  interface ce_travel_product_config_hotel_bundle {
     id: string;
     minRoomSelection: number;
     maxRoomSelection: number;
-    rooms: EntityCollection<"ce_room_bundle">;
+    genericProductBundle?: Entity<"ce_travel_product_config_generic_product_bundle">;
+    roomOptions: EntityCollection<"ce_travel_product_config_room_bundle">;
   }
 
-  interface ce_room_bundle {
+  interface ce_travel_product_config_room_bundle {
     id: string;
-    room: Entity<"product">;
+    roomProduct?: Entity<"product">;
     roomExtra: EntityCollection<"product">;
-    roomRules?: Entity<"ce_room_rules">;
+    genericProductBundle?: Entity<"ce_travel_product_config_generic_product_bundle">;
+    roomRule?: Entity<"ce_travel_product_config_room_bundle_rule">;
   }
 
-  interface ce_room_rules {
+  interface ce_travel_product_config_room_bundle_rule {
     id: string;
     minAdults: number;
     maxAdults: number;
     minChildren: number;
     maxChildren: number;
-    supplement?: Entity<"ce_room_supplement">;
+    supplement?: Entity<"ce_travel_product_config_room_bundle_supplement_rule">;
   }
 
-  interface ce_room_supplement {
+  interface ce_travel_product_config_room_bundle_supplement_rule {
     id: string;
     supplementName: string;
     applyIfAdults: number;
@@ -114,19 +114,22 @@ declare namespace EntitySchema {
     supplementProduct?: Entity<"product">;
   }
 
-  interface ce_sale_rules {
-    id: string;
-    ruleName: string;
-    ruleDescription: string;
-    minQuantityAgainstParentProductQuantity: number;
-    validFromParentProductQuantity: number;
-    maxQuantityAgainstParentProductQuantity: number;
-  }
-
-  interface ce_child_discount {
+  interface ce_travel_product_config_child_discount {
     id: string;
     discountPercentage: number;
     applyOnQuantity: number;
     applyToQuantity: number;
+  }
+
+  interface ce_travel_product_config_generic_product_bundle {
+    id: string;
+    minQuantity: number;
+    maxQuantity: number;
+    minQuantityAgainstParent: number;
+    maxQuantityAgainstParent: number;
+    quantityStep: number;
+    allowMultipleProducts: boolean;
+    sortOrder: number;
+    productOptions: EntityCollection<"product">;
   }
 }

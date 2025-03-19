@@ -20,7 +20,7 @@
     "@hono/node-server": "^1.11.4",
     "@shopware-ag/app-server-sdk": "^1.1.16",
     "@shopware-ag/entity-schema-types": "^5.0.0",
-    "@shopware-ag/meteor-admin-sdk": "^5.7.5",
+    "@shopware-ag/meteor-admin-sdk": "^5.8.0",
     "archiver": "^7.0.1",
     "better-sqlite3": "^11.2.1",
     "dotenv": "^16.4.7",
@@ -37,6 +37,6 @@
     "@vitejs/plugin-vue": "^x.x.x",
     "tsx": "^4.19.3",
     "typescript": "^5.7.3",
-    "vite": "^x.x.x"
+    "vite": "^6.2.2"
   }
 }

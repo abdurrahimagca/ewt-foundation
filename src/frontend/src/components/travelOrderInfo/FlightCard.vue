@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { defineProps } from "vue";
 
-const props = defineProps<{
+ defineProps<{
   flightInfo: EntitySchema.Entities["ce_flight_info"];
 }>();
 
