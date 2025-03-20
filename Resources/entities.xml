@@ -63,17 +63,17 @@
     <entity name="ce_travel_product_config">
         <fields>
             <one-to-one name="product" store-api-aware="true" reference="product" on-delete="set-null"/>
-            <one-to-one name="hotel_bundle" store-api-aware="true" reference="ce_travel_product_config_hotel_bundle" on-delete="set-null"/>
-            <one-to-one name="child_discount" store-api-aware="true" reference="ce_travel_product_config_child_discount" on-delete="set-null"/>
-            <one-to-one name="generic_product_bundle" reference="ce_travel_product_config_generic_product_bundle" store-api-aware="true" on-delete="set-null" />
+            <one-to-one name="hotel_bundle" store-api-aware="true" reference="ce_hotel_bundle" on-delete="set-null"/>
+            <one-to-one name="child_discount" store-api-aware="true" reference="ce_custom_child_discount" on-delete="set-null"/>
+            <one-to-one name="additional_products" reference="ce_generic_product_bundle" store-api-aware="true" on-delete="set-null" />
         </fields>
     </entity>
 
-    <entity name="ce_travel_product_config_hotel_bundle">
+    <entity name="ce_hotel_bundle">
         <fields>
             <int name="min_room_selection" store-api-aware="true"/>
             <int name="max_room_selection" store-api-aware="true"/>
-            <one-to-one name="generic_product_bundle" reference="ce_travel_product_config_generic_product_bundle" store-api-aware="true" on-delete="set-null" /> 
+            <one-to-one name="additional_products" reference="ce_generic_product_bundle" store-api-aware="true" on-delete="set-null" /> 
             <one-to-many name="room_options" store-api-aware="true" reference="ce_travel_product_config_room_bundle" on-delete="set-null"/>
         </fields>
     </entity>
@@ -82,22 +82,22 @@
         <fields>
             <one-to-one name="room_product" store-api-aware="true" reference="product" on-delete="set-null"/>
             <one-to-many name="room_extra" store-api-aware="true" reference="product" on-delete="set-null"/>
-            <one-to-one name="generic_product_bundle" reference="ce_travel_product_config_generic_product_bundle" store-api-aware="true" on-delete="set-null" /> 
-            <one-to-one name="room_rule" store-api-aware="true" reference="ce_travel_product_config_room_bundle_rule" on-delete="set-null"/>
+            <one-to-one name="additional_products" reference="ce_generic_product_bundle" store-api-aware="true" on-delete="set-null" /> 
+            <one-to-one name="room_sale_rule" store-api-aware="true" reference="ce_room_sale_rule" on-delete="set-null"/>
         </fields>
     </entity>
 
-    <entity name="ce_travel_product_config_room_bundle_rule">
+    <entity name="ce_room_sale_rule">
         <fields>
             <int name="min_adults" store-api-aware="true"/>
             <int name="max_adults" store-api-aware="true"/>
             <int name="min_children" store-api-aware="true"/>
             <int name="max_children" store-api-aware="true"/>
-            <one-to-one name="supplement" store-api-aware="true" reference="ce_travel_product_config_room_bundle_supplement_rule" on-delete="set-null"/>
+            <one-to-one name="supplement_rule" store-api-aware="true" reference="ce_room_supplement_rule" on-delete="set-null"/>
         </fields>
     </entity>
 
-    <entity name="ce_travel_product_config_room_bundle_supplement_rule">
+    <entity name="ce_room_supplement_rule">
         <fields>
             <text name="supplement_name" store-api-aware="true"/>
             <int name="apply_if_adults" store-api-aware="true"/>
@@ -106,7 +106,7 @@
         </fields>
     </entity>
 
-    <entity name="ce_travel_product_config_child_discount">
+    <entity name="ce_custom_child_discount">
         <fields>
             <float name="discount_percentage" store-api-aware="true"/>
             <int name="apply_on_quantity" store-api-aware="true"/>
@@ -114,7 +114,7 @@
         </fields>
     </entity>
 
-   <entity name="ce_travel_product_config_generic_product_bundle">
+   <entity name="ce_generic_product_bundle">
         <fields>
             <int name="min_quantity" store-api-aware="true"/>
             <int name="max_quantity" store-api-aware="true"/>

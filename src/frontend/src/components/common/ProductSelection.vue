@@ -1,17 +1,36 @@
 <script lang="ts" setup>
 import { data } from "@shopware-ag/meteor-admin-sdk";
+import { defineProps, ref, watch, defineEmits } from "vue";
 
-import { defineProps, ref, watch } from "vue";
 const props = defineProps<{
-  initialProduct?: EntitySchema.Entities["product"][];
+  initialProduct?:
+    | EntitySchema.Entities["product"][]
+    | EntitySchema.Entities["product"];
+  mode?: "single" | "multiple"; // New prop to determine selection mode
 }>();
+
+const emit = defineEmits<{
+  (
+    e: "update:initialProduct",
+    value:
+      | EntitySchema.Entities["product"][]
+      | EntitySchema.Entities["product"],
+  ): void;
+}>();
+
 const nameToSearch = ref<string | null | undefined>(undefined);
 const selectables = ref<EntitySchema.Entities["product"][]>([]);
 const selecteds = ref<EntitySchema.Entities["product"][]>([]);
 const isDropdownOpen = ref(false);
 const error = ref<string | undefined>(undefined);
+
+// Initialize selecteds based on mode
 if (props.initialProduct) {
-  selecteds.value = props.initialProduct;
+  if (Array.isArray(props.initialProduct)) {
+    selecteds.value = props.initialProduct;
+  } else {
+    selecteds.value = [props.initialProduct];
+  }
 }
 
 async function searchProduct() {
@@ -43,7 +62,9 @@ function removeSelected(productId: string) {
 }
 
 function addToSelecteds(product: EntitySchema.Entities["product"]) {
-  if (!selecteds.value.some((p) => p.id === product.id)) {
+  if (props.mode === "single") {
+    selecteds.value = [product];
+  } else if (!selecteds.value.some((p) => p.id === product.id)) {
     selecteds.value.push(product);
   }
   nameToSearch.value = "";
@@ -53,6 +74,14 @@ function addToSelecteds(product: EntitySchema.Entities["product"]) {
 
 function handleInputFocus() {
   isDropdownOpen.value = true;
+}
+
+function commitChanges() {
+  if (!props.initialProduct) {
+    throw new Error("initialProduct is not defined");
+  }
+  const result = props.mode === "single" ? selecteds.value[0] : selecteds.value;
+  emit("update:initialProduct", result);
 }
 
 watch(nameToSearch, () => {
@@ -67,7 +96,11 @@ watch(nameToSearch, () => {
         <div class="selected-tags" v-if="selecteds.length > 0">
           <div v-for="product in selecteds" :key="product.id" class="tag">
             {{ product.name }}
-            <button class="remove-tag" @click="removeSelected(product.id)">
+            <button
+              v-if="props.mode === 'multiple'"
+              class="remove-tag"
+              @click="removeSelected(product.id)"
+            >
               ×
             </button>
           </div>
@@ -108,31 +141,41 @@ watch(nameToSearch, () => {
           </div>
         </div>
       </div>
+      <div v-if="selecteds.length > 0">
+        <button @click="commitChanges">Commit Changes</button>
+      </div>
     </div>
   </div>
 </template>
 
 <style scoped>
 .product-selection-wrapper {
-  height: 400px;
-  overflow: hidden;
+  min-height: 100px;
+  overflow: visible;
   display: flex;
   flex-direction: column;
+  font-family:
+    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
+    Cantarell, sans-serif;
 }
 
 .product-selection {
   position: relative;
   width: 100%;
   max-width: 500px;
-  height: 100%;
   display: flex;
   flex-direction: column;
+  gap: 8px;
+  padding: 12px;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
 }
 
 .selected-tags-wrapper {
-  max-height: 150px;
+  max-height: 100px;
   overflow-y: auto;
-  padding: 8px 0;
+  padding: 4px 0;
 }
 
 .selected-tags {
@@ -141,116 +184,130 @@ watch(nameToSearch, () => {
   gap: 8px;
 }
 
-.dropdown-container {
-  position: relative;
-  width: 100%;
-  flex-shrink: 0;
-}
-
-.search-input {
-  width: 100%;
-  padding: 8px 12px;
-  border: 1px solid #dcdcdc;
-  border-radius: 4px;
-  font-size: 14px;
-  outline: none;
-  transition: border-color 0.2s;
-}
-
-.search-input:focus {
-  border-color: #189eff;
-}
-
-.dropdown-content {
-  position: absolute;
-  top: 100%;
-  left: 0;
-  right: 0;
-  background: white;
-  border: 1px solid #dcdcdc;
-  border-radius: 4px;
-  margin-top: 4px;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-  z-index: 1000;
-  max-height: 200px;
-  overflow-y: auto;
-}
-
-/* Custom scrollbar styles for better appearance */
-.dropdown-content::-webkit-scrollbar,
-.selected-tags-wrapper::-webkit-scrollbar {
-  width: 6px;
-}
-
-.dropdown-content::-webkit-scrollbar-track,
-.selected-tags-wrapper::-webkit-scrollbar-track {
-  background: #f1f1f1;
-  border-radius: 3px;
-}
-
-.dropdown-content::-webkit-scrollbar-thumb,
-.selected-tags-wrapper::-webkit-scrollbar-thumb {
-  background: #c1c1c1;
-  border-radius: 3px;
-}
-
-.dropdown-content::-webkit-scrollbar-thumb:hover,
-.selected-tags-wrapper::-webkit-scrollbar-thumb:hover {
-  background: #a8a8a8;
-}
-
-/* Rest of the styles remain the same */
-.options-list {
-  padding: 4px 0;
-}
-
-.option {
-  padding: 8px 12px;
-  cursor: pointer;
-  transition: background-color 0.2s;
-}
-
-.option:hover {
-  background-color: #f5f5f5;
-}
-
-.option.selected {
-  background-color: #e3f2fd;
-  color: #189eff;
-}
-
 .tag {
-  background-color: #e3f2fd;
-  color: #189eff;
-  padding: 4px 8px;
-  border-radius: 4px;
+  background-color: #f0f7ff;
+  color: #0066cc;
+  padding: 6px 10px;
+  border-radius: 6px;
   font-size: 14px;
   display: flex;
   align-items: center;
-  gap: 4px;
+  gap: 6px;
+  border: 1px solid #cce4ff;
+  transition: all 0.2s ease;
+}
+
+.tag:hover {
+  background-color: #e5f1ff;
 }
 
 .remove-tag {
   background: none;
   border: none;
-  color: #189eff;
+  color: #0066cc;
   cursor: pointer;
   padding: 0 2px;
   font-size: 16px;
   line-height: 1;
+  opacity: 0.7;
+  transition: opacity 0.2s ease;
 }
 
 .remove-tag:hover {
-  color: #0056b3;
+  opacity: 1;
+}
+
+.search-input {
+  width: 100%;
+  padding: 8px 12px;
+  border: 2px solid #e0e0e0;
+  border-radius: 8px;
+  font-size: 14px;
+  outline: none;
+  transition: all 0.2s ease;
+  background-color: #f8f9fa;
+}
+
+.search-input:focus {
+  border-color: #0066cc;
+  background-color: white;
+  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+}
+
+.dropdown-container {
+  position: relative;
+  width: 100%;
+  flex-shrink: 0;
+  margin-bottom: 8px;
+}
+
+.dropdown-content {
+  position: absolute;
+  top: calc(100% + 4px);
+  left: 0;
+  right: 0;
+  background: white;
+  border-radius: 8px;
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  z-index: 1000;
+  max-height: 200px;
+  overflow-y: auto;
+  border: 1px solid #e0e0e0;
+}
+
+.options-list {
+  padding: 6px 0;
+}
+
+.option {
+  padding: 8px 12px;
+  cursor: pointer;
+  transition: all 0.2s ease;
+  font-size: 14px;
+}
+
+.option:hover {
+  background-color: #f0f7ff;
+}
+
+.option.selected {
+  background-color: #e5f1ff;
+  color: #0066cc;
+  font-weight: 500;
 }
 
 .error-message {
   color: #dc3545;
-  padding: 8px 12px;
+  padding: 12px 16px;
+  font-size: 14px;
+  background-color: #fff5f5;
+  border-radius: 6px;
 }
 
 .no-results {
-  padding: 8px 12px;
+  padding: 12px 16px;
   color: #666;
+  font-size: 14px;
+  text-align: center;
+}
+
+button {
+  background-color: #0066cc;
+  color: white;
+  border: none;
+  padding: 8px 16px;
+  border-radius: 6px;
+  font-size: 14px;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 0.2s ease;
+}
+
+button:hover {
+  background-color: #0052a3;
+}
+
+button:active {
+  transform: translateY(1px);
 }
 </style>

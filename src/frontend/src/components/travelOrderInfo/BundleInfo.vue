@@ -1,7 +1,7 @@
 <script lang="ts" setup>
 import { defineProps } from "vue";
 import GenericInfoDisplay from "../common/GenericInfoDisplay.vue";
-const props = defineProps<{
+defineProps<{
   bundleInfo: EntitySchema.Entities["ce_travel_order_bundle_info"];
 }>();
 </script>
