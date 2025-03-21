@@ -44,57 +44,70 @@ watch(
 </script>
 
 <template>
-  <div v-if="genericProductBundle" class="generic-bundle-container">
-    <div class="form-group">
-      <label for="maxQuantity">Max Quantity</label>
-      <input
-        id="maxQuantity"
-        v-model="genericProductBundle.maxQuantity"
-        type="number"
-      />
+  <div v-if="genericProductBundle" class="ewt-card-detail">
+    <div class="ewt-grid-2">
+      <div class="ewt-form-group">
+        <label for="maxQuantity" class="ewt-form-label">Max Quantity</label>
+        <input
+          id="maxQuantity"
+          v-model="genericProductBundle.maxQuantity"
+          type="number"
+          min="1"
+          class="ewt-input"
+        />
+      </div>
+      <div class="ewt-form-group">
+        <label for="minQuantity" class="ewt-form-label">Min Quantity</label>
+        <input
+          id="minQuantity"
+          v-model="genericProductBundle.minQuantity"
+          type="number"
+          min="1"
+          class="ewt-input"
+        />
+      </div>
+      <div class="ewt-form-group">
+        <label for="maxQuantityAgainstParent" class="ewt-form-label">Max Quantity Against Parent</label>
+        <input
+          id="maxQuantityAgainstParent"
+          v-model="genericProductBundle.maxQuantityAgainstParent"
+          type="number"
+          min="1"
+          class="ewt-input"
+        />
+      </div>
+      <div class="ewt-form-group">
+        <label for="minQuantityAgainstParent" class="ewt-form-label">Min Quantity Against Parent</label>
+        <input
+          id="minQuantityAgainstParent"
+          v-model="genericProductBundle.minQuantityAgainstParent"
+          type="number"
+          min="1"
+          class="ewt-input"
+        />
+      </div>
+      <div class="ewt-form-group">
+        <label for="quantityStep" class="ewt-form-label">Quantity Step</label>
+        <input
+          id="quantityStep"
+          v-model="genericProductBundle.quantityStep"
+          type="number"
+          min="1"
+          class="ewt-input"
+        />
+      </div>
+      <div class="ewt-form-group">
+        <label for="sortOrder" class="ewt-form-label">Sort Order</label>
+        <input
+          id="sortOrder"
+          v-model="genericProductBundle.sortOrder"
+          type="number"
+          class="ewt-input"
+        />
+      </div>
     </div>
-    <div class="form-group">
-      <label for="minQuantity">Min Quantity</label>
-      <input
-        id="minQuantity"
-        v-model="genericProductBundle.minQuantity"
-        type="number"
-      />
-    </div>
-    <div class="form-group">
-      <label for="maxQuantityAgainstParent">Max Quantity Against Parent</label>
-      <input
-        id="maxQuantityAgainstParent"
-        v-model="genericProductBundle.maxQuantityAgainstParent"
-        type="number"
-      />
-    </div>
-    <div class="form-group">
-      <label for="minQuantityAgainstParent">Min Quantity Against Parent</label>
-      <input
-        id="minQuantityAgainstParent"
-        v-model="genericProductBundle.minQuantityAgainstParent"
-        type="number"
-      />
-    </div>
-    <div class="form-group">
-      <label for="quantityStep">Quantity Step</label>
-      <input
-        id="quantityStep"
-        v-model="genericProductBundle.quantityStep"
-        type="number"
-      />
-    </div>
-    <div class="form-group">
-      <label for="sortOrder">Sort Order</label>
-      <input
-        id="sortOrder"
-        v-model="genericProductBundle.sortOrder"
-        type="number"
-      />
-    </div>
-    <div class="form-group">
-      <label for="allowMultipleProducts">Allow Multiple Products</label>
+    <div class="ewt-form-group">
+      <label for="allowMultipleProducts" class="ewt-form-label">Allow Multiple Products</label>
       <input
         id="allowMultipleProducts"
         v-model="genericProductBundle.allowMultipleProducts"

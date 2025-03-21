@@ -2,9 +2,9 @@
 import { defineProps } from "vue";
 import ProductSelection from "../common/ProductSelection.vue";
 import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
-import EntityCollection from "@shopware-ag/meteor-admin-sdk/es/_internals/data/EntityCollection";
 import RoomRule from "./RoomRules.vue";
 import GenericBundleProduct from "./GenericBundleProduct.vue";
+import { data } from "@shopware-ag/meteor-admin-sdk";
 const props = defineProps<{
   roomBundle: EntitySchema.Entities["ce_travel_product_config_room_bundle"][];
 }>();
@@ -32,24 +32,114 @@ function handleOneProductChange(
     room.roomProduct = product as Entity<"product">;
   }
 }
+async function addRoom(id: string) {
+  try {
+    const repo = data.repository("product");
+    const newData = await repo.create();
+    if (newData === null) {
+      throw new Error("Could not create new room bundle");
+    }
+    const room = props.roomBundle.find((room) => room.id === id);
+    if (room) {
+      room.roomProduct = newData;
+    }
+  } catch (e) {
+    console.error(e);
+  }
+}
+async function addRoomSaleRule(id: string) {
+  try {
+    const repo = data.repository("ce_room_sale_rule");
+    const newRoomSaleRule = await repo.create();
+    if (newRoomSaleRule === null) {
+      throw new Error("Could not create new room sale rule");
+    }
+    const room = props.roomBundle.find((room) => room.id === id);
+    if (room) {
+      room.roomSaleRule = newRoomSaleRule;
+    }
+  } catch (e) {
+    console.error(e);
+  }
+}
+async function addAdditionalProduct(id: string) {
+  try {
+    const repo = data.repository("ce_generic_product_bundle");
+    const newAdditionalProduct = await repo.create();
+    if (newAdditionalProduct === null) {
+      throw new Error("Could not create new additional product");
+    }
+    const room = props.roomBundle.find((room) => room.id === id);
+    if (room) {
+      room.additionalProducts = newAdditionalProduct;
+    }
+  } catch (e) {
+    console.error(e);
+  }
+}
 </script>
 
 <template>
-  <div>
-    <h4>Room options</h4>
-    <div v-if="roomBundle">
-      <div v-for="room in roomBundle" :key="room.id">
-        <ProductSelection
-          mode="single"
-          :value="room.roomProduct"
-          :initialProduct="[room.roomProduct]"
-          @update:initialProduct="handleOneProductChange($event, room.id)"
-        />
-        <h4>Additional Products</h4>
-        <GenericBundleProduct :inheritedData="room.additionalProducts" />
-        <h4>Room Sale Rule</h4>
-        <RoomRule :rule="room.roomSaleRule" />
+  <div class="ewt-section-layout">
+    <h4 class="ewt-section-title">Room options</h4>
+
+    <div v-for="(room, index) in roomBundle" :key="room.id" class="ewt-card-detail">
+      <div class="ewt-section">
+        <div class="ewt-header">
+          <h3 class="ewt-title">Room {{ index + 1 }}</h3>
+        </div>
+
+        <div class="ewt-section">
+          <div class="ewt-section-header">
+            <h4 class="ewt-section-title">Room Product</h4>
+          </div>
+          <div v-if="!room.roomProduct">
+            <button @click="() => addRoom(room.id)" class="ewt-btn ewt-btn--primary">
+              Add Room Product
+            </button>
+          </div>
+          <div v-else class="ewt-product-selection">
+            <ProductSelection
+              mode="single"
+              :value="room.roomProduct"
+              :initialProduct="room.roomProduct"
+              @update:initialProduct="(product) => handleOneProductChange(product, room.id)"
+            />
+          </div>
+        </div>
+
+        <div class="ewt-section">
+          <div class="ewt-section-header">
+            <h4 class="ewt-section-title">Room Rules</h4>
+          </div>
+          <div v-if="!room.roomSaleRule">
+            <button @click="() => addRoomSaleRule(room.id)" class="ewt-btn ewt-btn--primary">
+              Add Room Rules
+            </button>
+          </div>
+          <div v-else>
+            <RoomRule :rule="room.roomSaleRule" />
+          </div>
+        </div>
+
+        <div class="ewt-section">
+          <div class="ewt-section-header">
+            <h4 class="ewt-section-title">Additional Products</h4>
+          </div>
+          <div v-if="!room.additionalProducts">
+            <button @click="() => addAdditionalProduct(room.id)" class="ewt-btn ewt-btn--primary">
+              Add Additional Products
+            </button>
+          </div>
+          <div v-else>
+            <GenericBundleProduct :inheritedData="room.additionalProducts" />
+          </div>
+        </div>
       </div>
     </div>
   </div>
 </template>
+
+<style scoped>
+/* Remove all styles as they're now in styles.css */
+</style>

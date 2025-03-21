@@ -89,15 +89,14 @@ declare namespace EntitySchema {
     minRoomSelection: number;
     maxRoomSelection: number;
     additionalProducts?: Entity<"ce_generic_product_bundle">;
-    roomOptions?: EntityCollection<"ce_travel_product_config_room_bundle">;
+    roomOptions: EntityCollection<"ce_travel_product_config_room_bundle">;
   }
 
   interface ce_travel_product_config_room_bundle {
     id: string;
-    roomProduct: Entity<"product">;
-    roomExtra: EntityCollection<"product">;
-    additionalProducts: Entity<"ce_generic_product_bundle">;
-    roomSaleRule: Entity<"ce_room_sale_rule">;
+    roomProduct?: Entity<"product">;
+    additionalProducts?: Entity<"ce_generic_product_bundle">;
+    roomSaleRule?: Entity<"ce_room_sale_rule">;
   }
 
   interface ce_room_sale_rule {

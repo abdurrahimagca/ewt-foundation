@@ -18,7 +18,7 @@ async function addRoom() {
     if (newData === null) {
       throw new Error("Could not create new room bundle");
     }
-    const newProduct = await data.repository("product").create();
+    /* const newProduct = await data.repository("product").create();
     if (newProduct === null) {
       throw new Error("Could not create new product");
     }
@@ -34,7 +34,7 @@ async function addRoom() {
     if (newRoomSaleRule === null) {
       throw new Error("Could not create new room sale rule");
     }
-    newData.roomSaleRule = newRoomSaleRule;
+  newData.roomSaleRule = newRoomSaleRule; */
     props.inheritedData.roomOptions?.push(newData);
   } catch (e) {
     console.error(e);
@@ -43,50 +43,52 @@ async function addRoom() {
 </script>
 
 <template>
-  <div v-if="inheritedData" class="hotel-bundle-container">
-    <div class="hotel-bundle-header">
-      <h3>Hotel Bundle Configuration</h3>
-      <p class="subtitle">Configure room selection limits and options</p>
+  <div v-if="inheritedData" class="ewt-card-detail">
+    <div class="ewt-section">
+      <h3 class="ewt-section-title">Hotel General Room Configuration</h3>
+      <p class="ewt-subtitle">
+        Configure room selection limits and options it'll effect how many
+        <strong>rooms</strong> can added. Each room can have own config
+      </p>
     </div>
-
-    <div class="form-grid">
-      <div class="form-group">
-        <label for="minRoomSelection">Minimum Rooms</label>
+    <div class="ewt-grid-2">
+      <div class="ewt-form-group">
+        <label for="minRoomSelection" class="ewt-form-label">Minimum Rooms</label>
         <input
           id="minRoomSelection"
           v-model="inheritedData.minRoomSelection"
           type="number"
           min="1"
-          class="form-input"
+          class="ewt-input"
         />
       </div>
 
-      <div class="form-group">
-        <label for="maxRoomSelection">Maximum Rooms</label>
+      <div class="ewt-form-group">
+        <label for="maxRoomSelection" class="ewt-form-label">Maximum Rooms</label>
         <input
           id="maxRoomSelection"
           v-model="inheritedData.maxRoomSelection"
           type="number"
           min="1"
-          class="form-input"
+          class="ewt-input"
         />
       </div>
     </div>
 
-    <div class="room-bundles-section">
-      <div class="section-header">
-        <h4>Room Bundles</h4>
-        <div class="button-group">
-          <button @click="addRoom" class="btn btn-primary">
+    <div class="ewt-section">
+      <div class="ewt-header">
+        <h4 class="ewt-section-title">Room Bundles</h4>
+        <div class="ewt-flex ewt-gap-3">
+          <button @click="addRoom" class="ewt-btn ewt-btn--primary">
             <span class="icon">+</span> Add Room
           </button>
-          <button @click="removeRoom" class="btn btn-secondary">
+          <button @click="removeRoom" class="ewt-btn ewt-btn--secondary">
             <span class="icon">-</span> Remove Room
           </button>
         </div>
       </div>
 
-      <div v-if="inheritedData.roomOptions" class="room-bundles-container">
+      <div v-if="inheritedData.roomOptions" class="ewt-grid-rooms">
         <RoomBundle :roomBundle="inheritedData.roomOptions" />
       </div>
     </div>

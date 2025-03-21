@@ -6,7 +6,7 @@ const props = defineProps<{
   initialProduct?:
     | EntitySchema.Entities["product"][]
     | EntitySchema.Entities["product"];
-  mode?: "single" | "multiple"; // New prop to determine selection mode
+  mode?: "single" | "multiple";
 }>();
 
 const emit = defineEmits<{
@@ -23,8 +23,8 @@ const selectables = ref<EntitySchema.Entities["product"][]>([]);
 const selecteds = ref<EntitySchema.Entities["product"][]>([]);
 const isDropdownOpen = ref(false);
 const error = ref<string | undefined>(undefined);
+const isFrozen = ref(false);
 
-// Initialize selecteds based on mode
 if (props.initialProduct) {
   if (Array.isArray(props.initialProduct)) {
     selecteds.value = props.initialProduct;
@@ -56,12 +56,14 @@ async function searchProduct() {
 }
 
 function removeSelected(productId: string) {
+  if (isFrozen.value) return;
   selecteds.value = selecteds.value.filter(
     (product) => product.id !== productId,
   );
 }
 
 function addToSelecteds(product: EntitySchema.Entities["product"]) {
+  if (isFrozen.value) return;
   if (props.mode === "single") {
     selecteds.value = [product];
   } else if (!selecteds.value.some((p) => p.id === product.id)) {
@@ -73,6 +75,7 @@ function addToSelecteds(product: EntitySchema.Entities["product"]) {
 }
 
 function handleInputFocus() {
+  if (isFrozen.value) return;
   isDropdownOpen.value = true;
 }
 
@@ -80,24 +83,31 @@ function commitChanges() {
   if (!props.initialProduct) {
     throw new Error("initialProduct is not defined");
   }
+  isFrozen.value = true;
   const result = props.mode === "single" ? selecteds.value[0] : selecteds.value;
   emit("update:initialProduct", result);
 }
 
+function toggleEditState() {
+  isFrozen.value = false;
+}
+
 watch(nameToSearch, () => {
-  searchProduct();
+  if (!isFrozen.value) {
+    searchProduct();
+  }
 });
 </script>
 
 <template>
   <div class="product-selection-wrapper">
-    <div class="product-selection">
+    <div class="product-selection" :class="{ frozen: isFrozen }">
       <div class="selected-tags-wrapper">
         <div class="selected-tags" v-if="selecteds.length > 0">
           <div v-for="product in selecteds" :key="product.id" class="tag">
             {{ product.name }}
             <button
-              v-if="props.mode === 'multiple'"
+              v-if="props.mode === 'multiple' && !isFrozen"
               class="remove-tag"
               @click="removeSelected(product.id)"
             >
@@ -114,6 +124,7 @@ watch(nameToSearch, () => {
           placeholder="Search for products..."
           @focus="handleInputFocus"
           class="search-input"
+          :disabled="isFrozen"
         />
 
         <div v-if="isDropdownOpen" class="dropdown-content">
@@ -142,7 +153,10 @@ watch(nameToSearch, () => {
         </div>
       </div>
       <div v-if="selecteds.length > 0">
-        <button @click="commitChanges">Commit Changes</button>
+        <button v-if="!isFrozen" @click="commitChanges">Commit Changes</button>
+        <button v-else class="edit-button" @click="toggleEditState">
+          Edit
+        </button>
       </div>
     </div>
   </div>
@@ -170,6 +184,16 @@ watch(nameToSearch, () => {
   background: white;
   border-radius: 8px;
   box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+}
+
+.product-selection.frozen {
+  opacity: 0.6;
+  pointer-events: none;
+}
+
+.product-selection.frozen .edit-button {
+  pointer-events: auto; /* Allow interaction with the Edit button */
+  opacity: 1; /* Ensure the Edit button is fully visible */
 }
 
 .selected-tags-wrapper {
@@ -232,6 +256,11 @@ watch(nameToSearch, () => {
   border-color: #0066cc;
   background-color: white;
   box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+}
+
+.search-input:disabled {
+  background-color: #e0e0e0;
+  cursor: not-allowed;
 }
 
 .dropdown-container {
@@ -309,5 +338,10 @@ button:hover {
 
 button:active {
   transform: translateY(1px);
+}
+
+button:disabled {
+  background-color: #cccccc;
+  cursor: not-allowed;
 }
 </style>

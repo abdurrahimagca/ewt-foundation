@@ -20,9 +20,9 @@ onMounted(() => {
 </script>
 
 <template>
-  <div class="app-container">
-    <header class="app-header">
-      <h1 class="app-title">EWT Foundation</h1>
+  <div class="ewt-app-container">
+    <header class="ewt-app-header">
+      <h3>EWT Foundation App</h3>
     </header>
     <Location v-if="showLocation" />
     <TravelOrderInfo v-if="showTravelOrder" />
