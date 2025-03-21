@@ -67,7 +67,9 @@ watch(
         />
       </div>
       <div class="ewt-form-group">
-        <label for="maxQuantityAgainstParent" class="ewt-form-label">Max Quantity Against Parent</label>
+        <label for="maxQuantityAgainstParent" class="ewt-form-label"
+          >Max Quantity Against Parent</label
+        >
         <input
           id="maxQuantityAgainstParent"
           v-model="genericProductBundle.maxQuantityAgainstParent"
@@ -77,7 +79,9 @@ watch(
         />
       </div>
       <div class="ewt-form-group">
-        <label for="minQuantityAgainstParent" class="ewt-form-label">Min Quantity Against Parent</label>
+        <label for="minQuantityAgainstParent" class="ewt-form-label"
+          >Min Quantity Against Parent</label
+        >
         <input
           id="minQuantityAgainstParent"
           v-model="genericProductBundle.minQuantityAgainstParent"
@@ -107,19 +111,23 @@ watch(
       </div>
     </div>
     <div class="ewt-form-group">
-      <label for="allowMultipleProducts" class="ewt-form-label">Allow Multiple Products</label>
+      <label for="allowMultipleProducts" class="ewt-form-label"
+        >Allow Multiple Products</label
+      >
       <input
         id="allowMultipleProducts"
         v-model="genericProductBundle.allowMultipleProducts"
         type="checkbox"
       />
     </div>
-    <ProductSelection
-      mode="multiple"
-      :value="genericProductBundle.productOptions"
-      :initialProduct="genericProductBundle.productOptions"
-      @update:initialProduct="handleMultipleProductsChange($event)"
-    />
+    <div v-if="genericProductBundle.productOptions">
+      <ProductSelection
+        mode="multiple"
+        :value="genericProductBundle.productOptions"
+        :initialProduct="genericProductBundle.productOptions"
+        @update:initialProduct="handleMultipleProductsChange($event)"
+      />
+    </div>
   </div>
 </template>
 

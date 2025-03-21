@@ -18,10 +18,18 @@ const props = defineProps<{
 async function createSupplementRule() {
   const repo = data.repository("ce_room_supplement_rule");
   const newSupplementRule = await repo.create();
+
   if (newSupplementRule === null) {
     throw new Error("Could not create new supplement rule");
   }
+
+  const productRepo = data.repository("product");
+  const newProduct = await productRepo.create();
+  if (newProduct === null) {
+    throw new Error("Could not create new product");
+  }
   props.rule.supplementRule = newSupplementRule;
+  props.rule.supplementRule.supplementProduct = newProduct;
 }
 </script>
 

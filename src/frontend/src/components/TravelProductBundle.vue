@@ -89,7 +89,19 @@ async function addGenericBundleProduct() {
     error.value = e as string;
   }
 }
-async function deleteDataFromRepo() {}
+async function deleteDataFromRepo() {
+  try {
+    const repo = data.repository("ce_travel_product_config");
+    if (!entityData.value) {
+      throw new Error("No entity data found");
+    }
+    await repo.delete(entityData.value.id);
+    entityData.value = undefined;
+  } catch (e) {
+    console.error(e);
+    error.value = e as string;
+  }
+}
 
 async function upsertUpdatedData() {
   try {

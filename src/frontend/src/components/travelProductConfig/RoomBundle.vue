@@ -83,7 +83,11 @@ async function addAdditionalProduct(id: string) {
   <div class="ewt-section-layout">
     <h4 class="ewt-section-title">Room options</h4>
 
-    <div v-for="(room, index) in roomBundle" :key="room.id" class="ewt-card-detail">
+    <div
+      v-for="(room, index) in roomBundle"
+      :key="room.id"
+      class="ewt-card-detail"
+    >
       <div class="ewt-section">
         <div class="ewt-header">
           <h3 class="ewt-title">Room {{ index + 1 }}</h3>
@@ -91,10 +95,13 @@ async function addAdditionalProduct(id: string) {
 
         <div class="ewt-section">
           <div class="ewt-section-header">
-            <h4 class="ewt-section-title">Room Product</h4>
+            <h4 class="ewt-section-title">Room {{ index + 1 }} Product</h4>
           </div>
           <div v-if="!room.roomProduct">
-            <button @click="() => addRoom(room.id)" class="ewt-btn ewt-btn--primary">
+            <button
+              @click="() => addRoom(room.id)"
+              class="ewt-btn ewt-btn--primary"
+            >
               Add Room Product
             </button>
           </div>
@@ -103,17 +110,22 @@ async function addAdditionalProduct(id: string) {
               mode="single"
               :value="room.roomProduct"
               :initialProduct="room.roomProduct"
-              @update:initialProduct="(product) => handleOneProductChange(product, room.id)"
+              @update:initialProduct="
+                (product) => handleOneProductChange(product, room.id)
+              "
             />
           </div>
         </div>
 
         <div class="ewt-section">
           <div class="ewt-section-header">
-            <h4 class="ewt-section-title">Room Rules</h4>
+            <h4 class="ewt-section-title">Room {{ index + 1 }} Rules</h4>
           </div>
           <div v-if="!room.roomSaleRule">
-            <button @click="() => addRoomSaleRule(room.id)" class="ewt-btn ewt-btn--primary">
+            <button
+              @click="() => addRoomSaleRule(room.id)"
+              class="ewt-btn ewt-btn--primary"
+            >
               Add Room Rules
             </button>
           </div>
@@ -124,10 +136,15 @@ async function addAdditionalProduct(id: string) {
 
         <div class="ewt-section">
           <div class="ewt-section-header">
-            <h4 class="ewt-section-title">Additional Products</h4>
+            <h4 class="ewt-section-title">
+              Room {{ index + 1 }} Additional Products
+            </h4>
           </div>
           <div v-if="!room.additionalProducts">
-            <button @click="() => addAdditionalProduct(room.id)" class="ewt-btn ewt-btn--primary">
+            <button
+              @click="() => addAdditionalProduct(room.id)"
+              class="ewt-btn ewt-btn--primary"
+            >
               Add Additional Products
             </button>
           </div>

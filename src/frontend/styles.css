@@ -8,7 +8,6 @@
 .ewt-card {
   background-color: white;
   border-radius: 8px;
-  box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
   padding: 24px;
 }
 
@@ -59,7 +58,6 @@
   border: 2px solid #e0e0e0;
   border-radius: 6px;
   font-size: 0.875rem;
-  transition: all 0.2s ease;
   background-color: #f8f9fa;
 }
 
@@ -79,7 +77,6 @@
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s ease;
   border: none;
 }
 
@@ -157,22 +154,6 @@
   }
 }
 
-/* Card Styles */
-.ewt-card-hover {
-  background: #ffffff;
-  border-radius: 12px;
-  padding: 24px;
-  margin-bottom: 20px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
-  border: 1px solid #f0f0f0;
-  transition: all 0.3s ease;
-}
-
-.ewt-card-hover:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-}
-
 /* Grid Layouts */
 .ewt-grid-2 {
   display: grid;
@@ -199,7 +180,6 @@
   border: 1px solid #e1e1e1;
   border-radius: 8px;
   font-size: 14px;
-  transition: all 0.3s ease;
   background-color: #f8f9fa;
 }
 
@@ -264,14 +244,7 @@
   background: #ffffff;
   border-radius: 12px;
   padding: 24px;
-  box-shadow: 0 4px 6px rgba(0, 0, 0, 0.07);
   border: 1px solid #f0f0f0;
-  transition: all 0.3s ease;
-}
-
-.ewt-card-detail:hover {
-  transform: translateY(-2px);
-  box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
 }
 
 /* Product Details */
@@ -503,7 +476,7 @@
   background-color: #0052a3;
   color: white;
   text-align: center;
-  
+
   padding: 16px;
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;

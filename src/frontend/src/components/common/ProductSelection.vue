@@ -3,7 +3,7 @@ import { data } from "@shopware-ag/meteor-admin-sdk";
 import { defineProps, ref, watch, defineEmits } from "vue";
 
 const props = defineProps<{
-  initialProduct?:
+  initialProduct:
     | EntitySchema.Entities["product"][]
     | EntitySchema.Entities["product"];
   mode?: "single" | "multiple";
