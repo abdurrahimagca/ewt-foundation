@@ -21,7 +21,7 @@ export const apiShopTransformMw = async (c: Context, next: Next) => {
     // console.log("app", app);
 
     const shop = await app.repository.getShopById(shopId);
-    console.log("shop", shop);
+    //console.log("shop", shop);
     if (!shop) {
       return c.json({ error: "Shop not found" }, 404);
     }

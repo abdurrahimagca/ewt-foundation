@@ -3,6 +3,7 @@
     "target": "ES2022",
     "module": "NodeNext",
     "moduleResolution": "NodeNext",
+
     "strict": true,
     "esModuleInterop": true,
     "outDir": "./dist",
@@ -13,12 +14,14 @@
     "resolveJsonModule": true,
     "isolatedModules": true,
     "noEmit": false,
+    "removeComments": true,
+    "declaration": false,
     "baseUrl": "./",
     "paths": {
       "@/*": ["src/*"]
     },
     "types": ["node"]
   },
-  "include": ["src", "index.ts", ".env"],
+  "include": ["src", "index.ts"],
   "exclude": ["src/frontend", "node_modules", "dist", "Resources", "frontend"]
 }

@@ -6,7 +6,7 @@
   "scripts": {
     "dev": "NODE_ENV=development tsx watch index.ts",
     "start": "node dist/index.js",
-    "build": "rm -rf dist && tsc && rm -rf html && vite build && cp -r html dist",
+    "build": "rm -rf dist && tsc && vite build",
     "test": "echo \"Error: no test specified\" && exit 1",
     "format": "prettier --write \"**/*.{ts,js,json,md}\"",
     "lint": "eslint . --ext .ts",

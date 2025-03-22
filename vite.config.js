@@ -5,7 +5,7 @@ export default defineConfig({
   plugins: [vue()],
   root: "./src/frontend",
   build: {
-    outDir: "../../dist",
+    outDir: "../../dist/frontend",
     assetsDir: "assets",
     emptyOutDir: true, 
     rollupOptions: {

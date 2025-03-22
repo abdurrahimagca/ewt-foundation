@@ -16,7 +16,7 @@ GLOBAL_ROUTE.get("/page/ping", (c) => {
 GLOBAL_ROUTE.use(
   "/frontend/*",
   serveStatic({
-    root: "dist",
+    root: "dist/frontend",
     rewriteRequestPath: (path) => path.replace(/^\/public\/frontend/, ""),
   }),
 );

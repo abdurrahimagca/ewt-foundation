@@ -4,15 +4,7 @@ import GLOBAL_ROUTE from "./src/internal/routes/public/routes.js";
 import { serve } from "@hono/node-server";
 import SHOPWARE_ROUTE from "./src/internal/routes/app/shopware.routes.js";
 import { cors } from "hono/cors";
-import { AddressInfo } from "node:net";
-
 const app = new Hono();
-
-// Debug middleware for main app
-app.use("*", async (c, next) => {
-  console.log("Main app handling path:", c.req.path);
-  await next();
-});
 
 if (process.env.NODE_ENV === "development") {
   app.use(logger());

@@ -72,7 +72,6 @@ RUN chown -R appuser:appgroup /app
 
 # Copy only the necessary files from builder stage
 COPY --from=builder --chown=appuser:appgroup /app/dist ./dist
-COPY --from=builder --chown=appuser:appgroup /app/html ./html
 COPY --from=builder --chown=appuser:appgroup /app/package*.json ./
 
 # Set npm cache directory to avoid permission issues
