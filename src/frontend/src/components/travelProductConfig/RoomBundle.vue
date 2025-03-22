@@ -5,6 +5,8 @@ import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity"
 import RoomRule from "./RoomRules.vue";
 import GenericBundleProduct from "./GenericBundleProduct.vue";
 import { data } from "@shopware-ag/meteor-admin-sdk";
+import { ref } from "vue";
+
 const props = defineProps<{
   roomBundle: EntitySchema.Entities["ce_travel_product_config_room_bundle"][];
 }>();
@@ -78,6 +80,14 @@ async function addAdditionalProduct(id: string) {
     console.error(e);
   }
 }
+
+const tabs = [
+  { id: "product", label: "Room Product" },
+  { id: "rules", label: "Room Rules" },
+  { id: "additional", label: "Additional Products" },
+];
+
+const activeTab = ref("product");
 </script>
 
 <template>
@@ -94,63 +104,75 @@ async function addAdditionalProduct(id: string) {
           <h3 class="ewt-title">Room {{ index + 1 }}</h3>
         </div>
 
-        <div class="ewt-section">
-          <div class="ewt-section-header">
-            <h4 class="ewt-section-title">Room {{ index + 1 }} Product</h4>
-          </div>
-          <div v-if="!room.roomProduct">
-            <button
-              @click="() => addRoom(room.id)"
-              class="ewt-btn ewt-btn--primary"
-            >
-              Add Room Product
-            </button>
-          </div>
-          <div v-else class="ewt-product-selection">
-            <ProductSelection
-              mode="single"
-              :value="room.roomProduct"
-              :initialProduct="room.roomProduct"
-              @update:initialProduct="
-                (product) => handleOneProductChange(product, room.id)
-              "
-            />
-          </div>
+        <div class="ewt-tabs">
+          <button
+            v-for="tab in tabs"
+            :key="tab.id"
+            class="ewt-tab-button"
+            :class="{ active: activeTab === tab.id }"
+            @click="activeTab = tab.id"
+          >
+            {{ tab.label }}
+          </button>
         </div>
 
-        <div class="ewt-section">
-          <div class="ewt-section-header">
-            <h4 class="ewt-section-title">Room {{ index + 1 }} Rules</h4>
+        <div class="ewt-tab-content">
+          <div v-if="activeTab === 'product'" class="ewt-tab-pane">
+            <div v-if="!room.roomProduct">
+              <div class="ewt-empty-state">
+                <p>No room product configured</p>
+                <button
+                  @click="() => addRoom(room.id)"
+                  class="ewt-btn ewt-btn--secondary"
+                >
+                  Add Room Product
+                </button>
+              </div>
+            </div>
+            <div v-else class="ewt-product-selection">
+              <ProductSelection
+                mode="single"
+                :value="room.roomProduct"
+                :initialProduct="room.roomProduct"
+                @update:initialProduct="
+                  (product) => handleOneProductChange(product, room.id)
+                "
+              />
+            </div>
           </div>
-          <div v-if="!room.roomSaleRule">
-            <button
-              @click="() => addRoomSaleRule(room.id)"
-              class="ewt-btn ewt-btn--primary"
-            >
-              Add Room Rules
-            </button>
-          </div>
-          <div v-else>
-            <RoomRule :rule="room.roomSaleRule" />
-          </div>
-        </div>
 
-        <div class="ewt-section">
-          <div class="ewt-section-header">
-            <h4 class="ewt-section-title">
-              Room {{ index + 1 }} Additional Products
-            </h4>
+          <div v-if="activeTab === 'rules'" class="ewt-tab-pane">
+            <div v-if="!room.roomSaleRule">
+              <div class="ewt-empty-state">
+                <p>No room rules configured</p>
+                <button
+                  @click="() => addRoomSaleRule(room.id)"
+                  class="ewt-btn ewt-btn--secondary"
+                >
+                  Add Room Rules
+                </button>
+              </div>
+            </div>
+            <div v-else>
+              <RoomRule :rule="room.roomSaleRule" />
+            </div>
           </div>
-          <div v-if="!room.additionalProducts">
-            <button
-              @click="() => addAdditionalProduct(room.id)"
-              class="ewt-btn ewt-btn--primary"
-            >
-              Add Additional Products
-            </button>
-          </div>
-          <div v-else>
-            <GenericBundleProduct :inheritedData="room.additionalProducts" />
+
+          <div v-if="activeTab === 'additional'" class="ewt-tab-pane">
+            <div v-if="!room.additionalProducts">
+              <div class="ewt-empty-state">
+                <p>No additional products configured</p>
+                <button
+                  @click="() => addAdditionalProduct(room.id)"
+                  class="ewt-btn ewt-btn--secondary"
+                >
+                  Add Additional Products
+                </button>
+              </div>
+            </div>
+            <div v-else>
+              <GenericBundleProduct :inheritedData="room.additionalProducts" />
+            </div>
           </div>
         </div>
       </div>

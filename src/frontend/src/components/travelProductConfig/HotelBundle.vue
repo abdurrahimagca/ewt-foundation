@@ -53,7 +53,9 @@ async function addRoom() {
     </div>
     <div class="ewt-grid-2">
       <div class="ewt-form-group">
-        <label for="minRoomSelection" class="ewt-form-label">Minimum Rooms</label>
+        <label for="minRoomSelection" class="ewt-form-label"
+          >Minimum Rooms</label
+        >
         <input
           id="minRoomSelection"
           v-model="inheritedData.minRoomSelection"
@@ -64,7 +66,9 @@ async function addRoom() {
       </div>
 
       <div class="ewt-form-group">
-        <label for="maxRoomSelection" class="ewt-form-label">Maximum Rooms</label>
+        <label for="maxRoomSelection" class="ewt-form-label"
+          >Maximum Rooms</label
+        >
         <input
           id="maxRoomSelection"
           v-model="inheritedData.maxRoomSelection"
@@ -83,7 +87,7 @@ async function addRoom() {
             <span class="icon">+</span> Add Room
           </button>
           <button @click="removeRoom" class="ewt-btn ewt-btn--secondary">
-            <span class="icon">-</span> Remove Room
+            <span class="icon">-</span> Remove Last Room
           </button>
         </div>
       </div>

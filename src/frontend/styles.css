@@ -481,3 +481,115 @@
   border-top-left-radius: 8px;
   border-top-right-radius: 8px;
 }
+
+/* Enhanced Checkbox Styles */
+.ewt-checkbox-group {
+  display: flex;
+  flex-direction: column;
+  gap: 12px;
+}
+
+.ewt-checkbox-wrapper {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  cursor: pointer;
+}
+
+.ewt-checkbox {
+  appearance: none;
+  -webkit-appearance: none;
+  width: 20px;
+  height: 20px;
+  border: 2px solid #e0e0e0;
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+  background-color: #fff;
+  transition: all 0.2s ease;
+}
+
+.ewt-checkbox:hover {
+  border-color: #0066cc;
+  background-color: #f8f9fa;
+}
+
+.ewt-checkbox:checked {
+  background-color: #0066cc;
+  border-color: #0066cc;
+}
+
+.ewt-checkbox:checked::after {
+  content: "";
+  position: absolute;
+  left: 6px;
+  top: 2px;
+  width: 5px;
+  height: 10px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.ewt-checkbox:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+}
+
+.ewt-checkbox-label {
+  font-size: 0.875rem;
+  color: #333;
+  user-select: none;
+}
+
+/* Tabs System (shared between RoomBundle and TravelProductBundle) */
+.ewt-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 0 4px;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 24px;
+}
+
+.ewt-tab-button {
+  padding: 12px 20px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #6b7280;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ewt-tab-button:hover {
+  color: #4f46e5;
+}
+
+.ewt-tab-button.active {
+  color: #4f46e5;
+  border-bottom-color: #4f46e5;
+}
+
+.ewt-tab-content {
+  background: white;
+  border-radius: 8px;
+  min-height: 300px;
+}
+
+.ewt-tab-pane {
+  padding: 16px;
+}
+
+.ewt-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
+  text-align: center;
+  color: #6b7280;
+}

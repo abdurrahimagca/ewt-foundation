@@ -5,12 +5,21 @@ import { onMounted, ref } from "vue";
 import HotelBundle from "./travelProductConfig/HotelBundle.vue";
 import GenericBundleProduct from "./travelProductConfig/GenericBundleProduct.vue";
 import ChildDiscount from "./travelProductConfig/ChildDiscount.vue";
+
 const productId = ref<string | undefined>(undefined);
 const error = ref<string | undefined>(undefined);
 const isLoading = ref<boolean>(false);
 const entityData = ref<Entity<"ce_travel_product_config"> | undefined>(
   undefined,
 );
+
+const activeTab = ref("hotel");
+
+const tabs = [
+  { id: "hotel", label: "Hotel Bundle" },
+  { id: "generic", label: "Additional Products" },
+  { id: "child", label: "Child Discount" },
+];
 
 onMounted(async () => {
   try {
@@ -24,6 +33,8 @@ onMounted(async () => {
     const associations = [
       "hotelBundle",
       "additionalProducts",
+      "additionalProducts.productOptions",
+
       "childDiscount",
       "hotelBundle.roomOptions",
       "hotelBundle.additionalProducts",
@@ -43,6 +54,7 @@ onMounted(async () => {
     const repoSearchResult = await repo.search(criteria);
 
     const firstResult = repoSearchResult?.first();
+    console.log(JSON.stringify(firstResult, null, 2));
 
     if (firstResult === null) {
       (async () => {
@@ -64,6 +76,7 @@ onMounted(async () => {
     location.startAutoResizer();
   }
 });
+
 async function addChildDiscount() {
   try {
     const repo = data.repository("ce_custom_child_discount");
@@ -77,6 +90,7 @@ async function addChildDiscount() {
     error.value = e as string;
   }
 }
+
 async function addHotelBundle() {
   try {
     const repo = data.repository("ce_hotel_bundle");
@@ -90,6 +104,7 @@ async function addHotelBundle() {
     error.value = e as string;
   }
 }
+
 async function addGenericBundleProduct() {
   try {
     const repo = data.repository("ce_generic_product_bundle");
@@ -103,6 +118,7 @@ async function addGenericBundleProduct() {
     error.value = e as string;
   }
 }
+
 async function deleteDataFromRepo() {
   try {
     const repo = data.repository("ce_travel_product_config");
@@ -138,21 +154,14 @@ async function upsertUpdatedData() {
     </div>
 
     <div class="ewt-flex top-bar">
-      <button @click="upsertUpdatedData" class="ewt-btn ewt-btn--primary">
-        Save Changes
-      </button>
-      <button @click="deleteDataFromRepo" class="ewt-btn ewt-btn--danger">
-        Delete Configuration
-      </button>
-      <button @click="addChildDiscount" class="ewt-btn ewt-btn--primary">
-        Add Child Discount
-      </button>
-      <button @click="addHotelBundle" class="ewt-btn ewt-btn--primary">
-        Add Hotel Bundle
-      </button>
-      <button @click="addGenericBundleProduct" class="ewt-btn ewt-btn--primary">
-        Add Generic Bundle Product
-      </button>
+      <div class="ewt-button-group primary-actions">
+        <button @click="upsertUpdatedData" class="ewt-btn ewt-btn--primary">
+          Save Changes
+        </button>
+        <button @click="deleteDataFromRepo" class="ewt-btn ewt-btn--danger">
+          Delete Configuration
+        </button>
+      </div>
     </div>
 
     <div v-if="isLoading" class="ewt-loading">Loading configuration...</div>
@@ -162,21 +171,65 @@ async function upsertUpdatedData() {
     </div>
 
     <div v-else-if="entityData" class="ewt-section">
-      <section>
-        <h3 class="ewt-section-title">Hotel Bundle Config</h3>
-        <div v-if="entityData.hotelBundle">
-          <HotelBundle :inheritedData="entityData.hotelBundle" />
+      <div class="ewt-tabs">
+        <button
+          v-for="tab in tabs"
+          :key="tab.id"
+          class="ewt-tab-button"
+          :class="{ active: activeTab === tab.id }"
+          @click="activeTab = tab.id"
+        >
+          {{ tab.label }}
+        </button>
+      </div>
+
+      <div class="ewt-tab-content">
+        <div v-if="activeTab === 'hotel'" class="ewt-tab-pane">
+          <div v-if="entityData.hotelBundle">
+            <HotelBundle :inheritedData="entityData.hotelBundle" />
+          </div>
+          <div v-else class="ewt-empty-state">
+            <p>No hotel bundle configured</p>
+            <button @click="addHotelBundle" class="ewt-btn ewt-btn--secondary">
+              Add Hotel Bundle
+            </button>
+          </div>
         </div>
-        <div v-if="entityData.additionalProducts">
-          <GenericBundleProduct
-            :inheritedData="entityData.additionalProducts"
-          />
+
+        <div v-if="activeTab === 'generic'" class="ewt-tab-pane">
+          <div v-if="entityData.additionalProducts">
+            <GenericBundleProduct
+              :inheritedData="entityData.additionalProducts"
+            />
+          </div>
+          <div v-else class="ewt-empty-state">
+            <p>No additional products configured</p>
+            <button
+              @click="addGenericBundleProduct"
+              class="ewt-btn ewt-btn--secondary"
+            >
+              Add Additional Products
+            </button>
+          </div>
         </div>
-        <div v-if="entityData.childDiscount">
-          <ChildDiscount :inheritedData="entityData.childDiscount" />
+
+        <div v-if="activeTab === 'child'" class="ewt-tab-pane">
+          <div v-if="entityData.childDiscount">
+            <ChildDiscount :inheritedData="entityData.childDiscount" />
+          </div>
+          <div v-else class="ewt-empty-state">
+            <p>No child discount configured</p>
+            <button
+              @click="addChildDiscount"
+              class="ewt-btn ewt-btn--secondary"
+            >
+              Add Child Discount
+            </button>
+          </div>
         </div>
-      </section>
+      </div>
     </div>
+
     <pre>{{ entityData }}</pre>
   </div>
 </template>
@@ -184,11 +237,93 @@ async function upsertUpdatedData() {
 <style scoped>
 .top-bar {
   justify-content: space-between;
-  margin-top: 20px;
-  padding: 10px;
-  border: 1px solid grey;
+  margin: 20px 0;
+  padding: 16px;
+  background: white;
+  border: 1px solid #e5e7eb;
   border-radius: 8px;
-  margin-bottom: 20px;
+  gap: 16px;
+}
+
+.ewt-button-group {
+  display: flex;
+  gap: 8px;
+  flex-wrap: wrap;
+}
+
+.primary-actions {
+  flex-shrink: 0;
+}
+
+.icon {
+  margin-right: 6px;
+}
+
+.ewt-tabs {
+  display: flex;
+  gap: 4px;
+  padding: 0 4px;
+  border-bottom: 1px solid #e5e7eb;
+  margin-bottom: 24px;
+}
+
+.ewt-tab-button {
+  padding: 12px 20px;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 14px;
+  color: #6b7280;
+  border-bottom: 2px solid transparent;
+  transition: all 0.2s ease;
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+
+.ewt-tab-button:hover {
+  color: #4f46e5;
+}
+
+.ewt-tab-button.active {
+  color: #4f46e5;
+  border-bottom-color: #4f46e5;
+}
+
+.tab-icon {
+  font-size: 16px;
+}
+
+.ewt-tab-content {
+  background: white;
+  border-radius: 8px;
+  min-height: 300px;
+}
+
+.ewt-empty-state {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  padding: 48px;
   text-align: center;
+  color: #6b7280;
+}
+
+.empty-icon {
+  font-size: 48px;
+  margin-bottom: 16px;
+}
+
+/* Make the debug output collapsible and styled */
+pre {
+  background: #f8fafc;
+  padding: 16px;
+  border-radius: 8px;
+  border: 1px solid #e5e7eb;
+  overflow: auto;
+  margin-top: 24px;
+  font-size: 12px;
+  color: #374151;
 }
 </style>

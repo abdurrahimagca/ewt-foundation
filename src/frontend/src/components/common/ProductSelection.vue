@@ -110,6 +110,7 @@ watch(nameToSearch, () => {
               v-if="props.mode === 'multiple' && !isFrozen"
               class="remove-tag"
               @click="removeSelected(product.id)"
+              title="Remove product"
             >
               ×
             </button>
@@ -118,14 +119,29 @@ watch(nameToSearch, () => {
       </div>
 
       <div class="dropdown-container">
-        <input
-          type="text"
-          v-model="nameToSearch"
-          placeholder="Search for products..."
-          @focus="handleInputFocus"
-          class="search-input"
-          :disabled="isFrozen"
-        />
+        <div class="search-input-wrapper">
+          <svg
+            class="search-icon"
+            width="20"
+            height="20"
+            viewBox="0 0 20 20"
+            fill="none"
+            xmlns="http://www.w3.org/2000/svg"
+          >
+            <path
+              d="M8.5 3a5.5 5.5 0 1 0 0 11 5.5 5.5 0 0 0 0-11zM2 8.5a6.5 6.5 0 1 1 11.436 4.23l3.857 3.857a.75.75 0 0 1-1.061 1.061l-3.857-3.857A6.5 6.5 0 0 1 2 8.5z"
+              fill="currentColor"
+            />
+          </svg>
+          <input
+            type="text"
+            v-model="nameToSearch"
+            placeholder="Search products..."
+            @focus="handleInputFocus"
+            class="search-input"
+            :disabled="isFrozen"
+          />
+        </div>
 
         <div v-if="isDropdownOpen" class="dropdown-content">
           <div v-if="error" class="error-message">
@@ -152,10 +168,13 @@ watch(nameToSearch, () => {
           </div>
         </div>
       </div>
-      <div v-if="selecteds.length > 0">
-        <button v-if="!isFrozen" @click="commitChanges">Commit Changes</button>
+
+      <div class="action-buttons" v-if="selecteds.length > 0">
+        <button v-if="!isFrozen" @click="commitChanges" class="commit-button">
+          Save Changes
+        </button>
         <button v-else class="edit-button" @click="toggleEditState">
-          Edit
+          Edit Selection
         </button>
       </div>
     </div>
@@ -164,40 +183,42 @@ watch(nameToSearch, () => {
 
 <style scoped>
 .product-selection-wrapper {
-  min-height: 100px;
+  min-height: 120px;
   overflow: visible;
   display: flex;
   flex-direction: column;
-  font-family:
-    -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Oxygen, Ubuntu,
-    Cantarell, sans-serif;
+  font-family: -apple-system, system-ui, sans-serif;
+  margin: 16px 0;
+  width: 100%;
 }
 
 .product-selection {
   position: relative;
   width: 100%;
-  max-width: 500px;
   display: flex;
   flex-direction: column;
-  gap: 8px;
-  padding: 12px;
+  gap: 16px;
+  padding: 20px;
   background: white;
-  border-radius: 8px;
-  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  border-radius: 12px;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.08);
+  border: 1px solid #e5e7eb;
+  box-sizing: border-box;
 }
 
 .product-selection.frozen {
-  opacity: 0.6;
+  opacity: 0.8;
+  background-color: #f9fafb;
   pointer-events: none;
 }
 
 .product-selection.frozen .edit-button {
-  pointer-events: auto; /* Allow interaction with the Edit button */
-  opacity: 1; /* Ensure the Edit button is fully visible */
+  pointer-events: auto;
+  opacity: 1;
 }
 
 .selected-tags-wrapper {
-  max-height: 100px;
+  max-height: 150px;
   overflow-y: auto;
   padding: 4px 0;
 }
@@ -205,135 +226,188 @@ watch(nameToSearch, () => {
 .selected-tags {
   display: flex;
   flex-wrap: wrap;
-  gap: 8px;
+  gap: 10px;
 }
 
 .tag {
-  background-color: #f0f7ff;
-  color: #0066cc;
-  padding: 6px 10px;
-  border-radius: 6px;
+  background-color: #eef2ff;
+  color: #4f46e5;
+  padding: 8px 12px;
+  border-radius: 8px;
   font-size: 14px;
   display: flex;
   align-items: center;
-  gap: 6px;
-  border: 1px solid #cce4ff;
+  gap: 8px;
+  border: 1px solid #e0e7ff;
   transition: all 0.2s ease;
+  box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
 .tag:hover {
-  background-color: #e5f1ff;
+  background-color: #e0e7ff;
 }
 
 .remove-tag {
   background: none;
   border: none;
-  color: #0066cc;
+  color: #4f46e5;
   cursor: pointer;
-  padding: 0 2px;
-  font-size: 16px;
+  padding: 2px 6px;
+  font-size: 18px;
   line-height: 1;
-  opacity: 0.7;
-  transition: opacity 0.2s ease;
+  border-radius: 4px;
+  transition: all 0.2s ease;
 }
 
 .remove-tag:hover {
-  opacity: 1;
+  background-color: #4f46e5;
+  color: white;
+}
+
+.search-input-wrapper {
+  position: relative;
+  width: 100%;
+  box-sizing: border-box;
+}
+
+.search-icon {
+  position: absolute;
+  left: 12px;
+  top: 50%;
+  transform: translateY(-50%);
+  color: #9ca3af;
+  pointer-events: none;
 }
 
 .search-input {
   width: 100%;
-  padding: 8px 12px;
-  border: 2px solid #e0e0e0;
+  box-sizing: border-box;
+  padding: 10px 12px 10px 40px;
+  border: 1px solid #e5e7eb;
   border-radius: 8px;
   font-size: 14px;
   outline: none;
   transition: all 0.2s ease;
-  background-color: #f8f9fa;
+  background-color: #f9fafb;
+}
+
+.search-input:hover {
+  background-color: #fff;
+  border-color: #d1d5db;
 }
 
 .search-input:focus {
-  border-color: #0066cc;
-  background-color: white;
-  box-shadow: 0 0 0 3px rgba(0, 102, 204, 0.1);
+  background-color: #fff;
+  border-color: #4f46e5;
+  box-shadow: 0 0 0 3px rgba(79, 70, 229, 0.1);
 }
 
 .search-input:disabled {
-  background-color: #e0e0e0;
+  background-color: #f3f4f6;
   cursor: not-allowed;
+  color: #9ca3af;
+}
+
+.search-input::placeholder {
+  color: #9ca3af;
 }
 
 .dropdown-container {
   position: relative;
   width: 100%;
-  flex-shrink: 0;
-  margin-bottom: 8px;
+  z-index: 100;
+  box-sizing: border-box;
 }
 
 .dropdown-content {
   position: absolute;
-  top: calc(100% + 4px);
+  top: calc(100% + 8px);
   left: 0;
-  right: 0;
+  width: 100%;
   background: white;
-  border-radius: 8px;
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border-radius: 10px;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.15);
   z-index: 1000;
-  max-height: 200px;
+  max-height: 250px;
   overflow-y: auto;
-  border: 1px solid #e0e0e0;
+  overflow-x: hidden;
+  border: 1px solid #e5e7eb;
+  box-sizing: border-box;
 }
 
 .options-list {
-  padding: 6px 0;
+  padding: 8px 0;
 }
 
 .option {
-  padding: 8px 12px;
+  padding: 12px 16px;
   cursor: pointer;
   transition: all 0.2s ease;
   font-size: 14px;
+  color: #374151;
 }
 
 .option:hover {
-  background-color: #f0f7ff;
+  background-color: #f3f4f6;
 }
 
 .option.selected {
-  background-color: #e5f1ff;
-  color: #0066cc;
+  background-color: #eef2ff;
+  color: #4f46e5;
   font-weight: 500;
 }
 
 .error-message {
-  color: #dc3545;
-  padding: 12px 16px;
+  color: #dc2626;
+  padding: 16px;
   font-size: 14px;
-  background-color: #fff5f5;
-  border-radius: 6px;
+  background-color: #fef2f2;
+  border-radius: 8px;
+  margin: 8px;
 }
 
 .no-results {
-  padding: 12px 16px;
-  color: #666;
+  padding: 16px;
+  color: #6b7280;
   font-size: 14px;
   text-align: center;
 }
 
-button {
-  background-color: #0066cc;
-  color: white;
-  border: none;
-  padding: 8px 16px;
-  border-radius: 6px;
+.action-buttons {
+  display: flex;
+  justify-content: flex-end;
+  gap: 12px;
+  margin-top: 8px;
+}
+
+.commit-button,
+.edit-button {
+  padding: 10px 20px;
+  border-radius: 8px;
   font-size: 14px;
   font-weight: 500;
   cursor: pointer;
   transition: all 0.2s ease;
+  border: none;
 }
 
-button:hover {
-  background-color: #0052a3;
+.commit-button {
+  background-color: #4f46e5;
+  color: white;
+}
+
+.commit-button:hover {
+  background-color: #4338ca;
+}
+
+.edit-button {
+  background-color: #f3f4f6;
+  color: #374151;
+  border: 1px solid #e5e7eb;
+}
+
+.edit-button:hover {
+  background-color: #e5e7eb;
 }
 
 button:active {
@@ -341,7 +415,32 @@ button:active {
 }
 
 button:disabled {
-  background-color: #cccccc;
+  background-color: #e5e7eb;
+  color: #9ca3af;
   cursor: not-allowed;
+}
+
+/* Custom scrollbar for dropdown */
+.dropdown-content::-webkit-scrollbar {
+  width: 8px;
+}
+
+.dropdown-content::-webkit-scrollbar-track {
+  background: #f3f4f6;
+  border-radius: 4px;
+}
+
+.dropdown-content::-webkit-scrollbar-thumb {
+  background: #d1d5db;
+  border-radius: 4px;
+}
+
+.dropdown-content::-webkit-scrollbar-thumb:hover {
+  background: #9ca3af;
+}
+
+.search-input-wrapper:after {
+  content: "";
+  display: none;
 }
 </style>

@@ -81,14 +81,14 @@ declare namespace EntitySchema {
     product?: Entity<"product">;
     hotelBundle?: Entity<"ce_hotel_bundle">;
     childDiscount?: Entity<"ce_custom_child_discount">;
-    additionalProducts?: Entity<"ce_generic_product_bundle">;
+    additionalProducts: Entity<"ce_generic_product_bundle">;
   }
 
   interface ce_hotel_bundle {
     id: string;
     minRoomSelection: number;
     maxRoomSelection: number;
-    additionalProducts?: Entity<"ce_generic_product_bundle">;
+    additionalProducts?: EntityCollection<"ce_generic_product_bundle">;
     roomOptions: EntityCollection<"ce_travel_product_config_room_bundle">;
   }
 
@@ -127,14 +127,11 @@ declare namespace EntitySchema {
 
   interface ce_generic_product_bundle {
     id: string;
-    minQuantity: number;
-    maxQuantity: number;
-    minQuantityAgainstParent: number;
-    maxQuantityAgainstParent: number;
-    quantityStep: number;
+    availableOnMinParentQuantity: number;
+    availableOnMaxParentQuantity: number;
     allowMultipleProducts: boolean;
-    sortOrder: number;
-    productOptionsId?: string[];
-    productOptions?: EntityCollection<"product">;
+    disableIfChild: boolean;
+    productOptionsIds: string[];
+    productOptions: EntityCollection<"product">;
   }
 }

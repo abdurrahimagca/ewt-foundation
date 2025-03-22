@@ -59,6 +59,8 @@
         </fields>
     </entity>
 
+    <!-- PRODUCT CONF   -->
+
   
     <entity name="ce_travel_product_config">
         <fields>
@@ -113,18 +115,19 @@
             <int name="apply_to_quantity" store-api-aware="true"/>
         </fields>
     </entity>
+<entity name="ce_generic_product_bundle">
+    <fields>
+        <int name="available_on_min_parent_quantity" default="1" store-api-aware="true" />
+        <int name="available_on_max_parent_quantity" store-api-aware="true" />
+        <bool name="allow_multiple_products"  default="true" store-api-aware="true" />
+        <bool name="disable_if_child" default="false" store-api-aware="true" />
+        <one-to-many 
+            name="product_options" 
+            reference="product" 
+            on-delete="set-null"
+            store-api-aware="true" />
+    </fields>
+</entity>
 
-   <entity name="ce_generic_product_bundle">
-        <fields>
-            <int name="min_quantity" store-api-aware="true"/>
-            <int name="max_quantity" store-api-aware="true"/>
-            <int name="min_quantity_against_parent" store-api-aware="true"/>
-            <int name="max_quantity_against_parent" store-api-aware="true"/>
-            <int name="quantity_step" store-api-aware="true"/>
-            <bool name="allow_multiple_products" store-api-aware="true"/>
-            <int name="sort_order" store-api-aware="true"/>
-            <one-to-many name="product_options" store-api-aware="true" reference="product" on-delete="set-null"/>
-        </fields>
-    </entity>
 
 </entities>
