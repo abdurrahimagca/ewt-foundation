@@ -11,38 +11,28 @@ defineProps<{
     <div class="ewt-card-detail">
       <div class="ewt-grid-2">
         <div class="ewt-form-group">
-          <label for="childDiscount" class="ewt-form-label"
-            >Appy On Quantity</label
+          <label for="childDiscountPercentage" class="ewt-form-label"
+            >Child Discount Percentage</label
           >
           <input
-            id="childDiscount"
-            v-model="inheritedData.applyOnQuantity"
+            id="childDiscountPercentage"
+            v-model="inheritedData.childDiscountPercentage"
             type="number"
             min="0"
+            step="0.01"
             class="ewt-input"
           />
         </div>
         <div class="ewt-form-group">
-          <label for="applyToQuantity" class="ewt-form-label"
-            >Apply to Quantity</label
+          <label for="infantsDiscountPercentage" class="ewt-form-label"
+            >Infants Discount Percentage</label
           >
           <input
-            id="applyToQuantity"
-            v-model="inheritedData.applyToQuantity"
+            id="infantsDiscountPercentage"
+            v-model="inheritedData.infantDiscountPercentage"
             type="number"
             min="0"
-            class="ewt-input"
-          />
-        </div>
-        <div class="ewt-form-group">
-          <label for="discountPercentage" class="ewt-form-label"
-            >Discount Percentage</label
-          >
-          <input
-            id="discountPercentage"
-            v-model="inheritedData.discountPercentage"
-            type="number"
-            min="0"
+            step="0.01"
             class="ewt-input"
           />
         </div>

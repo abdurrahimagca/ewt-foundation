@@ -106,6 +106,12 @@ declare namespace EntitySchema {
     maxAdults: number;
     minChildren: number;
     maxChildren: number;
+    childrenStartAge: number;
+    childrenEndAge: number;
+    minInfants: number;
+    maxInfants: number;
+    maxTotalPersons: number;
+    allowPets: boolean;
     supplementRule?: Entity<"ce_room_supplement_rule">;
   }
 
@@ -120,9 +126,8 @@ declare namespace EntitySchema {
 
   interface ce_custom_child_discount {
     id: string;
-    discountPercentage: number;
-    applyOnQuantity: number;
-    applyToQuantity: number;
+    childDiscountPercentage: number;
+    infantDiscountPercentage: number;
   }
 
   interface ce_generic_product_bundle {

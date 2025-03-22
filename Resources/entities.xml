@@ -83,7 +83,6 @@
     <entity name="ce_travel_product_config_room_bundle">
         <fields>
             <one-to-one name="room_product" store-api-aware="true" reference="product" on-delete="set-null"/>
-            <one-to-many name="room_extra" store-api-aware="true" reference="product" on-delete="set-null"/>
             <one-to-one name="additional_products" reference="ce_generic_product_bundle" store-api-aware="true" on-delete="set-null" /> 
             <one-to-one name="room_sale_rule" store-api-aware="true" reference="ce_room_sale_rule" on-delete="set-null"/>
         </fields>
@@ -95,6 +94,12 @@
             <int name="max_adults" store-api-aware="true"/>
             <int name="min_children" store-api-aware="true"/>
             <int name="max_children" store-api-aware="true"/>
+            <int name="children_start_age" store-api-aware="true"/>
+            <int name="children_end_age" store-api-aware="true"/>
+            <int name="min_infants" store-api-aware="true"/>
+            <int name="max_infants" store-api-aware="true"/>
+            <int name="max_total_persons" store-api-aware="true"/>
+            <bool name="allow_pets" store-api-aware="true"/>
             <one-to-one name="supplement_rule" store-api-aware="true" reference="ce_room_supplement_rule" on-delete="set-null"/>
         </fields>
     </entity>
@@ -109,10 +114,9 @@
     </entity>
 
     <entity name="ce_custom_child_discount">
-        <fields>
-            <float name="discount_percentage" store-api-aware="true"/>
-            <int name="apply_on_quantity" store-api-aware="true"/>
-            <int name="apply_to_quantity" store-api-aware="true"/>
+        <fields> 
+            <float name="child_discount_percentage" store-api-aware="true"/>
+            <float name="infants_discount_percentage" store-api-aware="true" />
         </fields>
     </entity>
 <entity name="ce_generic_product_bundle">

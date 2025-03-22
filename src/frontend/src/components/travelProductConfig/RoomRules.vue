@@ -12,6 +12,11 @@ const props = defineProps<{
     maxAdults: number;
     minChildren: number;
     maxChildren: number;
+    childrenStartAge: number;
+    minInfants: number;
+    maxInfants: number;
+    maxTotalPersons: number;
+    allowPets: boolean;
     supplementRule?: Entity<"ce_room_supplement_rule">;
   } */
 
@@ -75,7 +80,66 @@ async function createSupplementRule() {
           type="number"
           class="ewt-input"
         />
-      </div>
+            </div>
+            <div class="ewt-form-group">
+        <label for="childrenStartAge" class="ewt-form-label">Children Start Age</label>
+        <input
+          id="childrenStartAge"
+          v-model="rule.childrenStartAge"
+          min="0"
+          type="number"
+          class="ewt-input"
+        />
+            </div>
+             <div class="ewt-form-group">
+        <label for="childrenEndAge" class="ewt-form-label">Children End Age</label>
+        <input
+          id="childrenStartAge"
+          v-model="rule.childrenEndAge"
+          min="0"
+          type="number"
+          class="ewt-input"
+        />
+            </div>
+            <div class="ewt-form-group">
+        <label for="minInfants" class="ewt-form-label">Minimum Infants</label>
+        <input
+          id="minInfants"
+          v-model="rule.minInfants"
+          min="0"
+          type="number"
+          class="ewt-input"
+        />
+            </div>
+            <div class="ewt-form-group">
+        <label for="maxInfants" class="ewt-form-label">Maximum Infants</label>
+        <input
+          id="maxInfants"
+          v-model="rule.maxInfants"
+          min="0"
+          type="number"
+          class="ewt-input"
+        />
+            </div>
+            <div class="ewt-form-group">
+        <label for="maxTotalPersons" class="ewt-form-label">Maximum Total Persons</label>
+        <input
+          id="maxTotalPersons"
+          v-model="rule.maxTotalPersons"
+          min="1"
+          type="number"
+          class="ewt-input"
+        />
+            </div>
+            <div class="ewt-form-group">
+        <label for="allowPets" class="ewt-form-label">Allow Pets</label>
+        <input
+          id="allowPets"
+          v-model="rule.allowPets"
+          type="checkbox"
+          class="ewt-checkbox"
+        />
+            </div>
     </div>
     <div class="ewt-button-group">
       <button @click="createSupplementRule" class="ewt-btn ewt-btn--primary">
