@@ -29,6 +29,10 @@ function handleMultipleProductsChange(
   if (!props.inheritedData) {
     throw new Error("props must be valid");
   }
+  if (!Array.isArray(product)) {
+    throw new Error("Expected multiple products");
+  }
+  props.inheritedData.productOptionsId = product.map((p) => p.id);
   props.inheritedData.productOptions = product as EntityCollection<"product">;
 }
 

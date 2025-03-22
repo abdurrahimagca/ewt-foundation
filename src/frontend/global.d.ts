@@ -94,6 +94,7 @@ declare namespace EntitySchema {
 
   interface ce_travel_product_config_room_bundle {
     id: string;
+    roomProductId?: string;
     roomProduct?: Entity<"product">;
     additionalProducts?: Entity<"ce_generic_product_bundle">;
     roomSaleRule?: Entity<"ce_room_sale_rule">;
@@ -113,6 +114,7 @@ declare namespace EntitySchema {
     supplementName: string;
     applyIfAdults: number;
     applyIfChildren: number;
+    supplementProductId?: string;
     supplementProduct?: Entity<"product">;
   }
 
@@ -132,6 +134,7 @@ declare namespace EntitySchema {
     quantityStep: number;
     allowMultipleProducts: boolean;
     sortOrder: number;
+    productOptionsId?: string[];
     productOptions?: EntityCollection<"product">;
   }
 }

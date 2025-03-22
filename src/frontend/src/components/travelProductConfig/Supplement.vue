@@ -14,6 +14,7 @@ function updateInitialProduct(
     if (Array.isArray(product)) {
       throw new Error("Expected single product");
     }
+    props.inheritedData.supplementProductId = product.id;
     props.inheritedData.supplementProduct = product as Entity<"product">;
   } catch (e) {
     console.error(e);
@@ -70,7 +71,6 @@ function updateInitialProduct(
         <ProductSelection
           :initialProduct="inheritedData.supplementProduct"
           @update:initial-product="updateInitialProduct"
-          v-model="inheritedData.supplementProduct"
           mode="single"
         />
       </div>

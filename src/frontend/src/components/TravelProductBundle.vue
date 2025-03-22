@@ -4,6 +4,7 @@ import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity"
 import { onMounted, ref } from "vue";
 import HotelBundle from "./travelProductConfig/HotelBundle.vue";
 import GenericBundleProduct from "./travelProductConfig/GenericBundleProduct.vue";
+import ChildDiscount from "./travelProductConfig/ChildDiscount.vue";
 const productId = ref<string | undefined>(undefined);
 const error = ref<string | undefined>(undefined);
 const isLoading = ref<boolean>(false);
@@ -63,6 +64,19 @@ onMounted(async () => {
     location.startAutoResizer();
   }
 });
+async function addChildDiscount() {
+  try {
+    const repo = data.repository("ce_custom_child_discount");
+    const newChildDiscount = await repo.create();
+    if (newChildDiscount === null || !entityData.value) {
+      throw new Error("Could not create new child discount");
+    }
+    entityData.value.childDiscount = newChildDiscount;
+  } catch (e) {
+    console.error(e);
+    error.value = e as string;
+  }
+}
 async function addHotelBundle() {
   try {
     const repo = data.repository("ce_hotel_bundle");
@@ -130,6 +144,9 @@ async function upsertUpdatedData() {
       <button @click="deleteDataFromRepo" class="ewt-btn ewt-btn--danger">
         Delete Configuration
       </button>
+      <button @click="addChildDiscount" class="ewt-btn ewt-btn--primary">
+        Add Child Discount
+      </button>
       <button @click="addHotelBundle" class="ewt-btn ewt-btn--primary">
         Add Hotel Bundle
       </button>
@@ -154,6 +171,9 @@ async function upsertUpdatedData() {
           <GenericBundleProduct
             :inheritedData="entityData.additionalProducts"
           />
+        </div>
+        <div v-if="entityData.childDiscount">
+          <ChildDiscount :inheritedData="entityData.childDiscount" />
         </div>
       </section>
     </div>

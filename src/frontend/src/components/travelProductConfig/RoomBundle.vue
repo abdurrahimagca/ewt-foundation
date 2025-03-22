@@ -29,6 +29,7 @@ function handleOneProductChange(
 
   const room = props.roomBundle.find((room) => room.id === id);
   if (room) {
+    room.roomProductId = product.id;
     room.roomProduct = product as Entity<"product">;
   }
 }
