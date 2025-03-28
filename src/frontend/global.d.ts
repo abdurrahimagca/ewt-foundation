@@ -14,6 +14,7 @@ declare namespace EntitySchema {
     ce_room_supplement_rule: ce_room_supplement_rule;
     ce_custom_child_discount: ce_custom_child_discount;
     ce_generic_product_bundle: ce_generic_product_bundle;
+    ce_generic_bundle_product: ce_generic_bundle_product;
   }
 
   interface product {
@@ -134,9 +135,17 @@ declare namespace EntitySchema {
     id: string;
     availableOnMinParentQuantity: number;
     availableOnMaxParentQuantity: number;
-    allowMultipleProducts: boolean;
-    disableIfChild: boolean;
-    productOptionsIds: string[];
+    bundleProductsIds: string[];
+    bundleProducts: EntityCollection<"ce_generic_bundle_product">;
+  }
+
+  interface ce_generic_bundle_product {
+    id: string;
+    parentProductId?: string;
+    parentProduct: Entity<"product">;
     productOptions: EntityCollection<"product">;
+    matchParentQuantity: boolean;
+    matchTravellersCount: boolean;
+    isRequired: boolean;
   }
 }

@@ -1,29 +1,44 @@
 <script lang="ts" setup>
-import { defineProps} from "vue";
-import ProductSelection from "../common/ProductSelection.vue";
-import EntityCollection from "@shopware-ag/meteor-admin-sdk/es/_internals/data/EntityCollection";
+import { defineProps } from "vue";
+import BundleProduct from "./BundleProduct.vue";
+import { data } from "@shopware-ag/meteor-admin-sdk";
 
 const props = defineProps<{
   inheritedData?: EntitySchema.Entities["ce_generic_product_bundle"];
 }>();
 
-function handleMultipleProductsChange(
-  product:
-    | EntitySchema.Entities["product"][]
-    | EntitySchema.Entities["product"],
-) {
-  if (!props.inheritedData) {
-    throw new Error("props must be valid");
+async function addBundleProduct() {
+  try {
+    const repo = data.repository("ce_generic_bundle_product");
+    
+    const newBundleProduct = await repo.create();
+    if (newBundleProduct === null) {
+      throw new Error("Could not create new bundle product");
+    }
+    if (props.inheritedData) {
+      const repo = data.repository("ce_generic_bundle_product");
+    
+      const newBundleProduct = await repo.create();
+      const parentProduct = await data.repository("product").create();
+      if (parentProduct === null) {
+        throw new Error("Could not create new parent product");
+      }
+      if (newBundleProduct === null) {
+        throw new Error("Could not create new bundle product");
+      }
+      newBundleProduct.parentProduct = parentProduct;
+      props.inheritedData.bundleProducts.push(newBundleProduct);
+
+    }
+  } catch (e) {
+    console.error(e);
   }
-  if (!Array.isArray(product)) {
-    throw new Error("Expected multiple products");
+}
+
+function removeBundleProduct(id: string) {
+  if (props.inheritedData?.bundleProducts) {
+    props.inheritedData.bundleProducts.remove(id);
   }
-  const ids = product.map((product) => product.id);
-  if (!props.inheritedData.productOptionsIds) {
-    props.inheritedData.productOptionsIds = [];
-  }
-  props.inheritedData.productOptionsIds = ids;
-  props.inheritedData.productOptions = product as EntityCollection<"product">;
 }
 </script>
 
@@ -33,7 +48,7 @@ function handleMultipleProductsChange(
       <div class="ewt-grid-2">
         <div class="ewt-form-group">
           <label for="maxQuantity" class="ewt-form-label"
-            >Avaliable On Max Parent Quantity</label
+            >Available On Max Parent Quantity</label
           >
           <input
             id="maxQuantity"
@@ -45,7 +60,7 @@ function handleMultipleProductsChange(
         </div>
         <div class="ewt-form-group">
           <label for="minQuantity" class="ewt-form-label"
-            >Avaliable On Min Parent Quantity</label
+            >Available On Min Parent Quantity</label
           >
           <input
             id="minQuantity"
@@ -56,37 +71,28 @@ function handleMultipleProductsChange(
           />
         </div>
       </div>
-      <div class="ewt-form-group ewt-checkbox-group">
-        <div class="ewt-checkbox-wrapper">
-          <input
-            id="allowMultipleProducts"
-            v-model="inheritedData.allowMultipleProducts"
-            type="checkbox"
-            class="ewt-checkbox"
-          />
-          <label for="allowMultipleProducts" class="ewt-checkbox-label">
-            Allow Multiple Products
-          </label>
-        </div>
 
-        <div class="ewt-checkbox-wrapper">
-          <input
-            id="disableIfChild"
-            v-model="inheritedData.disableIfChild"
-            type="checkbox"
-            class="ewt-checkbox"
-          />
-          <label for="disableIfChild" class="ewt-checkbox-label">
-            Disable If Child
-          </label>
+      <div class="ewt-bundle-products">
+        <h4>Bundle Products</h4>
+        <button @click="addBundleProduct" class="ewt-btn ewt-btn--secondary">
+          Add Bundle Product
+        </button>
+
+        <div v-if="inheritedData.bundleProducts" class="bundle-products-list">
+          <div
+            v-for="bundleProduct in inheritedData.bundleProducts"
+            :key="bundleProduct.id"
+            class="bundle-product-item"
+          >
+            <BundleProduct :inheritedData="bundleProduct" />
+            <button
+              @click="() => removeBundleProduct(bundleProduct.id)"
+              class="ewt-btn ewt-btn--danger"
+            >
+              Remove
+            </button>
+          </div>
         </div>
-      </div>
-      <div v-if="inheritedData.productOptions">
-        <ProductSelection
-          mode="multiple"
-          :initialProduct="inheritedData.productOptions"
-          @update:initialProduct="handleMultipleProductsChange($event)"
-        />
       </div>
     </div>
   </div>
