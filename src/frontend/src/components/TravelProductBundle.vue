@@ -166,6 +166,21 @@ async function upsertUpdatedData() {
     error.value = e as string;
   }
 }
+
+// Add this function to prevent scroll jumps
+function handleTabChange(tabId: string) {
+  // Prevent default scroll behavior
+  const currentScrollPosition = window.scrollY;
+  activeTab.value = tabId;
+
+  // Use setTimeout to maintain scroll position after DOM update
+  setTimeout(() => {
+    window.scrollTo({
+      top: currentScrollPosition,
+      behavior: "instant",
+    });
+  }, 0);
+}
 </script>
 
 <template>
@@ -198,7 +213,7 @@ async function upsertUpdatedData() {
           :key="tab.id"
           class="ewt-tab-button"
           :class="{ active: activeTab === tab.id }"
-          @click="activeTab = tab.id"
+          @click="handleTabChange(tab.id)"
         >
           {{ tab.label }}
         </button>
@@ -314,9 +329,13 @@ async function upsertUpdatedData() {
 }
 
 .ewt-tab-content {
-  background: white;
-  border-radius: 8px;
+  position: relative;
   min-height: 300px;
+  overflow: visible;
+}
+
+.ewt-tab-pane {
+  position: relative;
 }
 
 .ewt-empty-state {

@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { defineProps } from "vue";
+import { defineProps, onMounted } from "vue";
 import ProductSelection from "../common/ProductSelection.vue";
 import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
 import RoomRule from "./RoomRules.vue";
@@ -18,6 +18,21 @@ const props = defineProps<{
     additionalProducts: Entity<"ce_generic_product_bundle">;
     roomSaleRule: Entity<"ce_room_sale_rule">;
   }*/
+
+// Add these to manage tabs independently for each room
+const roomTabs = ref<{ [key: string]: string }>({}); // Track active tab for each room
+
+// Initialize tabs for each room
+onMounted(() => {
+  props.roomBundle.forEach(room => {
+    roomTabs.value[room.id] = 'product'; // Set default tab
+  });
+});
+
+function handleTabChange(roomId: string, tabId: string) {
+  // Update only the specific room's tab
+  roomTabs.value[roomId] = tabId;
+}
 
 function handleOneProductChange(
   product:
@@ -91,8 +106,6 @@ const tabs = [
   { id: "rules", label: "Room Rules" },
   { id: "additional", label: "Additional Products" },
 ];
-
-const activeTab = ref("product");
 </script>
 
 <template>
@@ -114,15 +127,15 @@ const activeTab = ref("product");
             v-for="tab in tabs"
             :key="tab.id"
             class="ewt-tab-button"
-            :class="{ active: activeTab === tab.id }"
-            @click="activeTab = tab.id"
+            :class="{ active: roomTabs[room.id] === tab.id }"
+            @click="handleTabChange(room.id, tab.id)"
           >
             {{ tab.label }}
           </button>
         </div>
 
         <div class="ewt-tab-content">
-          <div v-if="activeTab === 'product'" class="ewt-tab-pane">
+          <div v-if="roomTabs[room.id] === 'product'" class="ewt-tab-pane">
             <div v-if="!room.roomProduct">
               <div class="ewt-empty-state">
                 <p>No room product configured</p>
@@ -146,7 +159,7 @@ const activeTab = ref("product");
             </div>
           </div>
 
-          <div v-if="activeTab === 'rules'" class="ewt-tab-pane">
+          <div v-if="roomTabs[room.id] === 'rules'" class="ewt-tab-pane">
             <div v-if="!room.roomSaleRule">
               <div class="ewt-empty-state">
                 <p>No room rules configured</p>
@@ -163,7 +176,7 @@ const activeTab = ref("product");
             </div>
           </div>
 
-          <div v-if="activeTab === 'additional'" class="ewt-tab-pane">
+          <div v-if="roomTabs[room.id] === 'additional'" class="ewt-tab-pane">
             <div v-if="!room.additionalProducts">
               <div class="ewt-empty-state">
                 <p>No additional products configured</p>
@@ -186,5 +199,54 @@ const activeTab = ref("product");
 </template>
 
 <style scoped>
-/* Remove all styles as they're now in styles.css */
+.ewt-card-detail {
+  contain: content;
+  background-color: #ffffff;
+  border: 1px solid #f0f0f0;
+  margin-bottom: 24px;
+}
+
+/* Alternate subtle background colors for rooms */
+.ewt-card-detail:nth-child(3n+1) {
+  background-color: #f8f9ff; /* Very subtle blue tint */
+}
+
+.ewt-card-detail:nth-child(3n+2) {
+  background-color: #fff8f5; /* Very subtle orange/peach tint */
+}
+
+.ewt-card-detail:nth-child(3n+3) {
+  background-color: #f5fff8; /* Very subtle green tint */
+}
+
+.ewt-tab-content {
+  position: relative;
+  min-height: 300px;
+  contain: layout;
+  background-color: #ffffff;
+  border-radius: 0 0 8px 8px;
+  padding: 16px;
+  box-shadow: inset 0 1px 3px rgba(0, 0, 0, 0.02);
+}
+
+.ewt-tab-pane {
+  position: relative;
+}
+
+.ewt-section {
+  background-color: inherit;
+  border-radius: 8px;
+  overflow: hidden;
+}
+
+.ewt-header {
+  padding: 16px;
+  border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  background-color: rgba(255, 255, 255, 0.5);
+}
+
+.ewt-tabs {
+  background-color: rgba(255, 255, 255, 0.5);
+  padding: 0 16px;
+}
 </style>
