@@ -13,14 +13,16 @@ declare namespace EntitySchema {
     ce_room_sale_rule: ce_room_sale_rule;
     ce_room_supplement_rule: ce_room_supplement_rule;
     ce_custom_child_discount: ce_custom_child_discount;
-    ce_generic_product_bundle: ce_generic_product_bundle;
+    ce_generic_bundle: ce_generic_bundle;
     ce_generic_bundle_product: ce_generic_bundle_product;
   }
 
   interface product {
     id: string;
     name: string;
+    productNumber: string;
     available: boolean;
+    _isNew: boolean;
   }
 
   interface ce_traveller {
@@ -82,14 +84,14 @@ declare namespace EntitySchema {
     product?: Entity<"product">;
     hotelBundle?: Entity<"ce_hotel_bundle">;
     childDiscount?: Entity<"ce_custom_child_discount">;
-    additionalProducts: Entity<"ce_generic_product_bundle">;
+    additionalProducts: Entity<"ce_generic_bundle">;
   }
 
   interface ce_hotel_bundle {
     id: string;
     minRoomSelection: number;
     maxRoomSelection: number;
-    additionalProducts?: EntityCollection<"ce_generic_product_bundle">;
+    additionalProducts?: EntityCollection<"ce_generic_bundle">;
     roomOptions: EntityCollection<"ce_travel_product_config_room_bundle">;
   }
 
@@ -97,7 +99,7 @@ declare namespace EntitySchema {
     id: string;
     roomProductId?: string;
     roomProduct?: Entity<"product">;
-    additionalProducts?: Entity<"ce_generic_product_bundle">;
+    additionalProducts?: Entity<"ce_generic_bundle">;
     roomSaleRule?: Entity<"ce_room_sale_rule">;
   }
 
@@ -131,10 +133,12 @@ declare namespace EntitySchema {
     infantDiscountPercentage: number;
   }
 
-  interface ce_generic_product_bundle {
+  interface ce_generic_bundle {
     id: string;
+    parentProductId?: string;
+    parentProduct: Entity<"product">;
     availableOnMinParentQuantity: number;
-    availableOnMaxParentQuantity: number;
+    availableOnMaxParentQuantity: number; 
     bundleProductsIds: string[];
     bundleProducts: EntityCollection<"ce_generic_bundle_product">;
   }
@@ -142,6 +146,7 @@ declare namespace EntitySchema {
   interface ce_generic_bundle_product {
     id: string;
     parentProductId?: string;
+    allowMultipleSelection: boolean;
     parentProduct: Entity<"product">;
     productOptions: EntityCollection<"product">;
     matchParentQuantity: boolean;

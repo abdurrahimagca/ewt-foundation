@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { data } from "@shopware-ag/meteor-admin-sdk";
+import { data, notification } from "@shopware-ag/meteor-admin-sdk";
 import { defineProps, ref, watch, defineEmits } from "vue";
 
 const props = defineProps<{
@@ -83,6 +83,14 @@ function commitChanges() {
   if (!props.initialProduct) {
     throw new Error("initialProduct is not defined");
   }
+  if (selecteds.value.map((p) => p._isNew).includes(true)) {
+    notification.dispatch({
+      title: "Error",
+      message: "Please select a existing product",
+    });
+    return;
+  }
+
   isFrozen.value = true;
   const result = props.mode === "single" ? selecteds.value[0] : selecteds.value;
   emit("update:initialProduct", result);
@@ -105,7 +113,7 @@ watch(nameToSearch, () => {
       <div class="selected-tags-wrapper">
         <div class="selected-tags" v-if="selecteds.length > 0">
           <div v-for="product in selecteds" :key="product.id" class="tag">
-            {{ product.name }}
+            {{ product.name }} - {{ product.productNumber }}
             <button
               v-if="props.mode === 'multiple' && !isFrozen"
               class="remove-tag"
@@ -163,7 +171,7 @@ watch(nameToSearch, () => {
               class="option"
               :class="{ selected: selecteds.some((p) => p.id === product.id) }"
             >
-              {{ product.name }}
+              {{ product.name }} - {{ product.productNumber }}
             </div>
           </div>
         </div>

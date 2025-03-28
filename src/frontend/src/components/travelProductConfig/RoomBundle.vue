@@ -3,7 +3,7 @@ import { defineProps } from "vue";
 import ProductSelection from "../common/ProductSelection.vue";
 import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
 import RoomRule from "./RoomRules.vue";
-import GenericBundleProduct from "./GenericBundleProduct.vue";
+import GenericBundle from "./GenericBundle.vue";
 import { data } from "@shopware-ag/meteor-admin-sdk";
 import { ref } from "vue";
 
@@ -67,12 +67,17 @@ async function addRoomSaleRule(id: string) {
 }
 async function addAdditionalProduct(id: string) {
   try {
-    const repo = data.repository("ce_generic_product_bundle");
+    const repo = data.repository("ce_generic_bundle");
     const newAdditionalProduct = await repo.create();
     if (newAdditionalProduct === null) {
       throw new Error("Could not create new additional product");
     }
     const room = props.roomBundle.find((room) => room.id === id);
+    const newProduct = await data.repository("product").create();
+    if (newProduct === null) {
+      throw new Error("Could not create new product");
+    }
+    newAdditionalProduct.parentProduct = newProduct;
     if (room) {
       room.additionalProducts = newAdditionalProduct;
     }
@@ -171,7 +176,7 @@ const activeTab = ref("product");
               </div>
             </div>
             <div v-else>
-              <GenericBundleProduct :inheritedData="room.additionalProducts" />
+              <GenericBundle :inheritedData="room.additionalProducts" />
             </div>
           </div>
         </div>

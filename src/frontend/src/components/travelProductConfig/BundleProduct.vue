@@ -31,7 +31,8 @@ function handleProductOptionsChange(
     throw new Error("Products must be an array");
   }
   if (props.inheritedData) {
-    props.inheritedData.productOptions = products as EntityCollection<"product">;
+    props.inheritedData.productOptions =
+      products as EntityCollection<"product">;
   }
 }
 </script>
@@ -40,6 +41,10 @@ function handleProductOptionsChange(
   <div v-if="inheritedData" class="ewt-card-detail">
     <div class="form-layout">
       <div class="ewt-grid-2">
+        <p>
+            For product level config use Shopware Config for each product. This is
+            only for bundle settings
+        </p>
         <div class="ewt-form-group">
           <label class="ewt-form-label">Is Required</label>
           <input
@@ -68,28 +73,34 @@ function handleProductOptionsChange(
         </div>
 
         <div class="ewt-form-group">
-          <label class="ewt-form-label">Parent Product</label>
-          <div v-if="inheritedData.parentProduct">
-          <ProductSelection
-            mode="single"
-            :initial-product="
-              inheritedData.parentProduct
-            "
-            @update:initial-product="handleParentProductChange"
+          <label class="ewt-form-label">Allow Multiple</label>
+          <input
+            v-model="inheritedData.allowMultipleSelection"
+            type="checkbox"
+            class="ewt-checkbox"
           />
-
         </div>
 
         <div class="ewt-form-group">
-          <label class="ewt-form-label">Product Options</label>
-          <ProductSelection
-            mode="multiple"
-            :initial-product="inheritedData.productOptions"
-            @update:initial-product="handleProductOptionsChange"
-          />
+          <label class="ewt-form-label">Parent Product</label>
+          <div v-if="inheritedData.parentProduct">
+            <ProductSelection
+              mode="single"
+              :initial-product="inheritedData.parentProduct"
+              @update:initial-product="handleParentProductChange"
+            />
+          </div>
+
+          <div class="ewt-form-group">
+            <label class="ewt-form-label">Product Options</label>
+            <ProductSelection
+              mode="multiple"
+              :initial-product="inheritedData.productOptions"
+              @update:initial-product="handleProductOptionsChange"
+            />
+          </div>
         </div>
       </div>
     </div>
-  </div>
   </div>
 </template>

@@ -1,9 +1,9 @@
 <script lang="ts" setup>
-import { data, location } from "@shopware-ag/meteor-admin-sdk";
+import { data, location, notification } from "@shopware-ag/meteor-admin-sdk";
 import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
 import { onMounted, ref } from "vue";
 import HotelBundle from "./travelProductConfig/HotelBundle.vue";
-import GenericBundleProduct from "./travelProductConfig/GenericBundleProduct.vue";
+import GenericBundle from "./travelProductConfig/GenericBundle.vue";
 import ChildDiscount from "./travelProductConfig/ChildDiscount.vue";
 
 const productId = ref<string | undefined>(undefined);
@@ -33,6 +33,7 @@ onMounted(async () => {
     const associations = [
       "hotelBundle",
       "additionalProducts",
+      "additionalProducts.parentProduct",
       "additionalProducts.bundleProducts",
       "additionalProducts.bundleProducts.parentProduct",
       "additionalProducts.bundleProducts.productOptions",
@@ -111,12 +112,16 @@ async function addHotelBundle() {
 
 async function addGenericBundleProduct() {
   try {
-    const repo = data.repository("ce_generic_product_bundle");
-    const newGenericBundleProduct = await repo.create();
-    if (newGenericBundleProduct === null || !entityData.value) {
-      throw new Error("Could not create new generic bundle product");
+    const newBundle = await data.repository("ce_generic_bundle").create();
+    if (newBundle === null || !entityData.value) {
+      throw new Error("Could not create new generic bundle");
     }
-    entityData.value.additionalProducts = newGenericBundleProduct;
+    const parent = await data.repository("product").create();
+    if (parent === null) {
+      throw new Error("Could not create new parent product");
+    }
+    newBundle.parentProduct = parent;
+    entityData.value.additionalProducts = newBundle;
   } catch (e) {
     console.error(e);
     error.value = e as string;
@@ -131,6 +136,10 @@ async function deleteDataFromRepo() {
     }
     await repo.delete(entityData.value.id);
     entityData.value = undefined;
+    notification.dispatch({
+      title: "Success",
+      message: "Configuration deleted",
+    });
   } catch (e) {
     console.error(e);
     error.value = e as string;
@@ -144,8 +153,16 @@ async function upsertUpdatedData() {
       throw new Error("No entity data found");
     }
     await repo.save(entityData.value);
+    notification.dispatch({
+      title: "Success",
+      message: "Configuration saved",
+    });
   } catch (e) {
     console.error(e);
+    notification.dispatch({
+      title: "Error",
+      message: "Could not save configuration",
+    });
     error.value = e as string;
   }
 }
@@ -202,9 +219,7 @@ async function upsertUpdatedData() {
 
         <div v-if="activeTab === 'generic'" class="ewt-tab-pane">
           <div v-if="entityData.additionalProducts">
-            <GenericBundleProduct
-              :inheritedData="entityData.additionalProducts"
-            />
+            <GenericBundle :inheritedData="entityData.additionalProducts" />
           </div>
           <div v-else class="ewt-empty-state">
             <p>No additional products configured</p>
