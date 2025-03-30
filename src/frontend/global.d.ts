@@ -19,10 +19,12 @@ declare namespace EntitySchema {
 
   interface product {
     id: string;
-    name: string;
+    variation?: string[];
+    name: string | null;
     productNumber: string;
     available: boolean;
     _isNew: boolean;
+    children: EntityCollection<"product">;
   }
 
   interface ce_traveller {
@@ -135,19 +137,19 @@ declare namespace EntitySchema {
 
   interface ce_generic_bundle {
     id: string;
-    parentProductId?: string;
-    parentProduct: Entity<"product">;
+   // parentProductId: string[];
+    parentProducts: EntityCollection<"product">;
     availableOnMinParentQuantity: number;
-    availableOnMaxParentQuantity: number; 
+    availableOnMaxParentQuantity: number;
     bundleProductsIds: string[];
     bundleProducts: EntityCollection<"ce_generic_bundle_product">;
   }
 
   interface ce_generic_bundle_product {
     id: string;
-    parentProductId?: string;
+    //parentProductId: string[];
     allowMultipleSelection: boolean;
-    parentProduct: Entity<"product">;
+    parentProducts: EntityCollection<"product">;
     productOptions: EntityCollection<"product">;
     matchParentQuantity: boolean;
     matchTravellersCount: boolean;

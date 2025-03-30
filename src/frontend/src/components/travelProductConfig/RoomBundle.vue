@@ -24,8 +24,8 @@ const roomTabs = ref<{ [key: string]: string }>({}); // Track active tab for eac
 
 // Initialize tabs for each room
 onMounted(() => {
-  props.roomBundle.forEach(room => {
-    roomTabs.value[room.id] = 'product'; // Set default tab
+  props.roomBundle.forEach((room) => {
+    roomTabs.value[room.id] = "product"; // Set default tab
   });
 });
 
@@ -88,11 +88,7 @@ async function addAdditionalProduct(id: string) {
       throw new Error("Could not create new additional product");
     }
     const room = props.roomBundle.find((room) => room.id === id);
-    const newProduct = await data.repository("product").create();
-    if (newProduct === null) {
-      throw new Error("Could not create new product");
-    }
-    newAdditionalProduct.parentProduct = newProduct;
+
     if (room) {
       room.additionalProducts = newAdditionalProduct;
     }
@@ -207,15 +203,15 @@ const tabs = [
 }
 
 /* Alternate subtle background colors for rooms */
-.ewt-card-detail:nth-child(3n+1) {
+.ewt-card-detail:nth-child(3n + 1) {
   background-color: #f8f9ff; /* Very subtle blue tint */
 }
 
-.ewt-card-detail:nth-child(3n+2) {
+.ewt-card-detail:nth-child(3n + 2) {
   background-color: #fff8f5; /* Very subtle orange/peach tint */
 }
 
-.ewt-card-detail:nth-child(3n+3) {
+.ewt-card-detail:nth-child(3n + 3) {
   background-color: #f5fff8; /* Very subtle green tint */
 }
 

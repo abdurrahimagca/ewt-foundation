@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { defineProps } from "vue";
 import ProductSelection from "../common/ProductSelection.vue";
-import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
 import EntityCollection from "@shopware-ag/meteor-admin-sdk/es/_internals/data/EntityCollection";
 
 const props = defineProps<{
@@ -13,12 +12,12 @@ function handleParentProductChange(
     | EntitySchema.Entities["product"]
     | EntitySchema.Entities["product"][],
 ) {
-  if (product instanceof Array) {
-    throw new Error("Product must be a single product");
+  if (!(product instanceof Array)) {
+    throw new Error("Product must be array");
   }
   if (props.inheritedData) {
-    props.inheritedData.parentProductId = product.id;
-    props.inheritedData.parentProduct = product as Entity<"product">;
+   // props.inheritedData.parentProductId.push(...product.map((p) => p.id));
+    props.inheritedData.parentProducts = product as EntityCollection<"product">;
   }
 }
 
@@ -83,10 +82,10 @@ function handleProductOptionsChange(
 
         <div class="ewt-form-group">
           <label class="ewt-form-label">Parent Product</label>
-          <div v-if="inheritedData.parentProduct">
+          <div v-if="inheritedData.parentProducts">
             <ProductSelection
-              mode="single"
-              :initial-product="inheritedData.parentProduct"
+              mode="multiple"
+              :initial-product="inheritedData.parentProducts"
               @update:initial-product="handleParentProductChange"
             />
           </div>

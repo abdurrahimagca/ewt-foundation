@@ -121,8 +121,9 @@
 <entity name="ce_generic_bundle">
     <fields>
         <int name="available_on_min_parent_quantity" default="1" store-api-aware="true" />
-        <int name="available_on_max_parent_quantity" store-api-aware="true" />   
-        <one-to-one name="parent_product" reference="product" store-api-aware="true" on-delete="set-null" /> 
+        <int name="available_on_max_parent_quantity" store-api-aware="true" />  
+         
+        <one-to-many name="parent_products" reference="product" store-api-aware="true" on-delete="set-null" /> 
         <one-to-many 
             name="bundle_products" 
             reference="ce_generic_bundle_product" 
@@ -132,7 +133,7 @@
 </entity>
 <entity name="ce_generic_bundle_product">
     <fields>
-    <one-to-one name="parent_product" reference="product" store-api-aware="true" on-delete="set-null" />
+    <one-to-many name="parent_products" reference="product" store-api-aware="true" on-delete="set-null" />
     <one-to-many name="product_options" reference="product" store-api-aware="true" on-delete="set-null" />
     <bool name="match_parent_quantity" store-api-aware="true" />
     <bool name="match_travellers_count" store-api-aware="true" />

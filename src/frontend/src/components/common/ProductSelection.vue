@@ -42,14 +42,32 @@ async function searchProduct() {
     const repo = data.repository("product");
     const criteria = new data.Classes.Criteria();
     criteria.addFilter(
-      data.Classes.Criteria.contains("name", nameToSearch.value),
+      data.Classes.Criteria.multi("OR", [
+        data.Classes.Criteria.contains("name", nameToSearch.value),
+        data.Classes.Criteria.contains("productNumber", nameToSearch.value),
+      ]),
     );
     const repoSearchResult = await repo.search(criteria);
     if (repoSearchResult === null || repoSearchResult.first() === null) {
       selectables.value = [];
       return;
     }
-    selectables.value = repoSearchResult.filter((product) => product.available);
+
+    const products = repoSearchResult.filter((product) => product.available);
+
+    const parentIds = products.map((p) => p.id);
+    const childCriteria = new data.Classes.Criteria();
+    childCriteria.addFilter(
+      data.Classes.Criteria.equalsAny("parentId", parentIds),
+    );
+
+    const childProducts =
+      parentIds.length > 0
+        ? (await repo.search(childCriteria))?.filter(
+            (product) => product.available,
+          ) || []
+        : [];
+    selectables.value = [...products, ...childProducts];
   } catch (e) {
     error.value = (e as Error).message;
   }
@@ -100,6 +118,11 @@ function toggleEditState() {
   isFrozen.value = false;
 }
 
+function openProductDetail(productId: string) {
+  const detailUrl = `http://ewt-shop.homelab-kaleici.space/admin#/sw/product/detail/${productId}/base`;
+  window.open(detailUrl, "_blank");
+}
+
 watch(nameToSearch, () => {
   if (!isFrozen.value) {
     searchProduct();
@@ -110,18 +133,45 @@ watch(nameToSearch, () => {
 <template>
   <div class="product-selection-wrapper">
     <div class="product-selection" :class="{ frozen: isFrozen }">
+      <p>
+        Please note that product variants may be unnamed. We recommend using the
+        Product Number for searching specific products.
+      </p>
       <div class="selected-tags-wrapper">
         <div class="selected-tags" v-if="selecteds.length > 0">
           <div v-for="product in selecteds" :key="product.id" class="tag">
-            {{ product.name }} - {{ product.productNumber }}
-            <button
-              v-if="props.mode === 'multiple' && !isFrozen"
-              class="remove-tag"
-              @click="removeSelected(product.id)"
-              title="Remove product"
-            >
-              ×
-            </button>
+            <span class="product-name">
+              {{ product.name ? product.name : "__unnamed__" }} -
+              {{ product.productNumber }}
+            </span>
+            <div class="tag-actions">
+              <button
+                class="info-button"
+                @click.stop="openProductDetail(product.id)"
+                title="View product details"
+              >
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </button>
+              <button
+                v-if="props.mode === 'multiple' && !isFrozen"
+                class="remove-tag"
+                @click.stop="removeSelected(product.id)"
+                title="Remove product"
+              >
+                ×
+              </button>
+            </div>
           </div>
         </div>
       </div>
@@ -144,7 +194,7 @@ watch(nameToSearch, () => {
           <input
             type="text"
             v-model="nameToSearch"
-            placeholder="Search products..."
+            placeholder="Search name or product number"
             @focus="handleInputFocus"
             class="search-input"
             :disabled="isFrozen"
@@ -167,11 +217,32 @@ watch(nameToSearch, () => {
             <div
               v-for="product in selectables"
               :key="product.id"
-              @click="addToSelecteds(product)"
               class="option"
               :class="{ selected: selecteds.some((p) => p.id === product.id) }"
+              @click="addToSelecteds(product)"
             >
-              {{ product.name }} - {{ product.productNumber }}
+              <span class="product-name">
+                {{ product.name ? product.name : "__unnamed__" }} -
+                {{ product.productNumber }}
+              </span>
+              <button
+                class="info-button"
+                @click.stop="openProductDetail(product.id)"
+                title="View product details"
+              >
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="none"
+                  xmlns="http://www.w3.org/2000/svg"
+                >
+                  <path
+                    d="M12 2C6.48 2 2 6.48 2 12s4.48 10 10 10 10-4.48 10-10S17.52 2 12 2zm1 15h-2v-6h2v6zm0-8h-2V7h2v2z"
+                    fill="currentColor"
+                  />
+                </svg>
+              </button>
             </div>
           </div>
         </div>
@@ -245,31 +316,65 @@ watch(nameToSearch, () => {
   font-size: 14px;
   display: flex;
   align-items: center;
-  gap: 8px;
+  justify-content: space-between;
   border: 1px solid #e0e7ff;
   transition: all 0.2s ease;
   box-shadow: 0 1px 2px rgba(0, 0, 0, 0.05);
 }
 
-.tag:hover {
-  background-color: #e0e7ff;
+.tag-actions {
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  margin-left: 8px;
 }
 
-.remove-tag {
+.product-name {
+  flex: 1;
+  min-width: 0;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+
+.info-button {
+  display: flex;
+  align-items: center;
+  justify-content: center;
   background: none;
   border: none;
   color: #4f46e5;
   cursor: pointer;
-  padding: 2px 6px;
-  font-size: 18px;
+  padding: 4px;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+  opacity: 0.7;
+}
+
+.info-button:hover {
+  opacity: 1;
+  background-color: rgba(79, 70, 229, 0.1);
+}
+
+.remove-tag {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background: none;
+  border: none;
+  color: #4f46e5;
+  cursor: pointer;
+  padding: 4px;
+  font-size: 16px;
   line-height: 1;
   border-radius: 4px;
   transition: all 0.2s ease;
+  opacity: 0.7;
 }
 
 .remove-tag:hover {
-  background-color: #4f46e5;
-  color: white;
+  opacity: 1;
+  background-color: rgba(79, 70, 229, 0.1);
 }
 
 .search-input-wrapper {
@@ -348,6 +453,9 @@ watch(nameToSearch, () => {
 }
 
 .option {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
   padding: 12px 16px;
   cursor: pointer;
   transition: all 0.2s ease;
@@ -450,5 +558,32 @@ button:disabled {
 .search-input-wrapper:after {
   content: "";
   display: none;
+}
+
+.product-link {
+  cursor: pointer;
+  color: inherit;
+  text-decoration: none;
+}
+
+.product-link:hover {
+  text-decoration: underline;
+}
+
+.add-product {
+  background: none;
+  border: none;
+  color: #4f46e5;
+  cursor: pointer;
+  padding: 2px 8px;
+  font-size: 18px;
+  line-height: 1;
+  border-radius: 4px;
+  transition: all 0.2s ease;
+}
+
+.add-product:hover {
+  background-color: #4f46e5;
+  color: white;
 }
 </style>

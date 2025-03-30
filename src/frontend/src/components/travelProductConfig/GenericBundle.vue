@@ -2,8 +2,8 @@
 import { defineProps } from "vue";
 import BundleProduct from "./BundleProduct.vue";
 import { data } from "@shopware-ag/meteor-admin-sdk";
-import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
 import ProductSelection from "../common/ProductSelection.vue";
+import EntityCollection from "@shopware-ag/meteor-admin-sdk/es/_internals/data/EntityCollection";
 
 const props = defineProps<{
   inheritedData?: EntitySchema.Entities["ce_generic_bundle"];
@@ -21,14 +21,10 @@ async function addBundleProduct() {
       const repo = data.repository("ce_generic_bundle_product");
 
       const newBundleProduct = await repo.create();
-      const parentProduct = await data.repository("product").create();
-      if (parentProduct === null) {
-        throw new Error("Could not create new parent product");
-      }
       if (newBundleProduct === null) {
         throw new Error("Could not create new bundle product");
       }
-      newBundleProduct.parentProduct = parentProduct;
+
       props.inheritedData.bundleProducts.push(newBundleProduct);
     }
   } catch (e) {
@@ -40,12 +36,13 @@ function handleParentProductChange(
     | EntitySchema.Entities["product"]
     | EntitySchema.Entities["product"][],
 ) {
-  if (product instanceof Array) {
-    throw new Error("Product must be a single product");
+  console.log("Received product:", product);
+  console.log("Product type:", Object.prototype.toString.call(product));
+  if (!(product instanceof Array)) {
+    throw new Error("Product must be array");
   }
   if (props.inheritedData) {
-    props.inheritedData.parentProductId = product.id;
-    props.inheritedData.parentProduct = product as Entity<"product">;
+    props.inheritedData.parentProducts = product as EntityCollection<"product">;
   }
 }
 function removeBundleProduct(id: string) {
@@ -61,11 +58,14 @@ function removeBundleProduct(id: string) {
       <div class="ewt-grid-2">
         <div class="ewt-form-group">
           <label class="ewt-form-label">Parent Product (for bundle)</label>
-          <p>Each bundle product can have its own parent. This is for the top-level product, typically a Tour Product.</p>
+          <p>
+            Each bundle product can have its own parent. This is for the
+            top-level product, typically a Tour Product.
+          </p>
           <ProductSelection
-            :initialProduct="inheritedData.parentProduct"
+            :initialProduct="inheritedData.parentProducts"
             @update:initialProduct="handleParentProductChange"
-            mode="single"
+            mode="multiple"
           />
           <label for="maxQuantity" class="ewt-form-label"
             >Available On Max Parent Quantity</label

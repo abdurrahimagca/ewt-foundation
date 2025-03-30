@@ -33,9 +33,9 @@ onMounted(async () => {
     const associations = [
       "hotelBundle",
       "additionalProducts",
-      "additionalProducts.parentProduct",
+      "additionalProducts.parentProducts",
       "additionalProducts.bundleProducts",
-      "additionalProducts.bundleProducts.parentProduct",
+      "additionalProducts.bundleProducts.parentProducts",
       "additionalProducts.bundleProducts.productOptions",
 
       "childDiscount",
@@ -43,7 +43,7 @@ onMounted(async () => {
       "hotelBundle.roomOptions.roomProduct",
       "hotelBundle.roomOptions.additionalProducts",
       "hotelBundle.roomOptions.additionalProducts.bundleProducts",
-      "hotelBundle.roomOptions.additionalProducts.bundleProducts.parentProduct",
+      "hotelBundle.roomOptions.additionalProducts.bundleProducts.parentProducts",
       "hotelBundle.roomOptions.additionalProducts.bundleProducts.productOptions",
       "hotelBundle.roomOptions.roomSaleRule",
       "hotelBundle.roomOptions.roomSaleRule.supplementRule",
@@ -116,11 +116,7 @@ async function addGenericBundleProduct() {
     if (newBundle === null || !entityData.value) {
       throw new Error("Could not create new generic bundle");
     }
-    const parent = await data.repository("product").create();
-    if (parent === null) {
-      throw new Error("Could not create new parent product");
-    }
-    newBundle.parentProduct = parent;
+
     entityData.value.additionalProducts = newBundle;
   } catch (e) {
     console.error(e);
