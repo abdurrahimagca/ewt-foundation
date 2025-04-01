@@ -7,7 +7,7 @@ import { data, notification } from "@shopware-ag/meteor-admin-sdk";
 import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
 
 const props = defineProps<{
-  inheritedData?: EntitySchema.Entities["ce_generic_bundle"];
+  inheritedData?: Entity<"ce_generic_bundle">;
 }>();
 const emit = defineEmits<{
   (e: "update:data"): void;
@@ -25,24 +25,12 @@ function handleParentProductChange(
     if (!props.inheritedData?.parentProducts) {
       throw new Error("Inherited data is undefined");
     }
-     if (product.some((p) => !p || !p.id)) {
-      throw new Error("One of the products is invalid");
-    }
-    const entities = product.map((item) => {
-      return new data.Classes.Entity(item.id, "product", item);
-    });
-    entities.forEach((item) => {
-      props.inheritedData?.parentProducts?.add(item);
-    });
-    props.inheritedData?.parentProducts?.getIds().forEach((item) => {
-      if (!entities.find((entity) => entity.id === item)) {
-        props.inheritedData?.parentProducts?.remove(item);
-      }
-    });
+    props.inheritedData.parentProductId = product.map((p) => p.id);
+    props.inheritedData.parentProducts = product as EntityCollection<"product">;
     data
       .repository("ce_generic_bundle")
       .save(props.inheritedData as Entity<"ce_generic_bundle">);
-    emit("update:data");
+    // emit("update:data");
   } catch (e) {
     console.error("error on handling parent product change", e);
     notification.dispatch({
@@ -52,51 +40,22 @@ function handleParentProductChange(
     });
   }
 }
-
 async function handleGenericBundleChange() {
   try {
-    await data
-      .repository("ce_generic_bundle")
-      .save(props.inheritedData as Entity<"ce_generic_bundle">);
-
-    notification.dispatch({
-      title: "Bundle Product Updated",
-      message: "Bundle product updated successfully.",
-      variant: "success",
-    });
-    emit("update:data");
-  } catch (e) {
-    console.error("error on handling generic bundle change", e);
-    console.log("data is: ", JSON.stringify(props.inheritedData, null, 2));
-    notification.dispatch({
-      title: "Error",
-      message: "An error occurred while updating the bundle product.",
-      variant: "error",
-    });
-  }
-}
-
-async function addBundleProduct() {
-  try {
-    const repo = data.repository("ce_generic_bundle_product");
-    const newData = await repo.create();
-    if (newData === null) {
-      throw new Error("Could not create new bundle product");
-    }
-    newData.matchParentQuantity = true;
-    await repo.save(newData);
-    if (!props.inheritedData?.bundleProducts) {
+    if (!props.inheritedData) {
       throw new Error("Inherited data is undefined");
     }
-    const result = await repo.get(newData.id);
-    if (result === null) {
-      throw new Error("Could not get new bundle product");
-    }
-    props.inheritedData?.bundleProducts?.add(result);
+    //const opt = props.inheritedData;
 
-    handleGenericBundleChange();
+    await data.repository("ce_generic_bundle").save(props.inheritedData);
+    emit("update:data");
   } catch (e) {
-    console.error(e);
+    console.error("error on bundle product parent product:", e);
+    notification.dispatch({
+      title: "Error",
+      message: "An error occurred while updating the parent product.",
+      variant: "error",
+    });
   }
 }
 </script>
@@ -140,14 +99,12 @@ async function addBundleProduct() {
           />
         </div>
       </div>
-      <button class="ewt-button ewt-button-primary" @click="addBundleProduct">
-        Add Bundle Product
-      </button>
 
       <div class="ewt-bundle-products">
         <h4>Bundle Products</h4>
         <BundleProduct
-          @update:data="handleGenericBundleChange"
+          @update:genericBundle="handleGenericBundleChange"
+          @update:data="emit('update:data')"
           :inheritedData="inheritedData.bundleProducts"
         />
       </div>

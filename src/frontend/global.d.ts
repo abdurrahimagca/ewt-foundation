@@ -86,8 +86,11 @@ declare namespace EntitySchema {
     id: string;
     productId?: string;
     product?: Entity<"product">;
+    hotelBundleId?: string;
     hotelBundle?: Entity<"ce_hotel_bundle">;
+    childDiscountId?: string;
     childDiscount?: Entity<"ce_custom_child_discount">;
+    additionalProductsId: string;
     additionalProducts: Entity<"ce_generic_bundle">;
   }
 
@@ -95,7 +98,9 @@ declare namespace EntitySchema {
     id: string;
     minRoomSelection: number;
     maxRoomSelection: number;
+    additionalProductsId: string[];
     additionalProducts?: EntityCollection<"ce_generic_bundle">;
+    roomOptionsId: string[];
     roomOptions: EntityCollection<"ce_travel_product_config_room_bundle">;
   }
 
@@ -103,7 +108,9 @@ declare namespace EntitySchema {
     id: string;
     roomProductId?: string;
     roomProduct?: Entity<"product">;
+    additionalProductsId: string[];
     additionalProducts?: Entity<"ce_generic_bundle">;
+    roomSaleRuleId?: string;
     roomSaleRule?: Entity<"ce_room_sale_rule">;
   }
 
@@ -119,6 +126,7 @@ declare namespace EntitySchema {
     maxInfants: number;
     maxTotalPersons: number;
     allowPets: boolean;
+    supplementRuleId?: string;
     supplementRule?: Entity<"ce_room_supplement_rule">;
   }
 
@@ -139,19 +147,21 @@ declare namespace EntitySchema {
 
   interface ce_generic_bundle {
     id: string;
-   // parentProductId: string[];
+    parentProductId?: string[];
     parentProducts: EntityCollection<"product">;
     availableOnMinParentQuantity: number;
     availableOnMaxParentQuantity: number;
-    bundleProductsIds: string[];
+    bundleProductsIds?: string[];
     bundleProducts: EntityCollection<"ce_generic_bundle_product">;
   }
 
   interface ce_generic_bundle_product {
     id: string;
-    //parentProductId: string[];
+    parentProductId?: string[];
     allowMultipleSelection: boolean;
     parentProducts: EntityCollection<"product">;
+    productOptionsId?: string[];
+
     productOptions: EntityCollection<"product">;
     matchParentQuantity: boolean;
     matchTravellersCount: boolean;

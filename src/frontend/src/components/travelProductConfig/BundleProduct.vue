@@ -6,10 +6,11 @@ import { data, notification } from "@shopware-ag/meteor-admin-sdk";
 import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
 
 const props = defineProps<{
-  inheritedData?: EntitySchema.Entities["ce_generic_bundle_product"][];
+  inheritedData?: EntityCollection<"ce_generic_bundle_product">;
 }>();
 const emit = defineEmits<{
   (e: "update:data"): void;
+  (e: "update:genericBundle"): void;
 }>();
 
 async function handleParentProductChange(
@@ -19,9 +20,8 @@ async function handleParentProductChange(
     | EntitySchema.Entities["product"][],
 ) {
   try {
-    const opt = props.inheritedData?.find((opt) => opt.id === id);
-    if (!opt) {
-      throw new Error("Option not found");
+    if (!props.inheritedData) {
+      throw new Error("Inherited data is undefined");
     }
     if (!(product instanceof Array)) {
       throw new Error("Product must be array");
@@ -29,31 +29,15 @@ async function handleParentProductChange(
     if (product.some((p) => !p || !p.id)) {
       throw new Error("One of the products is invalid");
     }
-
-    if (opt) {
-      const entities = product.map((item) => {
-        return new data.Classes.Entity(item.id, "product", item);
-      });
-      entities.forEach((item) => {
-        opt.parentProducts.add(item);
-      });
-
-      opt.parentProducts.getIds().forEach((item) => {
-        if (!entities.find((entity) => entity.id === item)) {
-          opt.parentProducts.remove(item);
-        }
-      });
-      await data
-        .repository("ce_generic_bundle_product")
-        .save(opt as Entity<"ce_generic_bundle_product">);
-
-      emit("update:data");
-      notification.dispatch({
-        title: "Parent Product Updated",
-        message: "Parent product updated successfully.",
-        variant: "success",
-      });
+    const entity = props.inheritedData.get(id);
+    if (entity == null) {
+      throw new Error("Entity not found");
     }
+    entity.parentProductId = product.map((p) => p.id);
+    entity.parentProducts = product as EntityCollection<"product">;
+    await data.repository("ce_generic_bundle_product").save(entity);
+
+    emit("update:data");
   } catch (e) {
     console.error("erroron bundle product parent product:", e);
     notification.dispatch({
@@ -71,44 +55,72 @@ async function handleProductOptionsChange(
     | EntitySchema.Entities["product"][],
 ) {
   try {
-    const opt = props.inheritedData?.find((opt) => opt.id === id);
-    if (!opt) {
-      throw new Error("Option not found");
-    }
     if (!(products instanceof Array)) {
       throw new Error("Product must be array");
     }
-     if (products.some((p) => !p || !p.id)) {
+    if (products.some((p) => !p || !p.id)) {
       throw new Error("One of the products is invalid");
     }
-    if (opt) {
-      const entities = products.map((item) => {
-        return new data.Classes.Entity(item.id, "product", item);
-      });
-      entities.forEach((item) => {
-        opt.productOptions.add(item);
-      });
-      opt.productOptions.getIds().forEach((item) => {
-        if (!entities.find((entity) => entity.id === item)) {
-          opt.productOptions.remove(item);
-        }
-      });
-
-      await data
-        .repository("ce_generic_bundle_product")
-        .save(opt as Entity<"ce_generic_bundle_product">);
-      emit("update:data");
+    if (!props.inheritedData) {
+      throw new Error("Inherited data is undefined");
     }
-    notification.dispatch({
-      title: "Product Options Updated",
-      message: "Product options updated successfully.",
-      variant: "success",
-    });
+    const entity = props.inheritedData.get(id);
+    if (entity == null) {
+      throw new Error("Entity not found");
+    }
+    
+    entity.productOptions = products as EntityCollection<"product">;
+    entity.productOptionsId = products.map((p) => p.id);
+    await data.repository("ce_generic_bundle_product").save(entity);
+
+    emit("update:data");
   } catch (e) {
     console.error("error on poptsion:", e);
     notification.dispatch({
       title: "Error",
       message: "An error occurred while updating the product options.",
+      variant: "error",
+    });
+  }
+}
+async function createBundleProduct() {
+  try {
+    const repo = data.repository("ce_generic_bundle_product");
+
+    if (!props.inheritedData) {
+      throw new Error("Inherited data is undefined");
+    }
+
+    // 1. Yeni bir entity oluştur
+    const newEntity = await repo.create();
+
+    if (!newEntity) {
+      throw new Error("Could not create bundle product");
+    }
+
+    newEntity.matchParentQuantity = true;
+    newEntity.allowMultipleSelection = false;
+    newEntity.isRequired = false;
+    newEntity.matchTravellersCount = false;
+    await repo.save(newEntity);
+
+    props.inheritedData.add(newEntity);
+    await repo.saveAll(props.inheritedData);
+
+
+    // (İsteğe bağlı) emit ile üst bileşene bildir
+    //emit("update:genericBundle");
+
+    notification.dispatch({
+      title: "Success",
+      message: "New bundle product created.",
+      variant: "success",
+    });
+  } catch (e) {
+    console.error("Error on creating bundle product:", e);
+    notification.dispatch({
+      title: "Error",
+      message: "An error occurred while creating the bundle product.",
       variant: "error",
     });
   }
@@ -187,5 +199,10 @@ async function handleProductOptionsChange(
         </div>
       </div>
     </div>
+  </div>
+  <div class="ewt-button-group">
+    <button @click="createBundleProduct" class="ewt-btn ewt-btn--secondary">
+      Add Bundle Product
+    </button>
   </div>
 </template>
