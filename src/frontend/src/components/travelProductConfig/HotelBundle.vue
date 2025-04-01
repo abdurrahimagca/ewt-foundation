@@ -10,6 +10,9 @@ const props = defineProps<{
 async function removeRoom() {
   props.inheritedData.roomOptions?.pop();
 }
+const emit = defineEmits<{
+  (e: "update:data"): void;
+}>();
 
 async function addRoom() {
   try {
@@ -18,24 +21,11 @@ async function addRoom() {
     if (newData === null) {
       throw new Error("Could not create new room bundle");
     }
-    /* const newProduct = await data.repository("product").create();
-    if (newProduct === null) {
-      throw new Error("Could not create new product");
-    }
-    newData.roomProduct = newProduct;
-    const newAdditionalProducts = await data
-      .repository("ce_generic_product_bundle")
-      .create();
-    if (newAdditionalProducts === null) {
-      throw new Error("Could not create new additional products");
-    }
-    newData.additionalProducts = newAdditionalProducts;
-    const newRoomSaleRule = await data.repository("ce_room_sale_rule").create();
-    if (newRoomSaleRule === null) {
-      throw new Error("Could not create new room sale rule");
-    }
-  newData.roomSaleRule = newRoomSaleRule; */
+
+    await repo.save(newData);
+
     props.inheritedData.roomOptions?.push(newData);
+    emit("update:data");
   } catch (e) {
     console.error(e);
   }
@@ -93,7 +83,10 @@ async function addRoom() {
       </div>
 
       <div v-if="inheritedData.roomOptions" class="ewt-grid-rooms">
-        <RoomBundle :roomBundle="inheritedData.roomOptions" />
+        <RoomBundle
+          @update:data="emit('update:data')"
+          :roomBundle="inheritedData.roomOptions"
+        />
       </div>
     </div>
   </div>

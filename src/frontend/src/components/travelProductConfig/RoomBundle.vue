@@ -10,16 +10,9 @@ import { ref } from "vue";
 const props = defineProps<{
   roomBundle: EntitySchema.Entities["ce_travel_product_config_room_bundle"][];
 }>();
-/*
-  interface ce_travel_product_config_room_bundle {
-    id: string;
-    roomProduct: Entity<"product">;
-    roomExtra: EntityCollection<"product">;
-    additionalProducts: Entity<"ce_generic_product_bundle">;
-    roomSaleRule: Entity<"ce_room_sale_rule">;
-  }*/
-
-// Add these to manage tabs independently for each room
+const emit = defineEmits<{
+  (e: "update:data"): void;
+}>();
 const roomTabs = ref<{ [key: string]: string }>({}); // Track active tab for each room
 
 // Initialize tabs for each room
@@ -43,6 +36,9 @@ function handleOneProductChange(
   if (product instanceof Array) {
     throw new Error("Product must be a single product");
   }
+  if (!product) {
+    throw new Error("Product is undefined");
+  }
 
   const room = props.roomBundle.find((room) => room.id === id);
   if (room) {
@@ -50,21 +46,7 @@ function handleOneProductChange(
     room.roomProduct = product as Entity<"product">;
   }
 }
-async function addRoom(id: string) {
-  try {
-    const repo = data.repository("product");
-    const newData = await repo.create();
-    if (newData === null) {
-      throw new Error("Could not create new room bundle");
-    }
-    const room = props.roomBundle.find((room) => room.id === id);
-    if (room) {
-      room.roomProduct = newData;
-    }
-  } catch (e) {
-    console.error(e);
-  }
-}
+
 async function addRoomSaleRule(id: string) {
   try {
     const repo = data.repository("ce_room_sale_rule");
@@ -72,10 +54,13 @@ async function addRoomSaleRule(id: string) {
     if (newRoomSaleRule === null) {
       throw new Error("Could not create new room sale rule");
     }
+    newRoomSaleRule.allowPets = true;
+    await repo.save(newRoomSaleRule);
     const room = props.roomBundle.find((room) => room.id === id);
     if (room) {
       room.roomSaleRule = newRoomSaleRule;
     }
+    emit("update:data");
   } catch (e) {
     console.error(e);
   }
@@ -87,11 +72,14 @@ async function addAdditionalProduct(id: string) {
     if (newAdditionalProduct === null) {
       throw new Error("Could not create new additional product");
     }
+    newAdditionalProduct.availableOnMinParentQuantity = 1;
+    await repo.save(newAdditionalProduct);
     const room = props.roomBundle.find((room) => room.id === id);
 
     if (room) {
       room.additionalProducts = newAdditionalProduct;
     }
+    emit("update:data");
   } catch (e) {
     console.error(e);
   }
@@ -129,64 +117,53 @@ const tabs = [
             {{ tab.label }}
           </button>
         </div>
+        <div v-if="roomTabs[room.id] === 'product'">
+          <div class="ewt-tab-content">
+            <ProductSelection
+              mode="single"
+              :value="room.roomProduct"
+              :initialProduct="room.roomProduct"
+              @update:initialProduct="
+                (product) => handleOneProductChange(product, room.id)
+              "
+            />
+          </div>
+        </div>
 
-        <div class="ewt-tab-content">
-          <div v-if="roomTabs[room.id] === 'product'" class="ewt-tab-pane">
-            <div v-if="!room.roomProduct">
-              <div class="ewt-empty-state">
-                <p>No room product configured</p>
-                <button
-                  @click="() => addRoom(room.id)"
-                  class="ewt-btn ewt-btn--secondary"
-                >
-                  Add Room Product
-                </button>
-              </div>
-            </div>
-            <div v-else class="ewt-product-selection">
-              <ProductSelection
-                mode="single"
-                :value="room.roomProduct"
-                :initialProduct="room.roomProduct"
-                @update:initialProduct="
-                  (product) => handleOneProductChange(product, room.id)
-                "
-              />
+        <div v-if="roomTabs[room.id] === 'rules'" class="ewt-tab-pane">
+          <div v-if="!room.roomSaleRule">
+            <div class="ewt-empty-state">
+              <p>No room rules configured</p>
+              <button
+                @click="() => addRoomSaleRule(room.id)"
+                class="ewt-btn ewt-btn--secondary"
+              >
+                Add Room Rules
+              </button>
             </div>
           </div>
+          <div v-else>
+            <RoomRule :rule="room.roomSaleRule" />
+          </div>
+        </div>
 
-          <div v-if="roomTabs[room.id] === 'rules'" class="ewt-tab-pane">
-            <div v-if="!room.roomSaleRule">
-              <div class="ewt-empty-state">
-                <p>No room rules configured</p>
-                <button
-                  @click="() => addRoomSaleRule(room.id)"
-                  class="ewt-btn ewt-btn--secondary"
-                >
-                  Add Room Rules
-                </button>
-              </div>
-            </div>
-            <div v-else>
-              <RoomRule :rule="room.roomSaleRule" />
+        <div v-if="roomTabs[room.id] === 'additional'" class="ewt-tab-pane">
+          <div v-if="!room.additionalProducts">
+            <div class="ewt-empty-state">
+              <p>No additional products configured</p>
+              <button
+                @click="() => addAdditionalProduct(room.id)"
+                class="ewt-btn ewt-btn--secondary"
+              >
+                Add Additional Products
+              </button>
             </div>
           </div>
-
-          <div v-if="roomTabs[room.id] === 'additional'" class="ewt-tab-pane">
-            <div v-if="!room.additionalProducts">
-              <div class="ewt-empty-state">
-                <p>No additional products configured</p>
-                <button
-                  @click="() => addAdditionalProduct(room.id)"
-                  class="ewt-btn ewt-btn--secondary"
-                >
-                  Add Additional Products
-                </button>
-              </div>
-            </div>
-            <div v-else>
-              <GenericBundle :inheritedData="room.additionalProducts" />
-            </div>
+          <div v-else>
+            <GenericBundle
+              @update:data="emit('update:data')"
+              :inheritedData="room.additionalProducts"
+            />
           </div>
         </div>
       </div>

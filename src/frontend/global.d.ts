@@ -80,6 +80,8 @@ declare namespace EntitySchema {
     productQuantity: number;
   }
 
+  //***product config */
+
   interface ce_travel_product_config {
     id: string;
     productId?: string;

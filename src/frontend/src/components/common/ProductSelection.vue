@@ -3,7 +3,7 @@ import { data, notification } from "@shopware-ag/meteor-admin-sdk";
 import { defineProps, ref, watch, defineEmits } from "vue";
 
 const props = defineProps<{
-  initialProduct:
+  initialProduct?:
     | EntitySchema.Entities["product"][]
     | EntitySchema.Entities["product"];
   mode?: "single" | "multiple";
@@ -98,9 +98,6 @@ function handleInputFocus() {
 }
 
 function commitChanges() {
-  if (!props.initialProduct) {
-    throw new Error("initialProduct is not defined");
-  }
   if (selecteds.value.map((p) => p._isNew).includes(true)) {
     notification.dispatch({
       title: "Error",

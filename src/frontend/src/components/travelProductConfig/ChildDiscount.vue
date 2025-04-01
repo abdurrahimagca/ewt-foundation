@@ -5,6 +5,7 @@ defineProps<{
 }>();
 </script>
 
+
 <template>
   <div v-if="inheritedData">
     <h3>Custom Child Discount</h3>

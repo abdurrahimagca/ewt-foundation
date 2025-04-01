@@ -5,6 +5,9 @@ import { data } from "@shopware-ag/meteor-admin-sdk";
 const props = defineProps<{
   rule: EntitySchema.Entities["ce_room_sale_rule"];
 }>();
+const emit = defineEmits<{
+  (e: "update:data"): void;
+}>();
 
 /** interface ce_room_sale_rule {
     id: string;
@@ -27,14 +30,9 @@ async function createSupplementRule() {
   if (newSupplementRule === null) {
     throw new Error("Could not create new supplement rule");
   }
-
-  const productRepo = data.repository("product");
-  const newProduct = await productRepo.create();
-  if (newProduct === null) {
-    throw new Error("Could not create new product");
-  }
+  await repo.save(newSupplementRule);
   props.rule.supplementRule = newSupplementRule;
-  props.rule.supplementRule.supplementProduct = newProduct;
+  emit("update:data");
 }
 </script>
 
@@ -80,9 +78,11 @@ async function createSupplementRule() {
           type="number"
           class="ewt-input"
         />
-            </div>
-            <div class="ewt-form-group">
-        <label for="childrenStartAge" class="ewt-form-label">Children Start Age</label>
+      </div>
+      <div class="ewt-form-group">
+        <label for="childrenStartAge" class="ewt-form-label"
+          >Children Start Age</label
+        >
         <input
           id="childrenStartAge"
           v-model="rule.childrenStartAge"
@@ -90,9 +90,11 @@ async function createSupplementRule() {
           type="number"
           class="ewt-input"
         />
-            </div>
-             <div class="ewt-form-group">
-        <label for="childrenEndAge" class="ewt-form-label">Children End Age</label>
+      </div>
+      <div class="ewt-form-group">
+        <label for="childrenEndAge" class="ewt-form-label"
+          >Children End Age</label
+        >
         <input
           id="childrenStartAge"
           v-model="rule.childrenEndAge"
@@ -100,8 +102,8 @@ async function createSupplementRule() {
           type="number"
           class="ewt-input"
         />
-            </div>
-            <div class="ewt-form-group">
+      </div>
+      <div class="ewt-form-group">
         <label for="minInfants" class="ewt-form-label">Minimum Infants</label>
         <input
           id="minInfants"
@@ -110,8 +112,8 @@ async function createSupplementRule() {
           type="number"
           class="ewt-input"
         />
-            </div>
-            <div class="ewt-form-group">
+      </div>
+      <div class="ewt-form-group">
         <label for="maxInfants" class="ewt-form-label">Maximum Infants</label>
         <input
           id="maxInfants"
@@ -120,9 +122,11 @@ async function createSupplementRule() {
           type="number"
           class="ewt-input"
         />
-            </div>
-            <div class="ewt-form-group">
-        <label for="maxTotalPersons" class="ewt-form-label">Maximum Total Persons</label>
+      </div>
+      <div class="ewt-form-group">
+        <label for="maxTotalPersons" class="ewt-form-label"
+          >Maximum Total Persons</label
+        >
         <input
           id="maxTotalPersons"
           v-model="rule.maxTotalPersons"
@@ -130,8 +134,8 @@ async function createSupplementRule() {
           type="number"
           class="ewt-input"
         />
-            </div>
-            <div class="ewt-form-group">
+      </div>
+      <div class="ewt-form-group">
         <label for="allowPets" class="ewt-form-label">Allow Pets</label>
         <input
           id="allowPets"
@@ -139,7 +143,7 @@ async function createSupplementRule() {
           type="checkbox"
           class="ewt-checkbox"
         />
-            </div>
+      </div>
     </div>
     <div class="ewt-button-group">
       <button @click="createSupplementRule" class="ewt-btn ewt-btn--primary">

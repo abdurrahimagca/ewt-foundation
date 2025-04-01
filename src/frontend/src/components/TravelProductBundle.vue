@@ -29,49 +29,15 @@ onMounted(async () => {
       selectors: ["id"],
     });
     productId.value = result.id as string;
-    const criteria = new data.Classes.Criteria();
-    const associations = [
-      "hotelBundle",
-      "additionalProducts",
-      "additionalProducts.parentProducts",
-      "additionalProducts.bundleProducts",
-      "additionalProducts.bundleProducts.parentProducts",
-      "additionalProducts.bundleProducts.productOptions",
-
-      "childDiscount",
-      "hotelBundle.roomOptions",
-      "hotelBundle.roomOptions.roomProduct",
-      "hotelBundle.roomOptions.additionalProducts",
-      "hotelBundle.roomOptions.additionalProducts.bundleProducts",
-      "hotelBundle.roomOptions.additionalProducts.bundleProducts.parentProducts",
-      "hotelBundle.roomOptions.additionalProducts.bundleProducts.productOptions",
-      "hotelBundle.roomOptions.roomSaleRule",
-      "hotelBundle.roomOptions.roomSaleRule.supplementRule",
-      "hotelBundle.roomOptions.roomSaleRule.supplementRule.supplementProduct",
-    ];
-    associations.forEach((association) => {
-      criteria.addAssociation(association);
-    });
-    criteria.addFilter(
-      data.Classes.Criteria.equals("productId", productId.value),
-    );
-    const repo = data.repository("ce_travel_product_config");
-    const repoSearchResult = await repo.search(criteria);
-
-    const firstResult = repoSearchResult?.first();
-    console.log(JSON.stringify(firstResult, null, 2));
-
-    if (firstResult === null) {
-      (async () => {
-        const newEntity = await repo.create();
-        if (newEntity === null) {
-          throw new Error("Could not create new entity");
-        }
-        newEntity.productId = productId.value;
-        entityData.value = newEntity;
-      })();
+    const searchResult = await fetchData(productId.value as string);
+    if (searchResult === null) {
+      const newData = await createData(productId.value as string);
+      if (!newData) {
+        throw new Error("Could not create new entity data");
+      }
+      entityData.value = newData;
     } else {
-      entityData.value = firstResult;
+      entityData.value = searchResult;
     }
   } catch (e) {
     console.error(e);
@@ -86,10 +52,15 @@ async function addChildDiscount() {
   try {
     const repo = data.repository("ce_custom_child_discount");
     const newChildDiscount = await repo.create();
+
     if (newChildDiscount === null || !entityData.value) {
       throw new Error("Could not create new child discount");
     }
+    newChildDiscount.infantDiscountPercentage = 100;
+    newChildDiscount.childDiscountPercentage = 50;
+    await repo.save(newChildDiscount);
     entityData.value.childDiscount = newChildDiscount;
+    upsertUpdatedData();
   } catch (e) {
     console.error(e);
     error.value = e as string;
@@ -103,7 +74,11 @@ async function addHotelBundle() {
     if (newHotelBundle === null || !entityData.value) {
       throw new Error("Could not create new hotel bundle");
     }
+    await repo.save(newHotelBundle);
+    newHotelBundle.minRoomSelection = 1;
+    newHotelBundle.maxRoomSelection = 1;
     entityData.value.hotelBundle = newHotelBundle;
+    upsertUpdatedData();
   } catch (e) {
     console.error(e);
     error.value = e as string;
@@ -112,26 +87,93 @@ async function addHotelBundle() {
 
 async function addGenericBundleProduct() {
   try {
-    const newBundle = await data.repository("ce_generic_bundle").create();
+    const repo = data.repository("ce_generic_bundle");
+    const newBundle = await repo.create();
     if (newBundle === null || !entityData.value) {
       throw new Error("Could not create new generic bundle");
     }
-
+    await repo.save(newBundle);
+    newBundle.availableOnMinParentQuantity = 1;
     entityData.value.additionalProducts = newBundle;
+    upsertUpdatedData();
   } catch (e) {
     console.error(e);
     error.value = e as string;
   }
 }
 
+async function fetchData(
+  pid: string,
+): Promise<Entity<"ce_travel_product_config"> | null | undefined> {
+  try {
+    isLoading.value = true;
+    const criteria = new data.Classes.Criteria();
+    const associations = [
+      "hotelBundle",
+      "additionalProducts",
+      "additionalProducts.parentProducts",
+      "additionalProducts.bundleProducts",
+      "additionalProducts.bundleProducts.parentProducts",
+      "additionalProducts.bundleProducts.productOptions",
+      "childDiscount",
+      "hotelBundle.roomOptions",
+      "hotelBundle.roomOptions.roomProduct",
+      "hotelBundle.roomOptions.additionalProducts",
+      "hotelBundle.roomOptions.additionalProducts.parentProducts",
+      "hotelBundle.roomOptions.additionalProducts.bundleProducts",
+      "hotelBundle.roomOptions.additionalProducts.bundleProducts.parentProducts",
+      "hotelBundle.roomOptions.additionalProducts.bundleProducts.productOptions",
+      "hotelBundle.roomOptions.roomSaleRule",
+      "hotelBundle.roomOptions.roomSaleRule.supplementRule",
+      "hotelBundle.roomOptions.roomSaleRule.supplementRule.supplementProduct",
+    ];
+    associations.forEach((association) => {
+      criteria.addAssociation(association);
+    });
+    criteria.addFilter(data.Classes.Criteria.equals("productId", pid));
+    const repo = data.repository("ce_travel_product_config");
+    const repoSearchResult = await repo.search(criteria);
+
+    const firstResult = repoSearchResult?.first();
+    return firstResult;
+  } catch (e) {
+    console.error(e);
+    error.value = e as string;
+    return null;
+  } finally {
+    isLoading.value = false;
+  }
+}
+async function createData(pid: string) {
+  try {
+    const repo = data.repository("ce_travel_product_config");
+    const newEntity = await repo.create();
+    if (newEntity === null) {
+      throw new Error("Could not create new entity");
+    }
+    newEntity.productId = pid;
+    await repo.save(newEntity);
+    return await fetchData(pid);
+  } catch (e) {
+    console.error(e);
+    error.value = e as string;
+    return null;
+  }
+}
 async function deleteDataFromRepo() {
   try {
+    isLoading.value = true;
     const repo = data.repository("ce_travel_product_config");
     if (!entityData.value) {
       throw new Error("No entity data found");
     }
     await repo.delete(entityData.value.id);
     entityData.value = undefined;
+    const newData = await createData(productId.value as string);
+    if (!newData) {
+      throw new Error("Could not create new entity data");
+    }
+    entityData.value = newData;
     notification.dispatch({
       title: "Success",
       message: "Configuration deleted",
@@ -139,30 +181,39 @@ async function deleteDataFromRepo() {
   } catch (e) {
     console.error(e);
     error.value = e as string;
+  } finally {
+    isLoading.value = false;
   }
 }
 
 async function upsertUpdatedData() {
   try {
+    isLoading.value = true;
     const repo = data.repository("ce_travel_product_config");
     if (!entityData.value) {
       throw new Error("No entity data found");
     }
     await repo.save(entityData.value);
+    const newData = await fetchData(productId.value as string);
+    if (!newData) {
+      throw new Error("Could not fetch updated entity data");
+    }
+    entityData.value = newData;
     notification.dispatch({
       title: "Success",
-      message: "Configuration saved",
+      message: "Configuration saved successfully",
     });
   } catch (e) {
     console.error(e);
     notification.dispatch({
       title: "Error",
-      message: "Could not save configuration",
+      message: "Failed to save configuration. Please try again.",
     });
     error.value = e as string;
+  } finally {
+    isLoading.value = false;
   }
 }
-
 // Add this function to prevent scroll jumps
 function handleTabChange(tabId: string) {
   // Prevent default scroll behavior
@@ -218,7 +269,10 @@ function handleTabChange(tabId: string) {
       <div class="ewt-tab-content">
         <div v-if="activeTab === 'hotel'" class="ewt-tab-pane">
           <div v-if="entityData.hotelBundle">
-            <HotelBundle :inheritedData="entityData.hotelBundle" />
+            <HotelBundle
+              @update:data="upsertUpdatedData"
+              :inheritedData="entityData.hotelBundle"
+            />
           </div>
           <div v-else class="ewt-empty-state">
             <p>No hotel bundle configured</p>
@@ -230,7 +284,10 @@ function handleTabChange(tabId: string) {
 
         <div v-if="activeTab === 'generic'" class="ewt-tab-pane">
           <div v-if="entityData.additionalProducts">
-            <GenericBundle :inheritedData="entityData.additionalProducts" />
+            <GenericBundle
+              @update:data="upsertUpdatedData"
+              :inheritedData="entityData.additionalProducts"
+            />
           </div>
           <div v-else class="ewt-empty-state">
             <p>No additional products configured</p>
@@ -245,7 +302,10 @@ function handleTabChange(tabId: string) {
 
         <div v-if="activeTab === 'child'" class="ewt-tab-pane">
           <div v-if="entityData.childDiscount">
-            <ChildDiscount :inheritedData="entityData.childDiscount" />
+            <ChildDiscount
+              @update:data="upsertUpdatedData"
+              :inheritedData="entityData.childDiscount"
+            />
           </div>
           <div v-else class="ewt-empty-state">
             <p>No child discount configured</p>

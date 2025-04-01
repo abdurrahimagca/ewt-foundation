@@ -67,13 +67,12 @@ function updateInitialProduct(
         This product will be added if these conditions are met on cart of this
         <strong>particular</strong> room product.
       </p>
-      <div v-if="inheritedData.supplementProduct" class="ewt-product-selection">
-        <ProductSelection
-          :initialProduct="inheritedData.supplementProduct"
-          @update:initial-product="updateInitialProduct"
-          mode="single"
-        />
-      </div>
+
+      <ProductSelection
+        :initialProduct="inheritedData.supplementProduct"
+        @update:initial-product="updateInitialProduct"
+        mode="single"
+      />
     </div>
   </div>
 </template>
