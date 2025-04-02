@@ -1,37 +1,42 @@
 <script lang="ts" setup>
 import { data, notification } from "@shopware-ag/meteor-admin-sdk";
-import { defineProps, ref, watch, defineEmits } from "vue";
+import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
+import EntityCollection from "@shopware-ag/meteor-admin-sdk/es/_internals/data/EntityCollection";
+import { defineProps, ref, watch, defineEmits, onMounted } from "vue";
 
 const props = defineProps<{
-  initialProduct?:
-    | EntitySchema.Entities["product"][]
-    | EntitySchema.Entities["product"];
+  initialProduct?: Entity<"product"> | EntityCollection<"product">;
   mode?: "single" | "multiple";
 }>();
 
 const emit = defineEmits<{
   (
     e: "update:initialProduct",
-    value:
-      | EntitySchema.Entities["product"][]
-      | EntitySchema.Entities["product"],
+    value: Entity<"product"> | EntityCollection<"product">,
   ): void;
 }>();
 
 const nameToSearch = ref<string | null | undefined>(undefined);
-const selectables = ref<EntitySchema.Entities["product"][]>([]);
-const selecteds = ref<EntitySchema.Entities["product"][]>([]);
+const selectables = ref<Entity<"product">[]>([]);
+const selecteds = ref<EntityCollection<"product"> | null>(null);
 const isDropdownOpen = ref(false);
 const error = ref<string | undefined>(undefined);
 const isFrozen = ref(false);
 
-if (props.initialProduct) {
-  if (Array.isArray(props.initialProduct)) {
+onMounted(async () => {
+  if (props.initialProduct instanceof EntityCollection) {
     selecteds.value = props.initialProduct;
   } else {
-    selecteds.value = [props.initialProduct];
+    const criteria = new data.Classes.Criteria();
+    const repo = data.repository("product");
+    const result = await repo.search(criteria);
+    if (result === null || result.first() === null) {
+      throw new Error("No product found");
+    } else {
+      selecteds.value = result;
+    }
   }
-}
+});
 
 async function searchProduct() {
   if (!nameToSearch || !nameToSearch.value || nameToSearch.value === "") {
@@ -40,6 +45,7 @@ async function searchProduct() {
   }
   try {
     const repo = data.repository("product");
+
     const criteria = new data.Classes.Criteria();
     criteria.addFilter(
       data.Classes.Criteria.multi("OR", [
@@ -47,6 +53,7 @@ async function searchProduct() {
         data.Classes.Criteria.contains("productNumber", nameToSearch.value),
       ]),
     );
+
     const repoSearchResult = await repo.search(criteria);
     if (repoSearchResult === null || repoSearchResult.first() === null) {
       selectables.value = [];
@@ -75,18 +82,24 @@ async function searchProduct() {
 
 function removeSelected(productId: string) {
   if (isFrozen.value) return;
-  selecteds.value = selecteds.value.filter(
-    (product) => product.id !== productId,
-  );
+  selecteds.value?.remove(productId);
 }
 
-function addToSelecteds(product: EntitySchema.Entities["product"]) {
+function addToSelecteds(product: Entity<"product">) {
   if (isFrozen.value) return;
-  if (props.mode === "single") {
-    selecteds.value = [product];
-  } else if (!selecteds.value.some((p) => p.id === product.id)) {
-    selecteds.value.push(product);
+  if (product._isNew) {
+    notification.dispatch({
+      title: "Error",
+      message: "Please select an existing product",
+    });
+    return;
   }
+  if (selecteds.value === null) {
+    throw new Error("selecteds is null");
+  }
+
+  selecteds.value.add(product);
+
   nameToSearch.value = "";
   selectables.value = [];
   isDropdownOpen.value = false;
@@ -98,17 +111,34 @@ function handleInputFocus() {
 }
 
 function commitChanges() {
-  if (selecteds.value.map((p) => p._isNew).includes(true)) {
+  isFrozen.value = true;
+  if (!selecteds.value || selecteds.value.total === 0) {
     notification.dispatch({
       title: "Error",
-      message: "Please select a existing product",
+      message: "Please select at least one product",
     });
     return;
   }
-
-  isFrozen.value = true;
-  const result = props.mode === "single" ? selecteds.value[0] : selecteds.value;
-  emit("update:initialProduct", result);
+  if (props.mode === "single") {
+    if (selecteds.value.total && selecteds.value.total > 1) {
+      notification.dispatch({
+        title: "Error",
+        message: "Please select only one product",
+      });
+      return;
+    }
+    const result = selecteds.value.first();
+    if (result === null) {
+      notification.dispatch({
+        title: "Error",
+        message: "Please select a product",
+      });
+      return;
+    }
+    emit("update:initialProduct", result);
+  } else {
+    emit("update:initialProduct", selecteds.value);
+  }
 }
 
 function toggleEditState() {
@@ -135,7 +165,7 @@ watch(nameToSearch, () => {
         Product Number for searching specific products.
       </p>
       <div class="selected-tags-wrapper">
-        <div class="selected-tags" v-if="selecteds.length > 0">
+        <div class="selected-tags" v-if="selecteds">
           <div v-for="product in selecteds" :key="product.id" class="tag">
             <span class="product-name">
               {{ product.name ? product.name : "__unnamed__" }} -
@@ -215,7 +245,7 @@ watch(nameToSearch, () => {
               v-for="product in selectables"
               :key="product.id"
               class="option"
-              :class="{ selected: selecteds.some((p) => p.id === product.id) }"
+              :class="{ selected: selecteds?.find((p) => p.id === product.id) }"
               @click="addToSelecteds(product)"
             >
               <span class="product-name">
@@ -245,7 +275,7 @@ watch(nameToSearch, () => {
         </div>
       </div>
 
-      <div class="action-buttons" v-if="selecteds.length > 0">
+      <div class="action-buttons" v-if="selecteds">
         <button v-if="!isFrozen" @click="commitChanges" class="commit-button">
           Save Changes
         </button>

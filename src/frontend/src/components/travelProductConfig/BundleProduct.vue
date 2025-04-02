@@ -16,13 +16,11 @@ const emit = defineEmits<{
 
 async function handleParentProductChange(
   id: string,
-  product:
-    | EntitySchema.Entities["product"]
-    | EntitySchema.Entities["product"][],
+  product: EntityCollection<"product"> | Entity<"product">,
 ) {
   try {
-    if (!props.inheritedData) {
-      throw new Error("Inherited data is undefined");
+    if (!(product instanceof EntityCollection)) {
+      throw new Error("Product must be an EntityCollection");
     }
     if (!(product instanceof Array)) {
       throw new Error("Product must be array");
@@ -30,12 +28,15 @@ async function handleParentProductChange(
     if (product.some((p) => !p || !p.id)) {
       throw new Error("One of the products is invalid");
     }
+    if (!props.inheritedData) {
+      throw new Error("Inherited data is undefined");
+    }
     const entity = props.inheritedData.get(id);
     if (entity == null) {
       throw new Error("Entity not found");
     }
-    entity.parentProductId = product.map((p) => p.id);
-    entity.parentProducts = product as EntityCollection<"product">;
+
+    entity.parentProducts = product;
     await data.repository("ce_generic_bundle_product").save(entity);
 
     emit("update:data");
@@ -51,16 +52,11 @@ async function handleParentProductChange(
 
 async function handleProductOptionsChange(
   id: string,
-  products:
-    | EntitySchema.Entities["product"]
-    | EntitySchema.Entities["product"][],
+  products: EntityCollection<"product"> | Entity<"product">,
 ) {
   try {
-    if (!(products instanceof Array)) {
-      throw new Error("Product must be array");
-    }
-    if (products.some((p) => !p || !p.id)) {
-      throw new Error("One of the products is invalid");
+    if (!(products instanceof EntityCollection)) {
+      throw new Error("Products must be an EntityCollection");
     }
     if (!props.inheritedData) {
       throw new Error("Inherited data is undefined");
@@ -69,10 +65,8 @@ async function handleProductOptionsChange(
     if (entity == null) {
       throw new Error("Entity not found");
     }
-    
 
-    entity.productOptions = products as EntityCollection<"product">;
-    entity.productOptionsId = products.map((p) => p.id);
+    entity.productOptions = products;
     await data.repository("ce_generic_bundle_product").save(entity);
 
     emit("update:data");

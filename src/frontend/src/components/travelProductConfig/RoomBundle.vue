@@ -6,9 +6,10 @@ import RoomRule from "./RoomRules.vue";
 import GenericBundle from "./GenericBundle.vue";
 import { data } from "@shopware-ag/meteor-admin-sdk";
 import { ref } from "vue";
+import EntityCollection from "@shopware-ag/meteor-admin-sdk/es/_internals/data/EntityCollection";
 
 const props = defineProps<{
-  roomBundle: EntitySchema.Entities["ce_travel_product_config_room_bundle"][];
+  roomBundle: EntityCollection<"ce_travel_product_config_room_bundle">;
 }>();
 const emit = defineEmits<{
   (e: "update:data"): void;
@@ -28,9 +29,7 @@ function handleTabChange(roomId: string, tabId: string) {
 }
 
 function handleOneProductChange(
-  product:
-    | EntitySchema.Entities["product"][]
-    | EntitySchema.Entities["product"],
+  product: Entity<"product"> | EntityCollection<"product">,
   id: string,
 ) {
   if (product instanceof Array) {
@@ -118,7 +117,7 @@ const tabs = [
           </button>
         </div>
         <div v-if="roomTabs[room.id] === 'product'">
-          <div class="ewt-tab-content">
+          <div v-if="room.roomProduct" class="ewt-tab-content">
             <ProductSelection
               mode="single"
               :value="room.roomProduct"
@@ -129,42 +128,42 @@ const tabs = [
             />
           </div>
         </div>
+      </div>
 
-        <div v-if="roomTabs[room.id] === 'rules'" class="ewt-tab-pane">
-          <div v-if="!room.roomSaleRule">
-            <div class="ewt-empty-state">
-              <p>No room rules configured</p>
-              <button
-                @click="() => addRoomSaleRule(room.id)"
-                class="ewt-btn ewt-btn--secondary"
-              >
-                Add Room Rules
-              </button>
-            </div>
-          </div>
-          <div v-else>
-            <RoomRule :rule="room.roomSaleRule" />
+      <div v-if="roomTabs[room.id] === 'rules'" class="ewt-tab-pane">
+        <div v-if="!room.roomSaleRule">
+          <div class="ewt-empty-state">
+            <p>No room rules configured</p>
+            <button
+              @click="() => addRoomSaleRule(room.id)"
+              class="ewt-btn ewt-btn--secondary"
+            >
+              Add Room Rules
+            </button>
           </div>
         </div>
+        <div v-else>
+          <RoomRule :rule="room.roomSaleRule" />
+        </div>
+      </div>
 
-        <div v-if="roomTabs[room.id] === 'additional'" class="ewt-tab-pane">
-          <div v-if="!room.additionalProducts">
-            <div class="ewt-empty-state">
-              <p>No additional products configured</p>
-              <button
-                @click="() => addAdditionalProduct(room.id)"
-                class="ewt-btn ewt-btn--secondary"
-              >
-                Add Additional Products
-              </button>
-            </div>
+      <div v-if="roomTabs[room.id] === 'additional'" class="ewt-tab-pane">
+        <div v-if="!room.additionalProducts">
+          <div class="ewt-empty-state">
+            <p>No additional products configured</p>
+            <button
+              @click="() => addAdditionalProduct(room.id)"
+              class="ewt-btn ewt-btn--secondary"
+            >
+              Add Additional Products
+            </button>
           </div>
-          <div v-else>
-            <GenericBundle
-              @update:data="emit('update:data')"
-              :inheritedData="room.additionalProducts"
-            />
-          </div>
+        </div>
+        <div v-else>
+          <GenericBundle
+            @update:data="emit('update:data')"
+            :inheritedData="room.additionalProducts"
+          />
         </div>
       </div>
     </div>

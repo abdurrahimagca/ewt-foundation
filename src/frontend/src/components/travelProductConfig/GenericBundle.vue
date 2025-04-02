@@ -14,19 +14,17 @@ const emit = defineEmits<{
 }>();
 
 function handleParentProductChange(
-  product:
-    | EntitySchema.Entities["product"]
-    | EntitySchema.Entities["product"][],
+  product: EntityCollection<"product"> | Entity<"product">,
 ) {
   try {
-    if (!Array.isArray(product)) {
-      throw new Error("Product must be array");
+    if (!(product instanceof EntityCollection)) {
+      throw new Error("Product must be an EntityCollection");
     }
     if (!props.inheritedData?.parentProducts) {
       throw new Error("Inherited data is undefined");
     }
-    props.inheritedData.parentProductId = product.map((p) => p.id);
-    props.inheritedData.parentProducts = product as EntityCollection<"product">;
+
+    props.inheritedData.parentProducts = product;
     data
       .repository("ce_generic_bundle")
       .save(props.inheritedData as Entity<"ce_generic_bundle">);
@@ -40,7 +38,6 @@ function handleParentProductChange(
     });
   }
 }
-
 </script>
 
 <template>
@@ -86,8 +83,6 @@ function handleParentProductChange(
       <div class="ewt-bundle-products">
         <h4>Bundle Products</h4>
         <BundleProduct
-     
-        
           @update:data="emit('update:data')"
           :inheritedData="inheritedData.bundleProducts"
         />
