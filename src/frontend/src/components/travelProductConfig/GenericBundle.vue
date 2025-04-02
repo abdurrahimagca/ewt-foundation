@@ -5,29 +5,48 @@ import ProductSelection from "../common/ProductSelection.vue";
 import EntityCollection from "@shopware-ag/meteor-admin-sdk/es/_internals/data/EntityCollection";
 import { data, notification } from "@shopware-ag/meteor-admin-sdk";
 import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
-
+import { nextTick } from "vue";
 const props = defineProps<{
-  inheritedData?: Entity<"ce_generic_bundle">;
+  inheritedData: Entity<"ce_generic_bundle">;
 }>();
 const emit = defineEmits<{
   (e: "update:data"): void;
 }>();
+
 async function createBundleProduct() {
   try {
+    
     const repo = data.repository("ce_generic_bundle_product");
+
     if (!props.inheritedData) {
       throw new Error("Inherited data is undefined");
     }
+
     const newEntity = await repo.create();
     if (!newEntity) throw new Error("Could not create bundle product");
+
     newEntity.matchParentQuantity = true;
     newEntity.allowMultipleSelection = false;
     newEntity.isRequired = false;
     newEntity.matchTravellersCount = false;
-    await repo.save(newEntity);
+
     props.inheritedData.bundleProducts.add(newEntity);
+
+    const updated = EntityCollection.fromCollection(
+      props.inheritedData.bundleProducts,
+    );
+
+    props.inheritedData.bundleProducts = updated;
+
+    await data
+      .repository("ce_generic_bundle_product")
+      .saveAll(props.inheritedData.bundleProducts);
     await data.repository("ce_generic_bundle").save(props.inheritedData);
+
+    await nextTick();
+
     emit("update:data");
+
     notification.dispatch({
       title: "Success",
       message: "New bundle product created.",
@@ -42,7 +61,8 @@ async function createBundleProduct() {
     });
   }
 }
-function handleParentProductChange(
+
+async function handleParentProductChange(
   product: EntityCollection<"product"> | Entity<"product">,
 ) {
   try {
@@ -53,9 +73,17 @@ function handleParentProductChange(
       throw new Error("Inherited data is undefined");
     }
 
-    props.inheritedData.parentProducts = product;
-
-    emit("update:data");
+    const updated = EntityCollection.fromCollection(product);
+    updated.forEach((product) => {
+      product.ceGenericBundleParentProductsId = props.inheritedData.id;
+    });
+    props.inheritedData.parentProducts = updated;
+    await data.repository("ce_generic_bundle").save(props.inheritedData);
+    notification.dispatch({
+      title: "Success",
+      message: "Parent product updated successfully.",
+      variant: "success",
+    });
   } catch (e) {
     console.error("error on handling parent product change", e);
     notification.dispatch({
@@ -113,10 +141,15 @@ function handleParentProductChange(
 
       <div class="ewt-bundle-products">
         <h4>Bundle Products</h4>
-        <BundleProduct
-          @update:data="emit('update:data')"
-          :inheritedData="inheritedData.bundleProducts"
-        />
+        <div
+          v-for="bundleProduct in inheritedData.bundleProducts"
+          :key="bundleProduct.id"
+        >
+          <BundleProduct
+            :inheritedData="bundleProduct"
+            @update:data="emit('update:data')"
+          />
+        </div>
       </div>
     </div>
   </div>

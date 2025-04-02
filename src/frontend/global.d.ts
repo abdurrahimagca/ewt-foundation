@@ -24,6 +24,9 @@ declare namespace EntitySchema {
     productNumber: string;
     available: boolean;
     _isNew: boolean;
+    ceGenericBundleParentProductsId: null | string;
+    ceGenericBundleProductParentProductsId: null | string;
+    ceGenericBundleProductProductOptionsId: null | string;
     children: EntityCollection<"product">;
   }
 

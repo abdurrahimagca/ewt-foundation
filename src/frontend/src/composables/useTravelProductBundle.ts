@@ -157,27 +157,14 @@ export function useTravelProductConfig() {
   const addGenericBundleProduct = async () => {
     try {
       const repo = data.repository("ce_generic_bundle");
-      const newGenericBundleProduct = data.repository(
-        "ce_generic_bundle_product",
-      );
-      const newBundleProduct = await newGenericBundleProduct.create();
-      if (newBundleProduct === null) {
-        throw new Error("Could not create new bundle product");
-      }
-
-      newBundleProduct.matchParentQuantity = true;
-
-      const newBundle = await repo.create();
-      if (!newBundle || !entityData.value)
+      const newGenericBundle = await repo.create();
+      if (!newGenericBundle || !entityData.value)
         throw new Error("Could not create generic bundle");
+      newGenericBundle.availableOnMaxParentQuantity = 1;
+      await repo.save(newGenericBundle);
+      entityData.value.additionalProductsId = newGenericBundle.id;
+      entityData.value.additionalProducts = newGenericBundle;
 
-      newBundle.bundleProducts.add(newBundleProduct);
-
-      newBundle.availableOnMinParentQuantity = 1;
-
-      await repo.save(newBundle);
-      entityData.value.additionalProductsId = newBundle.id;
-      entityData.value.additionalProducts = newBundle;
       await upsertUpdatedData();
     } catch (e) {
       console.error(e);
