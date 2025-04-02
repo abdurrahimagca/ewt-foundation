@@ -24,9 +24,7 @@ declare namespace EntitySchema {
     productNumber: string;
     available: boolean;
     _isNew: boolean;
-    ceGenericBundleParentProductsId: null | string;
-    ceGenericBundleProductParentProductsId: null | string;
-    ceGenericBundleProductProductOptionsId: null | string;
+   
     children: EntityCollection<"product">;
   }
 
@@ -93,16 +91,13 @@ declare namespace EntitySchema {
     hotelBundle?: Entity<"ce_hotel_bundle">;
     childDiscountId?: string;
     childDiscount?: Entity<"ce_custom_child_discount">;
-    additionalProductsId: string;
-    additionalProducts: Entity<"ce_generic_bundle">;
+    genericBundles?: EntityCollection<"ce_generic_bundle">;
   }
 
   interface ce_hotel_bundle {
     id: string;
     minRoomSelection: number;
-    maxRoomSelection: number;
-    additionalProductsId: string[];
-    additionalProducts?: EntityCollection<"ce_generic_bundle">;
+    maxRoomSelection: number;  
     roomOptionsId: string[];
     roomOptions: EntityCollection<"ce_travel_product_config_room_bundle">;
   }
@@ -111,8 +106,6 @@ declare namespace EntitySchema {
     id: string;
     roomProductId?: string;
     roomProduct?: Entity<"product">;
-    additionalProductsId: string[];
-    additionalProducts?: Entity<"ce_generic_bundle">;
     roomSaleRuleId?: string;
     roomSaleRule?: Entity<"ce_room_sale_rule">;
   }
@@ -150,24 +143,15 @@ declare namespace EntitySchema {
 
   interface ce_generic_bundle {
     id: string;
-    parentProductId?: string[];
-    parentProducts: EntityCollection<"product">;
     availableOnMinParentQuantity: number;
     availableOnMaxParentQuantity: number;
-    bundleProductsIds?: string[];
-    bundleProducts: EntityCollection<"ce_generic_bundle_product">;
-  }
-
-  interface ce_generic_bundle_product {
-    id: string;
-    parentProductId?: string[];
-    allowMultipleSelection: boolean;
-    parentProducts: EntityCollection<"product">;
-    productOptionsId?: string[];
-
-    productOptions: EntityCollection<"product">;
+    isParentOperatorAnd: boolean;
     matchParentQuantity: boolean;
-    matchTravellersCount: boolean;
+    matchTravellers: boolean;
     isRequired: boolean;
+    allowMultipleSelection: boolean;
+    propagandaText: string;
+    parentProducts: EntityCollection<"product">;
+    productOptions: EntityCollection<"product">;
   }
 }

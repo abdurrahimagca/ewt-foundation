@@ -22,19 +22,26 @@ const selecteds = ref<EntityCollection<"product"> | null>(null);
 const isDropdownOpen = ref(false);
 const error = ref<string | undefined>(undefined);
 const isFrozen = ref(false);
+const hasUnsavedChanges = ref(false);
 
+// Initialize local copy
 onMounted(async () => {
-  if (props.initialProduct instanceof EntityCollection) {
-    selecteds.value = props.initialProduct;
-  } else {
-    const criteria = new data.Classes.Criteria();
-    const repo = data.repository("product");
-    const result = await repo.search(criteria);
-    if (result === null || result.first() === null) {
-      throw new Error("No product found");
-    } else {
-      selecteds.value = result;
-    }
+  if (props.initialProduct) {
+    selecteds.value = data.Classes.EntityCollection.fromCollection(
+      props.initialProduct as EntityCollection<"product">,
+    );
+  }
+
+  const criteria = new data.Classes.Criteria();
+  criteria.addFilter(data.Classes.Criteria.equals("available", true));
+  criteria.setLimit(1);
+  const repo = data.repository("product");
+  const result = await repo.search(criteria);
+  if (result === null) {
+    throw new Error("No product found");
+  }
+  if (result && result.total && result.total > 0) {
+    selectables.value = result;
   }
 });
 
@@ -97,6 +104,7 @@ async function searchProduct() {
 function removeSelected(productId: string) {
   if (isFrozen.value) return;
   selecteds.value?.remove(productId);
+  hasUnsavedChanges.value = true;
 }
 
 function addToSelecteds(product: Entity<"product">) {
@@ -113,6 +121,7 @@ function addToSelecteds(product: Entity<"product">) {
   }
 
   selecteds.value.add(product);
+  hasUnsavedChanges.value = true;
 
   nameToSearch.value = "";
   selectables.value = [];
@@ -125,7 +134,6 @@ function handleInputFocus() {
 }
 
 function commitChanges() {
-  isFrozen.value = true;
   if (!selecteds.value || selecteds.value.total === 0) {
     notification.dispatch({
       title: "Error",
@@ -133,6 +141,7 @@ function commitChanges() {
     });
     return;
   }
+
   if (props.mode === "single") {
     if (selecteds.value.total && selecteds.value.total > 1) {
       notification.dispatch({
@@ -153,6 +162,9 @@ function commitChanges() {
   } else {
     emit("update:initialProduct", selecteds.value);
   }
+
+  hasUnsavedChanges.value = false;
+  isFrozen.value = true;
 }
 
 function toggleEditState() {
@@ -290,7 +302,15 @@ watch(nameToSearch, () => {
       </div>
 
       <div class="action-buttons" v-if="selecteds">
-        <button v-if="!isFrozen" @click="commitChanges" class="commit-button">
+        <span v-if="hasUnsavedChanges" class="unsaved-changes">
+          You have unsaved changes
+        </span>
+        <button
+          v-if="!isFrozen"
+          @click="commitChanges"
+          class="commit-button"
+          :class="{ 'has-changes': hasUnsavedChanges }"
+        >
           Save Changes
         </button>
         <button v-else class="edit-button" @click="toggleEditState">
@@ -626,5 +646,19 @@ button:disabled {
 .add-product:hover {
   background-color: #4f46e5;
   color: white;
+}
+
+.unsaved-changes {
+  color: #9ca3af;
+  font-size: 14px;
+  font-style: italic;
+}
+
+.commit-button.has-changes {
+  background-color: #059669;
+}
+
+.commit-button.has-changes:hover {
+  background-color: #047857;
 }
 </style>

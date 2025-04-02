@@ -22,9 +22,7 @@ async function addRoom() {
       throw new Error("Could not create new room bundle");
     }
 
-    await repo.save(newData);
-
-    props.inheritedData.roomOptions?.push(newData);
+    props.inheritedData.roomOptions?.add(newData);
     emit("update:data");
   } catch (e) {
     console.error(e);

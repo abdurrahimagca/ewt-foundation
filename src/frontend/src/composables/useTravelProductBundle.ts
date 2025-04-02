@@ -2,6 +2,19 @@ import { ref } from "vue";
 import { data, notification } from "@shopware-ag/meteor-admin-sdk";
 import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
 
+const ASSOCIATION = [
+  "hotelBundle",
+  "genericBundles",
+  "genericBundles.parentProducts",
+  "genericBundles.productOptions",
+  "childDiscount",
+  "hotelBundle.roomOptions",
+  "hotelBundle.roomOptions.roomProduct",
+  "hotelBundle.roomOptions.roomSaleRule",
+  "hotelBundle.roomOptions.roomSaleRule.supplementRule",
+  "hotelBundle.roomOptions.roomSaleRule.supplementRule.supplementProduct",
+];
+
 export function useTravelProductConfig() {
   const productId = ref<string | undefined>(undefined);
   const entityData = ref<Entity<"ce_travel_product_config"> | undefined>(
@@ -9,33 +22,16 @@ export function useTravelProductConfig() {
   );
   const isLoading = ref(false);
   const error = ref<string | undefined>(undefined);
-
-  const associations = [
-    "hotelBundle",
-    "additionalProducts",
-    "additionalProducts.parentProducts",
-    "additionalProducts.bundleProducts",
-    "additionalProducts.bundleProducts.parentProducts",
-    "additionalProducts.bundleProducts.productOptions",
-    "childDiscount",
-    "hotelBundle.roomOptions",
-    "hotelBundle.roomOptions.roomProduct",
-    "hotelBundle.roomOptions.additionalProducts",
-    "hotelBundle.roomOptions.additionalProducts.parentProducts",
-    "hotelBundle.roomOptions.additionalProducts.bundleProducts",
-    "hotelBundle.roomOptions.additionalProducts.bundleProducts.parentProducts",
-    "hotelBundle.roomOptions.additionalProducts.bundleProducts.productOptions",
-    "hotelBundle.roomOptions.roomSaleRule",
-    "hotelBundle.roomOptions.roomSaleRule.supplementRule",
-    "hotelBundle.roomOptions.roomSaleRule.supplementRule.supplementProduct",
-  ];
+  const lastSnapshot = ref<Entity<"ce_travel_product_config"> | undefined>(
+    undefined,
+  );
 
   const fetchData = async (pid: string | undefined) => {
     try {
       if (!pid) throw new Error("Product ID is required");
       isLoading.value = true;
       const criteria = new data.Classes.Criteria();
-      associations.forEach((association) => {
+      ASSOCIATION.forEach((association) => {
         criteria.addAssociation(association);
       });
       criteria.addFilter(data.Classes.Criteria.equals("productId", pid));
@@ -47,6 +43,7 @@ export function useTravelProductConfig() {
       if (!resultData) throw new Error("No entity data found");
 
       entityData.value = resultData;
+      lastSnapshot.value = resultData;
 
       return entityData.value;
     } catch (e) {
@@ -76,33 +73,25 @@ export function useTravelProductConfig() {
   };
 
   const upsertUpdatedData = async () => {
+    if (!entityData.value) {
+      throw new Error("No entity data found");
+    }
     try {
       isLoading.value = true;
-      if (!entityData.value) throw new Error("No entity data found");
-
       const repo = data.repository("ce_travel_product_config");
       await repo.save(entityData.value);
-      if (!productId.value) {
-        throw new Error("No productId found in entity data");
-      }
-
-      const newData = await fetchData(productId.value);
-      if (!newData) throw new Error("Could not fetch updated entity data");
-
-      entityData.value = newData;
+      const newResult = await fetchData(entityData.value?.productId as string);
+      if (!newResult) throw new Error("No entity data found");
+      entityData.value = newResult;
+      lastSnapshot.value = newResult;
       notification.dispatch({
-        title: "Success",
-        message: "Configuration saved successfully",
+        title: "Configuration updated",
+        message: "Configuration updated successfully",
         variant: "success",
       });
     } catch (e) {
+      tryRefreshData();
       console.error(e);
-      notification.dispatch({
-        title: "Error",
-        message: "Failed to save configuration. Please try again.",
-        variant: "error",
-      });
-      error.value = e as string;
     } finally {
       isLoading.value = false;
     }
@@ -119,7 +108,6 @@ export function useTravelProductConfig() {
       entityData.value = undefined;
       const newData = await createData(productId.value as string);
       if (!newData) throw new Error("Could not create new entity data");
-
       entityData.value = newData;
       notification.dispatch({
         title: "Success",
@@ -134,6 +122,28 @@ export function useTravelProductConfig() {
     }
   };
 
+  const tryRefreshData = async () => {
+    try {
+      if (!lastSnapshot.value) throw new Error("No last snapshot found");
+      await deleteDataFromRepo();
+      const repo = data.repository("ce_travel_product_config");
+      await repo.save(lastSnapshot.value);
+      const newResult = await fetchData(
+        lastSnapshot.value?.productId as string,
+      );
+      if (!newResult) throw new Error("No entity data found");
+      entityData.value = newResult;
+      notification.dispatch({
+        title: "Configuration could not be updated",
+        message: "Configuration could not be updated last snapshot restored",
+        variant: "error",
+      });
+    } catch (e) {
+      console.error(e);
+      error.value = "Error refreshing data";
+    }
+  };
+
   const addHotelBundle = async () => {
     try {
       const repo = data.repository("ce_hotel_bundle");
@@ -143,8 +153,6 @@ export function useTravelProductConfig() {
 
       newHotelBundle.minRoomSelection = 1;
       newHotelBundle.maxRoomSelection = 1;
-
-      await repo.save(newHotelBundle);
       entityData.value.hotelBundleId = newHotelBundle.id;
       entityData.value.hotelBundle = newHotelBundle;
       await upsertUpdatedData();
@@ -160,11 +168,10 @@ export function useTravelProductConfig() {
       const newGenericBundle = await repo.create();
       if (!newGenericBundle || !entityData.value)
         throw new Error("Could not create generic bundle");
-      newGenericBundle.availableOnMaxParentQuantity = 1;
-      await repo.save(newGenericBundle);
-      entityData.value.additionalProductsId = newGenericBundle.id;
-      entityData.value.additionalProducts = newGenericBundle;
-
+      if (!entityData.value.genericBundles) {
+        throw new Error("No generic bundles found");
+      }
+      entityData.value.genericBundles.push(newGenericBundle);
       await upsertUpdatedData();
     } catch (e) {
       console.error(e);
@@ -178,10 +185,8 @@ export function useTravelProductConfig() {
       const newChildDiscount = await repo.create();
       if (!newChildDiscount || !entityData.value)
         throw new Error("Could not create child discount");
-
       newChildDiscount.infantDiscountPercentage = 100;
       newChildDiscount.childDiscountPercentage = 50;
-      await repo.save(newChildDiscount);
       entityData.value.childDiscountId = newChildDiscount.id;
       entityData.value.childDiscount = newChildDiscount;
       await upsertUpdatedData();

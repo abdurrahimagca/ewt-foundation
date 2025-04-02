@@ -30,7 +30,7 @@ async function createSupplementRule() {
   if (newSupplementRule === null) {
     throw new Error("Could not create new supplement rule");
   }
-  await repo.save(newSupplementRule);
+ // await repo.save(newSupplementRule);
   props.rule.supplementRule = newSupplementRule;
   emit("update:data");
 }

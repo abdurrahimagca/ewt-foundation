@@ -3,7 +3,6 @@ import { defineProps, onMounted } from "vue";
 import ProductSelection from "../common/ProductSelection.vue";
 import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
 import RoomRule from "./RoomRules.vue";
-import GenericBundle from "./GenericBundle.vue";
 import { data } from "@shopware-ag/meteor-admin-sdk";
 import { ref } from "vue";
 import EntityCollection from "@shopware-ag/meteor-admin-sdk/es/_internals/data/EntityCollection";
@@ -42,8 +41,9 @@ function handleOneProductChange(
   const room = props.roomBundle.find((room) => room.id === id);
   if (room) {
     room.roomProductId = product.id;
-    room.roomProduct = product as Entity<"product">;
+    room.roomProduct = product;
   }
+  emit("update:data");
 }
 
 async function addRoomSaleRule(id: string) {
@@ -54,29 +54,10 @@ async function addRoomSaleRule(id: string) {
       throw new Error("Could not create new room sale rule");
     }
     newRoomSaleRule.allowPets = true;
-    await repo.save(newRoomSaleRule);
+    //await repo.save(newRoomSaleRule);
     const room = props.roomBundle.find((room) => room.id === id);
     if (room) {
       room.roomSaleRule = newRoomSaleRule;
-    }
-    emit("update:data");
-  } catch (e) {
-    console.error(e);
-  }
-}
-async function addAdditionalProduct(id: string) {
-  try {
-    const repo = data.repository("ce_generic_bundle");
-    const newAdditionalProduct = await repo.create();
-    if (newAdditionalProduct === null) {
-      throw new Error("Could not create new additional product");
-    }
-    newAdditionalProduct.availableOnMinParentQuantity = 1;
-    await repo.save(newAdditionalProduct);
-    const room = props.roomBundle.find((room) => room.id === id);
-
-    if (room) {
-      room.additionalProducts = newAdditionalProduct;
     }
     emit("update:data");
   } catch (e) {
@@ -87,7 +68,6 @@ async function addAdditionalProduct(id: string) {
 const tabs = [
   { id: "product", label: "Room Product" },
   { id: "rules", label: "Room Rules" },
-  { id: "additional", label: "Additional Products" },
 ];
 </script>
 
@@ -117,7 +97,7 @@ const tabs = [
           </button>
         </div>
         <div v-if="roomTabs[room.id] === 'product'">
-          <div v-if="room.roomProduct" class="ewt-tab-content">
+          <div class="ewt-tab-content">
             <ProductSelection
               mode="single"
               :value="room.roomProduct"
@@ -144,26 +124,6 @@ const tabs = [
         </div>
         <div v-else>
           <RoomRule :rule="room.roomSaleRule" />
-        </div>
-      </div>
-
-      <div v-if="roomTabs[room.id] === 'additional'" class="ewt-tab-pane">
-        <div v-if="!room.additionalProducts">
-          <div class="ewt-empty-state">
-            <p>No additional products configured</p>
-            <button
-              @click="() => addAdditionalProduct(room.id)"
-              class="ewt-btn ewt-btn--secondary"
-            >
-              Add Additional Products
-            </button>
-          </div>
-        </div>
-        <div v-else>
-          <GenericBundle
-            @update:data="emit('update:data')"
-            :inheritedData="room.additionalProducts"
-          />
         </div>
       </div>
     </div>

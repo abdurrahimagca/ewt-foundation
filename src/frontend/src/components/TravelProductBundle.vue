@@ -2,7 +2,7 @@
 import { onMounted, ref } from "vue";
 import { data, location } from "@shopware-ag/meteor-admin-sdk";
 import HotelBundle from "./travelProductConfig/HotelBundle.vue";
-import GenericBundle from "./travelProductConfig/GenericBundle.vue";
+import NewGenericBundle from "./travelProductConfig/NewGenericBundle.vue";
 import ChildDiscount from "./travelProductConfig/ChildDiscount.vue";
 import { useTravelProductConfig } from "../composables/useTravelProductBundle";
 
@@ -10,7 +10,7 @@ const activeTab = ref("hotel");
 
 const tabs = [
   { id: "hotel", label: "Hotel Bundle" },
-  { id: "generic", label: "Additional Products" },
+  { id: "generic", label: "Generic Bundles" },
   { id: "child", label: "Child Discount" },
 ];
 
@@ -112,21 +112,22 @@ function handleTabChange(tabId: string) {
         </div>
 
         <div v-if="activeTab === 'generic'" class="ewt-tab-pane">
-          <div v-if="entityData.additionalProducts">
-            <GenericBundle
+          <div
+            v-if="
+              entityData.genericBundles && entityData.genericBundles.length > 0
+            "
+          >
+            <NewGenericBundle
               @update:data="upsertUpdatedData"
-              :inheritedData="entityData.additionalProducts"
+              :inheritedData="entityData.genericBundles"
             />
           </div>
-          <div v-else class="ewt-empty-state">
-            <p>No additional products configured</p>
-            <button
-              @click="addGenericBundleProduct"
-              class="ewt-btn ewt-btn--secondary"
-            >
-              Add Additional Products
-            </button>
-          </div>
+          <button
+            @click="addGenericBundleProduct"
+            class="ewt-btn ewt-btn--secondary"
+          >
+            Add Generic Bundle
+          </button>
         </div>
 
         <div v-if="activeTab === 'child'" class="ewt-tab-pane">
