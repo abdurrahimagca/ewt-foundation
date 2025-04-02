@@ -40,24 +40,7 @@ function handleParentProductChange(
     });
   }
 }
-async function handleGenericBundleChange() {
-  try {
-    if (!props.inheritedData) {
-      throw new Error("Inherited data is undefined");
-    }
-    //const opt = props.inheritedData;
 
-    await data.repository("ce_generic_bundle").save(props.inheritedData);
-    emit("update:data");
-  } catch (e) {
-    console.error("error on bundle product parent product:", e);
-    notification.dispatch({
-      title: "Error",
-      message: "An error occurred while updating the parent product.",
-      variant: "error",
-    });
-  }
-}
 </script>
 
 <template>
@@ -103,7 +86,8 @@ async function handleGenericBundleChange() {
       <div class="ewt-bundle-products">
         <h4>Bundle Products</h4>
         <BundleProduct
-          @update:genericBundle="handleGenericBundleChange"
+     
+        
           @update:data="emit('update:data')"
           :inheritedData="inheritedData.bundleProducts"
         />

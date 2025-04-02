@@ -1,8 +1,10 @@
 <script lang="ts" setup>
 import { defineProps } from "vue";
 import ProductSelection from "../common/ProductSelection.vue";
-import EntityCollection from "@shopware-ag/meteor-admin-sdk/es/_internals/data/EntityCollection";
-import { data, notification } from "@shopware-ag/meteor-admin-sdk";
+import EntityCollection, {
+  ApiContext,
+} from "@shopware-ag/meteor-admin-sdk/es/_internals/data/EntityCollection";
+import { context, data, notification } from "@shopware-ag/meteor-admin-sdk";
 import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
 
 const props = defineProps<{
@@ -10,7 +12,6 @@ const props = defineProps<{
 }>();
 const emit = defineEmits<{
   (e: "update:data"): void;
-  (e: "update:genericBundle"): void;
 }>();
 
 async function handleParentProductChange(
@@ -69,6 +70,7 @@ async function handleProductOptionsChange(
       throw new Error("Entity not found");
     }
     
+
     entity.productOptions = products as EntityCollection<"product">;
     entity.productOptionsId = products.map((p) => p.id);
     await data.repository("ce_generic_bundle_product").save(entity);
@@ -102,14 +104,15 @@ async function createBundleProduct() {
     newEntity.allowMultipleSelection = false;
     newEntity.isRequired = false;
     newEntity.matchTravellersCount = false;
+
+    // 2. Collection'a ekle
+    props.inheritedData.add(newEntity);
+
+    // 3. SAVE çağrısı yap
     await repo.save(newEntity);
 
-    props.inheritedData.add(newEntity);
-    await repo.saveAll(props.inheritedData);
-
-
     // (İsteğe bağlı) emit ile üst bileşene bildir
-    //emit("update:genericBundle");
+    emit("update:data");
 
     notification.dispatch({
       title: "Success",
