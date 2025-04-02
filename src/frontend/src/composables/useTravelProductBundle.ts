@@ -185,7 +185,7 @@ export function useTravelProductConfig() {
       const newChildDiscount = await repo.create();
       if (!newChildDiscount || !entityData.value)
         throw new Error("Could not create child discount");
-      newChildDiscount.infantDiscountPercentage = 100;
+      newChildDiscount.infantsDiscountPercentage = 100;
       newChildDiscount.childDiscountPercentage = 50;
       entityData.value.childDiscountId = newChildDiscount.id;
       entityData.value.childDiscount = newChildDiscount;

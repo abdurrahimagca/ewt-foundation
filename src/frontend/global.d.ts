@@ -138,7 +138,7 @@ declare namespace EntitySchema {
   interface ce_custom_child_discount {
     id: string;
     childDiscountPercentage: number;
-    infantDiscountPercentage: number;
+    infantsDiscountPercentage: number;
   }
 
   interface ce_generic_bundle {
