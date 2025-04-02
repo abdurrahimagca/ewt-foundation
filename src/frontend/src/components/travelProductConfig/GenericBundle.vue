@@ -12,7 +12,36 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: "update:data"): void;
 }>();
-
+async function createBundleProduct() {
+  try {
+    const repo = data.repository("ce_generic_bundle_product");
+    if (!props.inheritedData) {
+      throw new Error("Inherited data is undefined");
+    }
+    const newEntity = await repo.create();
+    if (!newEntity) throw new Error("Could not create bundle product");
+    newEntity.matchParentQuantity = true;
+    newEntity.allowMultipleSelection = false;
+    newEntity.isRequired = false;
+    newEntity.matchTravellersCount = false;
+    await repo.save(newEntity);
+    props.inheritedData.bundleProducts.add(newEntity);
+    await data.repository("ce_generic_bundle").save(props.inheritedData);
+    emit("update:data");
+    notification.dispatch({
+      title: "Success",
+      message: "New bundle product created.",
+      variant: "success",
+    });
+  } catch (e) {
+    console.error("Error on creating bundle product:", e);
+    notification.dispatch({
+      title: "Error",
+      message: "An error occurred while creating the bundle product.",
+      variant: "error",
+    });
+  }
+}
 function handleParentProductChange(
   product: EntityCollection<"product"> | Entity<"product">,
 ) {
@@ -25,10 +54,8 @@ function handleParentProductChange(
     }
 
     props.inheritedData.parentProducts = product;
-    data
-      .repository("ce_generic_bundle")
-      .save(props.inheritedData as Entity<"ce_generic_bundle">);
-    // emit("update:data");
+
+    emit("update:data");
   } catch (e) {
     console.error("error on handling parent product change", e);
     notification.dispatch({
@@ -41,7 +68,11 @@ function handleParentProductChange(
 </script>
 
 <template>
-  <div v-if="inheritedData" class="ewt-card-detail">
+  <button class="ewt-button ewt-button--primary" @click="createBundleProduct">
+    Add Bundle Product
+  </button>
+  <p>is inheritedData null {{ inheritedData === null }}</p>
+  <div v-if="inheritedData && inheritedData !== null" class="ewt-card-detail">
     <div class="form-layout">
       <div class="ewt-grid-2">
         <div class="ewt-form-group">

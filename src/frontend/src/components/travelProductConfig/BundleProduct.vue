@@ -1,5 +1,5 @@
 <script lang="ts" setup>
-import { defineProps } from "vue";
+import { defineProps, onMounted } from "vue";
 import ProductSelection from "../common/ProductSelection.vue";
 import EntityCollection, {
   ApiContext,
@@ -35,10 +35,11 @@ async function handleParentProductChange(
     if (entity == null) {
       throw new Error("Entity not found");
     }
-
     entity.parentProducts = product;
-    await data.repository("ce_generic_bundle_product").save(entity);
-
+  //  await data.repository("ce_generic_bundle_product").save(entity);
+    await data
+      .repository("ce_generic_bundle_product")
+      .saveAll(props.inheritedData);
     emit("update:data");
   } catch (e) {
     console.error("erroron bundle product parent product:", e);
@@ -65,10 +66,11 @@ async function handleProductOptionsChange(
     if (entity == null) {
       throw new Error("Entity not found");
     }
-
     entity.productOptions = products;
     await data.repository("ce_generic_bundle_product").save(entity);
-
+    await data
+      .repository("ce_generic_bundle_product")
+      .saveAll(props.inheritedData);
     emit("update:data");
   } catch (e) {
     console.error("error on poptsion:", e);
@@ -79,53 +81,11 @@ async function handleProductOptionsChange(
     });
   }
 }
-async function createBundleProduct() {
-  try {
-    const repo = data.repository("ce_generic_bundle_product");
-
-    if (!props.inheritedData) {
-      throw new Error("Inherited data is undefined");
-    }
-
-    // 1. Yeni bir entity oluştur
-    const newEntity = await repo.create();
-
-    if (!newEntity) {
-      throw new Error("Could not create bundle product");
-    }
-
-    newEntity.matchParentQuantity = true;
-    newEntity.allowMultipleSelection = false;
-    newEntity.isRequired = false;
-    newEntity.matchTravellersCount = false;
-
-    // 2. Collection'a ekle
-    props.inheritedData.add(newEntity);
-
-    // 3. SAVE çağrısı yap
-    await repo.save(newEntity);
-
-    // (İsteğe bağlı) emit ile üst bileşene bildir
-    emit("update:data");
-
-    notification.dispatch({
-      title: "Success",
-      message: "New bundle product created.",
-      variant: "success",
-    });
-  } catch (e) {
-    console.error("Error on creating bundle product:", e);
-    notification.dispatch({
-      title: "Error",
-      message: "An error occurred while creating the bundle product.",
-      variant: "error",
-    });
-  }
-}
 </script>
 
 <template>
-  <div v-if="inheritedData" class="ewt-card-detail">
+  <p>is inheritedData null {{ inheritedData === null }}</p>
+  <div v-if="inheritedData && inheritedData !== null" class="ewt-card-detail">
     <div v-for="(opt, index) in inheritedData" :key="index">
       <p>i have and id{{ opt.id }}</p>
       <div class="form-layout">
@@ -197,9 +157,5 @@ async function createBundleProduct() {
       </div>
     </div>
   </div>
-  <div class="ewt-button-group">
-    <button @click="createBundleProduct" class="ewt-btn ewt-btn--secondary">
-      Add Bundle Product
-    </button>
-  </div>
+  <div class="ewt-button-group"></div>
 </template>

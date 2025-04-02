@@ -39,10 +39,11 @@ onMounted(async () => {
 });
 
 async function searchProduct() {
-  if (!nameToSearch || !nameToSearch.value || nameToSearch.value === "") {
+  if (!nameToSearch?.value?.trim()) {
     selectables.value = [];
     return;
   }
+
   try {
     const repo = data.repository("product");
 
@@ -55,25 +56,38 @@ async function searchProduct() {
     );
 
     const repoSearchResult = await repo.search(criteria);
-    if (repoSearchResult === null || repoSearchResult.first() === null) {
-      selectables.value = [];
-      return;
+
+    const products: Entity<"product">[] = [];
+    if (repoSearchResult === null) {
+      throw new Error("No product found");
+    }
+    for (const product of repoSearchResult) {
+      if (product.available) {
+        products.push(product);
+      }
     }
 
-    const products = repoSearchResult.filter((product) => product.available);
-
     const parentIds = products.map((p) => p.id);
-    const childCriteria = new data.Classes.Criteria();
-    childCriteria.addFilter(
-      data.Classes.Criteria.equalsAny("parentId", parentIds),
-    );
 
-    const childProducts =
-      parentIds.length > 0
-        ? (await repo.search(childCriteria))?.filter(
-            (product) => product.available,
-          ) || []
-        : [];
+    let childProducts: Entity<"product">[] = [];
+
+    if (parentIds.length > 0) {
+      const childCriteria = new data.Classes.Criteria();
+      childCriteria.addFilter(
+        data.Classes.Criteria.equalsAny("parentId", parentIds),
+      );
+
+      const childResult = await repo.search(childCriteria);
+      if (childResult === null) {
+        throw new Error("No child product found");
+      }
+      for (const child of childResult) {
+        if (child.available) {
+          childProducts.push(child);
+        }
+      }
+    }
+
     selectables.value = [...products, ...childProducts];
   } catch (e) {
     error.value = (e as Error).message;
