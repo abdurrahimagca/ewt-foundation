@@ -1,7 +1,6 @@
 <script lang="ts" setup>
 import { defineProps, onMounted } from "vue";
 import ProductSelection from "../common/ProductSelection.vue";
-import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
 import RoomRule from "./RoomRules.vue";
 import { data } from "@shopware-ag/meteor-admin-sdk";
 import { ref } from "vue";
@@ -10,9 +9,7 @@ import EntityCollection from "@shopware-ag/meteor-admin-sdk/es/_internals/data/E
 const props = defineProps<{
   roomBundle: EntityCollection<"ce_travel_product_config_room_bundle">;
 }>();
-const emit = defineEmits<{
-  (e: "update:data"): void;
-}>();
+
 const roomTabs = ref<{ [key: string]: string }>({}); // Track active tab for each room
 
 // Initialize tabs for each room
@@ -34,12 +31,10 @@ function handleOneProductChange(
   if (!product) {
     throw new Error("Product is undefined");
   }
-
   const room = props.roomBundle.find((room) => room.id === id);
   if (room) {
     room.roomProducts = product;
   }
-  emit("update:data");
 }
 
 async function addRoomSaleRule(id: string) {
@@ -52,10 +47,8 @@ async function addRoomSaleRule(id: string) {
     newRoomSaleRule.allowPets = true;
     const room = props.roomBundle.find((room) => room.id === id);
     if (room) {
-      room.roomSaleRuleId = newRoomSaleRule.id;
       room.roomSaleRule = newRoomSaleRule;
     }
-    emit("update:data");
   } catch (e) {
     console.error(e);
   }

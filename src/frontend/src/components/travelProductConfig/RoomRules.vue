@@ -5,23 +5,6 @@ import { data } from "@shopware-ag/meteor-admin-sdk";
 const props = defineProps<{
   rule: EntitySchema.Entities["ce_room_sale_rule"];
 }>();
-const emit = defineEmits<{
-  (e: "update:data"): void;
-}>();
-
-/** interface ce_room_sale_rule {
-    id: string;
-    minAdults: number;
-    maxAdults: number;
-    minChildren: number;
-    maxChildren: number;
-    childrenStartAge: number;
-    minInfants: number;
-    maxInfants: number;
-    maxTotalPersons: number;
-    allowPets: boolean;
-    supplementRule?: Entity<"ce_room_supplement_rule">;
-  } */
 
 async function createSupplementRule() {
   const repo = data.repository("ce_room_supplement_rule");
@@ -30,9 +13,7 @@ async function createSupplementRule() {
   if (newSupplementRule === null) {
     throw new Error("Could not create new supplement rule");
   }
- // await repo.save(newSupplementRule);
   props.rule.supplementRule = newSupplementRule;
-  emit("update:data");
 }
 </script>
 

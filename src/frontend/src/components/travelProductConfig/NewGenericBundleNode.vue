@@ -2,17 +2,14 @@
 import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
 import EntityCollection from "@shopware-ag/meteor-admin-sdk/es/_internals/data/EntityCollection";
 import ProductSelection from "../common/ProductSelection.vue";
-import { data, notification } from "@shopware-ag/meteor-admin-sdk";
-import { watch } from "vue";
+import { notification } from "@shopware-ag/meteor-admin-sdk";
 
 const props = defineProps<{
   inheritedData: Entity<"ce_generic_bundle">;
 }>();
 
-
-
 async function handleParentProductChange(
-  products: EntityCollection<"product"> | Entity<"product">,
+  products: EntityCollection<"product">,
 ) {
   try {
     if (!(products instanceof EntityCollection)) {
@@ -35,7 +32,7 @@ async function handleParentProductChange(
   }
 }
 async function handleBundleProductChange(
-  products: EntityCollection<"product"> | Entity<"product">,
+  products: EntityCollection<"product">,
 ) {
   try {
     if (!(products instanceof EntityCollection)) {
@@ -67,6 +64,7 @@ async function handleBundleProductChange(
         This is not a replacement for product rules but a way to configure
         <strong>product selection</strong> limits and options.
       </p>
+
       <ProductSelection
         mode="multiple"
         :initialProduct="inheritedData.parentProducts"

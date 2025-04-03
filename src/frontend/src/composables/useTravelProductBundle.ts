@@ -153,9 +153,7 @@ export function useTravelProductConfig() {
 
       newHotelBundle.minRoomSelection = 1;
       newHotelBundle.maxRoomSelection = 1;
-      entityData.value.hotelBundleId = newHotelBundle.id;
       entityData.value.hotelBundle = newHotelBundle;
-     // await upsertUpdatedData();
     } catch (e) {
       console.error(e);
       error.value = e as string;
@@ -172,10 +170,7 @@ export function useTravelProductConfig() {
         throw new Error("No generic bundles found");
       }
       newGenericBundle.availableOnMinParentQuantity = 1;
-      await repo.save(newGenericBundle);
       entityData.value.genericBundles.push(newGenericBundle);
-      
-      //await upsertUpdatedData();
     } catch (e) {
       console.error(e);
       error.value = e as string;
@@ -190,9 +185,7 @@ export function useTravelProductConfig() {
         throw new Error("Could not create child discount");
       newChildDiscount.infantsDiscountPercentage = 100;
       newChildDiscount.childDiscountPercentage = 50;
-      entityData.value.childDiscountId = newChildDiscount.id;
       entityData.value.childDiscount = newChildDiscount;
-      //await upsertUpdatedData();
     } catch (e) {
       console.error(e);
       error.value = e as string;

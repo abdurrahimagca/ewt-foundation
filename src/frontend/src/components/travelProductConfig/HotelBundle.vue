@@ -10,9 +10,6 @@ const props = defineProps<{
 async function removeRoom() {
   props.inheritedData.roomOptions?.pop();
 }
-const emit = defineEmits<{
-  (e: "update:data"): void;
-}>();
 
 async function addRoom() {
   try {
@@ -79,10 +76,7 @@ async function addRoom() {
       </div>
 
       <div v-if="inheritedData.roomOptions" class="ewt-grid-rooms">
-        <RoomBundle
-          @update:data="emit('update:data')"
-          :roomBundle="inheritedData.roomOptions"
-        />
+        <RoomBundle :roomBundle="inheritedData.roomOptions" />
       </div>
     </div>
   </div>

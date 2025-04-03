@@ -1,10 +1,10 @@
 <script lang="ts" setup>
 import { defineProps } from "vue";
 import ProductSelection from "../common/ProductSelection.vue";
-import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
 import EntityCollection from "@shopware-ag/meteor-admin-sdk/es/_internals/data/EntityCollection";
+import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
 const props = defineProps<{
-  inheritedData: EntitySchema.Entities["ce_room_supplement_rule"];
+  inheritedData: Entity<"ce_room_supplement_rule">;
 }>();
 function updateInitialProduct(product: EntityCollection<"product">) {
   try {

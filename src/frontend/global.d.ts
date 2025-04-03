@@ -24,7 +24,7 @@ declare namespace EntitySchema {
     productNumber: string;
     available: boolean;
     _isNew: boolean;
-   
+
     children: EntityCollection<"product">;
   }
 
@@ -87,9 +87,7 @@ declare namespace EntitySchema {
     id: string;
     productId?: string;
     product?: Entity<"product">;
-    hotelBundleId?: string;
     hotelBundle?: Entity<"ce_hotel_bundle">;
-    childDiscountId?: string;
     childDiscount?: Entity<"ce_custom_child_discount">;
     genericBundles?: EntityCollection<"ce_generic_bundle">;
   }
@@ -97,14 +95,13 @@ declare namespace EntitySchema {
   interface ce_hotel_bundle {
     id: string;
     minRoomSelection: number;
-    maxRoomSelection: number;  
+    maxRoomSelection: number;
     roomOptions: EntityCollection<"ce_travel_product_config_room_bundle">;
   }
 
   interface ce_travel_product_config_room_bundle {
     id: string;
     roomProducts?: EntityCollection<"product">;
-    roomSaleRuleId?: string;
     roomSaleRule?: Entity<"ce_room_sale_rule">;
   }
 
@@ -120,7 +117,6 @@ declare namespace EntitySchema {
     maxInfants: number;
     maxTotalPersons: number;
     allowPets: boolean;
-    supplementRuleId?: string;
     supplementRule?: Entity<"ce_room_supplement_rule">;
   }
 
@@ -148,7 +144,7 @@ declare namespace EntitySchema {
     isRequired: boolean;
     allowMultipleSelection: boolean;
     propagandaText: string;
-    parentProducts: EntityCollection<"product"> ;
+    parentProducts: EntityCollection<"product">;
     productOptions: EntityCollection<"product">;
   }
 }
