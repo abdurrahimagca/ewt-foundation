@@ -98,14 +98,12 @@ declare namespace EntitySchema {
     id: string;
     minRoomSelection: number;
     maxRoomSelection: number;  
-    roomOptionsId: string[];
     roomOptions: EntityCollection<"ce_travel_product_config_room_bundle">;
   }
 
   interface ce_travel_product_config_room_bundle {
     id: string;
-    roomProductId?: string;
-    roomProduct?: Entity<"product">;
+    roomProducts?: EntityCollection<"product">;
     roomSaleRuleId?: string;
     roomSaleRule?: Entity<"ce_room_sale_rule">;
   }
@@ -131,8 +129,7 @@ declare namespace EntitySchema {
     supplementName: string;
     applyIfAdults: number;
     applyIfChildren: number;
-    supplementProductId?: string;
-    supplementProduct?: Entity<"product">;
+    supplementProducts?: EntityCollection<"product">;
   }
 
   interface ce_custom_child_discount {
@@ -151,7 +148,7 @@ declare namespace EntitySchema {
     isRequired: boolean;
     allowMultipleSelection: boolean;
     propagandaText: string;
-    parentProducts: EntityCollection<"product">;
+    parentProducts: EntityCollection<"product"> ;
     productOptions: EntityCollection<"product">;
   }
 }

@@ -21,9 +21,7 @@ async function addRoom() {
     if (newData === null) {
       throw new Error("Could not create new room bundle");
     }
-
-    props.inheritedData.roomOptions?.add(newData);
-    emit("update:data");
+    props.inheritedData.roomOptions?.push(newData);
   } catch (e) {
     console.error(e);
   }

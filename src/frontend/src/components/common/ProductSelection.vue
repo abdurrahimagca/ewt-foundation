@@ -5,15 +5,11 @@ import EntityCollection from "@shopware-ag/meteor-admin-sdk/es/_internals/data/E
 import { defineProps, ref, watch, defineEmits, onMounted } from "vue";
 
 const props = defineProps<{
-  initialProduct?: Entity<"product"> | EntityCollection<"product">;
-  mode?: "single" | "multiple";
+  initialProduct: EntityCollection<"product">;
 }>();
 
 const emit = defineEmits<{
-  (
-    e: "update:initialProduct",
-    value: Entity<"product"> | EntityCollection<"product">,
-  ): void;
+  (e: "update:initialProduct", value: EntityCollection<"product">): void;
 }>();
 
 const nameToSearch = ref<string | null | undefined>(undefined);
@@ -28,7 +24,7 @@ const hasUnsavedChanges = ref(false);
 onMounted(async () => {
   if (props.initialProduct) {
     selecteds.value = data.Classes.EntityCollection.fromCollection(
-      props.initialProduct as EntityCollection<"product">,
+      props.initialProduct,
     );
   }
 
@@ -141,28 +137,7 @@ function commitChanges() {
     });
     return;
   }
-
-  if (props.mode === "single") {
-    if (selecteds.value.total && selecteds.value.total > 1) {
-      notification.dispatch({
-        title: "Error",
-        message: "Please select only one product",
-      });
-      return;
-    }
-    const result = selecteds.value.first();
-    if (result === null) {
-      notification.dispatch({
-        title: "Error",
-        message: "Please select a product",
-      });
-      return;
-    }
-    emit("update:initialProduct", result);
-  } else {
-    emit("update:initialProduct", selecteds.value);
-  }
-
+  emit("update:initialProduct", selecteds.value);
   hasUnsavedChanges.value = false;
   isFrozen.value = true;
 }
@@ -217,7 +192,7 @@ watch(nameToSearch, () => {
                 </svg>
               </button>
               <button
-                v-if="props.mode === 'multiple' && !isFrozen"
+                v-if="!isFrozen"
                 class="remove-tag"
                 @click.stop="removeSelected(product.id)"
                 title="Remove product"

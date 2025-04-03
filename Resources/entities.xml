@@ -81,7 +81,7 @@
 
     <entity name="ce_travel_product_config_room_bundle">
         <fields>
-            <one-to-one name="room_product" store-api-aware="true" reference="product" on-delete="set-null"/>
+            <one-to-many name="room_products" store-api-aware="true" reference="product" on-delete="set-null"/>
             <one-to-one name="room_sale_rule" store-api-aware="true" reference="ce_room_sale_rule" on-delete="set-null"/>
         </fields>
     </entity>
@@ -107,7 +107,7 @@
             <text name="supplement_name" store-api-aware="true"/>
             <int name="apply_if_adults" store-api-aware="true"/>
             <int name="apply_if_children" store-api-aware="true"/>
-            <one-to-one name="supplement_product" store-api-aware="true" reference="product" on-delete="set-null"/>
+            <one-to-many name="supplement_products" store-api-aware="true" reference="product" on-delete="set-null"/>
         </fields>
     </entity>
 

@@ -9,28 +9,7 @@ const props = defineProps<{
   inheritedData: Entity<"ce_generic_bundle">;
 }>();
 
-watch(
-  () => props.inheritedData,
-  async (newValue) => {
-    try {
-      if (!newValue) {
-        return;
-      }
-      await data.repository("ce_generic_bundle").save(newValue);
-    } catch (error) {
-      console.error("Failed to save bundle configuration:", error);
-      notification.dispatch({
-        title: "Error",
-        message: "Failed to save bundle configuration",
-        variant: "error",
-      });
-    }
-  },
-  {
-    deep: true, // Watch for nested changes
-    flush: "post", // Wait for DOM updates before running
-  },
-);
+
 
 async function handleParentProductChange(
   products: EntityCollection<"product"> | Entity<"product">,

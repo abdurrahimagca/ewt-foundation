@@ -9,10 +9,10 @@ const ASSOCIATION = [
   "genericBundles.productOptions",
   "childDiscount",
   "hotelBundle.roomOptions",
-  "hotelBundle.roomOptions.roomProduct",
+  "hotelBundle.roomOptions.roomProducts",
   "hotelBundle.roomOptions.roomSaleRule",
   "hotelBundle.roomOptions.roomSaleRule.supplementRule",
-  "hotelBundle.roomOptions.roomSaleRule.supplementRule.supplementProduct",
+  "hotelBundle.roomOptions.roomSaleRule.supplementRule.supplementProducts",
 ];
 
 export function useTravelProductConfig() {
@@ -155,7 +155,7 @@ export function useTravelProductConfig() {
       newHotelBundle.maxRoomSelection = 1;
       entityData.value.hotelBundleId = newHotelBundle.id;
       entityData.value.hotelBundle = newHotelBundle;
-      await upsertUpdatedData();
+     // await upsertUpdatedData();
     } catch (e) {
       console.error(e);
       error.value = e as string;
@@ -171,8 +171,11 @@ export function useTravelProductConfig() {
       if (!entityData.value.genericBundles) {
         throw new Error("No generic bundles found");
       }
+      newGenericBundle.availableOnMinParentQuantity = 1;
+      await repo.save(newGenericBundle);
       entityData.value.genericBundles.push(newGenericBundle);
-      await upsertUpdatedData();
+      
+      //await upsertUpdatedData();
     } catch (e) {
       console.error(e);
       error.value = e as string;
@@ -189,7 +192,7 @@ export function useTravelProductConfig() {
       newChildDiscount.childDiscountPercentage = 50;
       entityData.value.childDiscountId = newChildDiscount.id;
       entityData.value.childDiscount = newChildDiscount;
-      await upsertUpdatedData();
+      //await upsertUpdatedData();
     } catch (e) {
       console.error(e);
       error.value = e as string;

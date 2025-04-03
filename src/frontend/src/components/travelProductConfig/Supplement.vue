@@ -2,20 +2,13 @@
 import { defineProps } from "vue";
 import ProductSelection from "../common/ProductSelection.vue";
 import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
+import EntityCollection from "@shopware-ag/meteor-admin-sdk/es/_internals/data/EntityCollection";
 const props = defineProps<{
   inheritedData: EntitySchema.Entities["ce_room_supplement_rule"];
 }>();
-function updateInitialProduct(
-  product:
-    | EntitySchema.Entities["product"]
-    | EntitySchema.Entities["product"][],
-) {
+function updateInitialProduct(product: EntityCollection<"product">) {
   try {
-    if (Array.isArray(product)) {
-      throw new Error("Expected single product");
-    }
-    props.inheritedData.supplementProductId = product.id;
-    props.inheritedData.supplementProduct = product as Entity<"product">;
+    props.inheritedData.supplementProducts = product;
   } catch (e) {
     console.error(e);
   }
@@ -67,12 +60,13 @@ function updateInitialProduct(
         This product will be added if these conditions are met on cart of this
         <strong>particular</strong> room product.
       </p>
-
-      <ProductSelection
-        :initialProduct="inheritedData.supplementProduct"
-        @update:initial-product="updateInitialProduct"
-        mode="single"
-      />
+      <div v-if="inheritedData.supplementProducts">
+        <ProductSelection
+          :initialProduct="inheritedData.supplementProducts"
+          @update:initial-product="updateInitialProduct"
+          mode="single"
+        />
+      </div>
     </div>
   </div>
 </template>

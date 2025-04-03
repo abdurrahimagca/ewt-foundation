@@ -28,20 +28,16 @@ function handleTabChange(roomId: string, tabId: string) {
 }
 
 function handleOneProductChange(
-  product: Entity<"product"> | EntityCollection<"product">,
+  product: EntityCollection<"product">,
   id: string,
 ) {
-  if (product instanceof Array) {
-    throw new Error("Product must be a single product");
-  }
   if (!product) {
     throw new Error("Product is undefined");
   }
 
   const room = props.roomBundle.find((room) => room.id === id);
   if (room) {
-    room.roomProductId = product.id;
-    room.roomProduct = product;
+    room.roomProducts = product;
   }
   emit("update:data");
 }
@@ -54,9 +50,9 @@ async function addRoomSaleRule(id: string) {
       throw new Error("Could not create new room sale rule");
     }
     newRoomSaleRule.allowPets = true;
-    //await repo.save(newRoomSaleRule);
     const room = props.roomBundle.find((room) => room.id === id);
     if (room) {
+      room.roomSaleRuleId = newRoomSaleRule.id;
       room.roomSaleRule = newRoomSaleRule;
     }
     emit("update:data");
@@ -96,15 +92,13 @@ const tabs = [
             {{ tab.label }}
           </button>
         </div>
-        <div v-if="roomTabs[room.id] === 'product'">
+        <div v-if="roomTabs[room.id] === 'product' && room.roomProducts">
           <div class="ewt-tab-content">
             <ProductSelection
               mode="single"
-              :value="room.roomProduct"
-              :initialProduct="room.roomProduct"
-              @update:initialProduct="
-                (product) => handleOneProductChange(product, room.id)
-              "
+              :value="room.roomProducts"
+              :initialProduct="room.roomProducts"
+              @update:initialProduct="handleOneProductChange($event, room.id)"
             />
           </div>
         </div>
