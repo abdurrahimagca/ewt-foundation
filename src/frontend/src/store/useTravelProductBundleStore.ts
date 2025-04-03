@@ -25,7 +25,6 @@ export const useTravelProductConfigStore = defineStore(
     const entityData = ref<Entity<"ce_travel_product_config">>();
     const isLoading = ref(false);
     const error = ref<string>();
-    const lastSnapshot = ref<Entity<"ce_travel_product_config">>();
 
     async function fetchData(pid: string) {
       try {
@@ -41,7 +40,7 @@ export const useTravelProductConfigStore = defineStore(
         if (!resultData) throw new Error("No entity data found");
 
         entityData.value = resultData;
-        lastSnapshot.value = resultData;
+
         return entityData.value;
       } catch (e) {
         console.error(e);
@@ -69,14 +68,13 @@ export const useTravelProductConfigStore = defineStore(
     }
 
     async function refreshState() {
+      isLoading.value = true;
+      error.value = undefined;
       try {
         if (!entityData.value)
           throw new Error("[Validation] No entity data found");
-
         try {
-          await data
-            .repository("ce_travel_product_config")
-            .save(entityData.value);
+          await saveTravelProductConfigDeep();
           notification.dispatch({
             title: "Success",
             message: "Configuration saved",
@@ -127,6 +125,96 @@ export const useTravelProductConfigStore = defineStore(
         console.log("ids are:", entityData.value?.genericBundles?.getIds());
         console.error(JSON.stringify(e, null, 2));
         console.error(e);
+      } finally {
+        isLoading.value = false;
+      }
+    }
+    async function saveTravelProductConfigDeep() {
+      if (!entityData.value)
+        throw new Error("[Validation] No entity data found");
+
+      try {
+        // 1. Generic Bundle içindeki ürünler
+        if (entityData.value.genericBundles) {
+          for (const bundle of entityData.value.genericBundles) {
+            await data.repository("product").saveAll(bundle.productOptions);
+            await data.repository("product").saveAll(bundle.parentProducts);
+          }
+          await data
+            .repository("ce_generic_bundle")
+            .saveAll(entityData.value.genericBundles);
+        }
+        // 2. Hotel Bundle içindeki Room Bundles ve onların içindeki ürünler
+        // 2. Hotel Bundle ve içeriği
+        const hotelBundle = entityData.value.hotelBundle;
+        if (hotelBundle) {
+          const roomOptions = hotelBundle.roomOptions;
+          if (roomOptions?.length) {
+            for (const roomOption of roomOptions) {
+              // Room Products
+              if (roomOption.roomProducts?.length) {
+                await data
+                  .repository("product")
+                  .saveAll(roomOption.roomProducts);
+              }
+
+              // Sale Rule ve Supplement Rule
+              const saleRule = roomOption.roomSaleRule;
+              if (saleRule) {
+                if (saleRule.supplementRule) {
+                  if (saleRule.supplementRule.supplementProducts?.length) {
+                    await data
+                      .repository("product")
+                      .saveAll(saleRule.supplementRule.supplementProducts);
+                  }
+
+                  await data
+                    .repository("ce_room_supplement_rule")
+                    .save(saleRule.supplementRule);
+                }
+
+                await data.repository("ce_room_sale_rule").save(saleRule);
+              }
+
+              // Room Bundle Save
+              await data
+                .repository("ce_travel_product_config_room_bundle")
+                .save(roomOption);
+            }
+          }
+
+          await data.repository("ce_hotel_bundle").save(hotelBundle);
+        }
+
+        // 3. Child Discount (varsa)
+        if (entityData.value.childDiscount) {
+          await data
+            .repository("ce_custom_child_discount")
+            .save(entityData.value.childDiscount);
+        }
+
+        // 4. Ana product (varsa)
+        if (entityData.value.product) {
+          await data.repository("product").save(entityData.value.product);
+        }
+
+        // 5. En son: ce_travel_product_config
+        await data
+          .repository("ce_travel_product_config")
+          .save(entityData.value);
+
+        notification.dispatch({
+          title: "Success",
+          message: "All data saved successfully",
+          variant: "success",
+        });
+      } catch (e) {
+        console.error("Error while saving travel product config:", e);
+        notification.dispatch({
+          title: "Error",
+          message: "Failed to save data",
+          variant: "error",
+        });
       }
     }
 
@@ -171,6 +259,7 @@ export const useTravelProductConfigStore = defineStore(
 
     async function addGenericBundleProduct() {
       try {
+        await refreshState();
         const repo = data.repository("ce_generic_bundle");
         const newGenericBundle = await repo.create();
         if (!newGenericBundle || !entityData.value || !newGenericBundle.id)
@@ -179,8 +268,9 @@ export const useTravelProductConfigStore = defineStore(
         if (!entityData.value.genericBundles) {
           throw new Error("Generic bundle doesnt exists");
         }
-    
-        entityData.value.genericBundles.push(newGenericBundle);
+        newGenericBundle.availableOnMinParentQuantity = 1;
+        entityData.value.genericBundles.add(newGenericBundle);
+
         await refreshState();
 
         notification.dispatch({

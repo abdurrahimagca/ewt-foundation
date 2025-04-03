@@ -1,70 +1,76 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <entities xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/shopware/trunk/src/Core/System/CustomEntity/Xml/entity-1.0.xsd">
 
-    <entity name="ce_travel_product_config">
+   <entity name="ce_travel_product_config">
         <fields>
             <one-to-one name="product" store-api-aware="true" reference="product" on-delete="set-null"/>
-            <one-to-one name="hotel_bundle" store-api-aware="true" reference="ce_travel_product_config_hotel_bundle" on-delete="set-null"/>
-            <one-to-one name="child_discount" store-api-aware="true" reference="ce_travel_product_config_child_discount" on-delete="set-null"/>
-            <one-to-one name="generic_product_bundle" reference="ce_travel_product_config_generic_product_bundle" store-api-aware="true" on-delete="set-null" />
+            <one-to-one name="hotel_bundle" store-api-aware="true" reference="ce_hotel_bundle" on-delete="set-null"/>
+            <one-to-one name="child_discount" store-api-aware="true" reference="ce_custom_child_discount" on-delete="set-null"/>
         </fields>
     </entity>
 
-    <entity name="ce_travel_product_config_hotel_bundle">
+    <entity name="ce_hotel_bundle">
         <fields>
+            <one-to-one name="tour_product" reference="product" store-api-aware="true" on-delete="set-null" />
             <int name="min_room_selection" store-api-aware="true"/>
             <int name="max_room_selection" store-api-aware="true"/>
-            <one-to-one name="generic_product_bundle" reference="ce_travel_product_config_generic_product_bundle" store-api-aware="true" on-delete="set-null" /> 
             <one-to-many name="room_options" store-api-aware="true" reference="ce_travel_product_config_room_bundle" on-delete="set-null"/>
         </fields>
     </entity>
 
     <entity name="ce_travel_product_config_room_bundle">
         <fields>
-            <one-to-one name="room_product" store-api-aware="true" reference="product" on-delete="set-null"/>
-            <one-to-many name="room_extra" store-api-aware="true" reference="product" on-delete="set-null"/>
-            <one-to-one name="generic_product_bundle" reference="ce_travel_product_config_generic_product_bundle" store-api-aware="true" on-delete="set-null" /> 
-            <one-to-one name="room_rule" store-api-aware="true" reference="ce_travel_product_config_room_bundle_rule" on-delete="set-null"/>
+            <one-to-many name="room_products" store-api-aware="true" reference="product" on-delete="set-null"/>
+            <one-to-one name="room_sale_rule" store-api-aware="true" reference="ce_room_sale_rule" on-delete="set-null"/>
         </fields>
     </entity>
 
-    <entity name="ce_travel_product_config_room_bundle_rule">
+    <entity name="ce_room_sale_rule">
         <fields>
             <int name="min_adults" store-api-aware="true"/>
             <int name="max_adults" store-api-aware="true"/>
             <int name="min_children" store-api-aware="true"/>
             <int name="max_children" store-api-aware="true"/>
-            <one-to-one name="supplement" store-api-aware="true" reference="ce_travel_product_config_room_bundle_supplement_rule" on-delete="set-null"/>
+            <int name="children_start_age" store-api-aware="true"/>
+            <int name="children_end_age" store-api-aware="true"/>
+            <int name="min_infants" store-api-aware="true"/>
+            <int name="max_infants" store-api-aware="true"/>
+            <int name="max_total_persons" store-api-aware="true"/>
+            <bool name="allow_pets" store-api-aware="true"/>
+            <one-to-one name="supplement_rule" store-api-aware="true" reference="ce_room_supplement_rule" on-delete="set-null"/>
         </fields>
     </entity>
 
-    <entity name="ce_travel_product_config_room_bundle_supplement_rule">
+    <entity name="ce_room_supplement_rule">
         <fields>
             <text name="supplement_name" store-api-aware="true"/>
             <int name="apply_if_adults" store-api-aware="true"/>
             <int name="apply_if_children" store-api-aware="true"/>
-            <one-to-one name="supplement_product" store-api-aware="true" reference="product" on-delete="set-null"/>
+            <one-to-many name="supplement_products" store-api-aware="true" reference="product" on-delete="set-null"/>
         </fields>
     </entity>
 
-    <entity name="ce_travel_product_config_child_discount">
-        <fields>
-            <float name="discount_percentage" store-api-aware="true"/>
-            <int name="apply_on_quantity" store-api-aware="true"/>
-            <int name="apply_to_quantity" store-api-aware="true"/>
+    <entity name="ce_custom_child_discount">
+        <fields> 
+            <float name="child_discount_percentage" store-api-aware="true"/>
+            <float name="infants_discount_percentage" store-api-aware="true" />
         </fields>
     </entity>
 
-   <entity name="ce_travel_product_config_generic_product_bundle">
-        <fields>
-            <int name="min_quantity" store-api-aware="true"/>
-            <int name="max_quantity" store-api-aware="true"/>
-            <int name="min_quantity_against_parent" store-api-aware="true"/>
-            <int name="max_quantity_against_parent" store-api-aware="true"/>
-            <int name="quantity_step" store-api-aware="true"/>
-            <bool name="allow_multiple_products" store-api-aware="true"/>
-            <int name="sort_order" store-api-aware="true"/>
-            <one-to-many name="product_options" store-api-aware="true" reference="product" on-delete="set-null"/>
-        </fields>
-    </entity>
+    <entity name="ce_generic_bundle">
+    <fields>
+        <one-to-one name="travel_product_config" store-api-aware="true" reference="ce_travel_product_config" on-delete="set-null"/>
+        <int name="available_on_min_parent_quantity" default="1" store-api-aware="true" />
+        <int name="available_on_max_parent_quantity" store-api-aware="true" />   
+        <text name="propaganda_text" store-api-aware="true" />
+        <bool name="is_parent_operator_and" store-api-aware="true" />
+        <bool name="match_parent_quantity" store-api-aware="true" />
+        <bool name="match_travellers" store-api-aware="true" />
+        <bool name="is_required" store-api-aware="true" />
+        <bool name="allow_multiple_selection" store-api-aware="true" />
+        <one-to-many name="parent_products" reference="product" store-api-aware="true" on-delete="set-null" />
+        <one-to-many name="product_options" reference="product" store-api-aware="true" on-delete="set-null" />  
+    </fields>
+</entity>
+
 </entities>

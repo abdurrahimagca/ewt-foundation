@@ -21,6 +21,14 @@ declare namespace EntitySchema {
     id: string;
     name: string | null;
     productNumber: string;
+    taxId: string;
+    stock: number;
+    price: {
+      currencyId: string;
+      net: number;
+      gross: number;
+      linked: boolean;
+    };
     available: boolean;
     _isNew: boolean;
   }
@@ -133,6 +141,7 @@ declare namespace EntitySchema {
 
   interface ce_generic_bundle {
     id: string;
+    
     availableOnMinParentQuantity: number;
     availableOnMaxParentQuantity: number;
     isParentOperatorAnd: boolean;

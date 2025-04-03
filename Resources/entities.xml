@@ -118,6 +118,8 @@
         </fields>
     </entity>
 
+    
+
     <entity name="ce_generic_bundle">
     <fields>
         <int name="available_on_min_parent_quantity" default="1" store-api-aware="true" />
