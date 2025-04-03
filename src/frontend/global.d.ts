@@ -19,13 +19,10 @@ declare namespace EntitySchema {
 
   interface product {
     id: string;
-    variation?: string[];
     name: string | null;
     productNumber: string;
     available: boolean;
     _isNew: boolean;
-
-    children: EntityCollection<"product">;
   }
 
   interface ce_traveller {

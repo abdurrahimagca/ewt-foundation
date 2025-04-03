@@ -2,11 +2,10 @@
 import { onMounted, ref } from "vue";
 import { data, location } from "@shopware-ag/meteor-admin-sdk";
 import HotelBundle from "./travelProductConfig/HotelBundle.vue";
-import NewGenericBundle from "./travelProductConfig/NewGenericBundle.vue";
 import ChildDiscount from "./travelProductConfig/ChildDiscount.vue";
 import { useTravelProductConfig } from "../composables/useTravelProductBundle";
 import { useTravelProductConfigStore } from "../store/useTravelProductBundleStore";
-import GenericBundle from "./travelProductConfig/GenericBundle.vue";
+import GenericBundleCollection from "./travelProductConfig/GenericBundleCollection.vue";
 
 const activeTab = ref("hotel");
 
@@ -56,10 +55,7 @@ function handleTabChange(tabId: string) {
 
     <div class="ewt-flex top-bar">
       <div class="ewt-button-group primary-actions">
-        <button
-          @click="store.upsertUpdatedData"
-          class="ewt-btn ewt-btn--primary"
-        >
+        <button @click="store.refreshState" class="ewt-btn ewt-btn--primary">
           Save Changes
         </button>
         <button
@@ -111,7 +107,7 @@ function handleTabChange(tabId: string) {
         </div>
 
         <div v-if="activeTab === 'generic'" class="ewt-tab-pane">
-          <GenericBundle />
+          <GenericBundleCollection />
 
           <button
             @click="store.addGenericBundleProduct"

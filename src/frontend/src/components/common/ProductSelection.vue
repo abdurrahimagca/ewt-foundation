@@ -1,7 +1,9 @@
 <script lang="ts" setup>
-import { data, notification } from "@shopware-ag/meteor-admin-sdk";
+import { context, data, notification } from "@shopware-ag/meteor-admin-sdk";
 import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
-import EntityCollection from "@shopware-ag/meteor-admin-sdk/es/_internals/data/EntityCollection";
+import EntityCollection, {
+  ApiContext,
+} from "@shopware-ag/meteor-admin-sdk/es/_internals/data/EntityCollection";
 import { defineProps, ref, watch, defineEmits, onMounted } from "vue";
 
 const props = defineProps<{
@@ -9,12 +11,12 @@ const props = defineProps<{
 }>();
 
 const emit = defineEmits<{
-  (e: "update:initialProduct", value: EntityCollection<"product">): void;
+  (e: "update:initialProduct", value: Entity<"product">[]): void;
 }>();
 
 const nameToSearch = ref<string | null | undefined>(undefined);
 const selectables = ref<Entity<"product">[]>([]);
-const selecteds = ref<EntityCollection<"product"> | null>(null);
+const selecteds = ref<Entity<"product">[] | undefined>(undefined);
 const isDropdownOpen = ref(false);
 const error = ref<string | undefined>(undefined);
 const isFrozen = ref(false);
@@ -23,9 +25,9 @@ const hasUnsavedChanges = ref(false);
 // Initialize local copy
 onMounted(async () => {
   if (props.initialProduct) {
-    selecteds.value = data.Classes.EntityCollection.fromCollection(
-      props.initialProduct,
-    );
+    selecteds.value = props.initialProduct.map((product) => {
+      return product;
+    });
   }
 
   const criteria = new data.Classes.Criteria();
@@ -51,6 +53,9 @@ async function searchProduct() {
     const repo = data.repository("product");
 
     const criteria = new data.Classes.Criteria();
+    /* criteria.addIncludes({
+      product: ["id", "name", "productNumber", "available"],
+    });*/
     criteria.addFilter(
       data.Classes.Criteria.multi("OR", [
         data.Classes.Criteria.contains("name", nameToSearch.value),
@@ -79,6 +84,9 @@ async function searchProduct() {
       childCriteria.addFilter(
         data.Classes.Criteria.equalsAny("parentId", parentIds),
       );
+      /*childCriteria.addIncludes({
+        product: ["id", "name", "productNumber", "available"],
+      }); */
 
       const childResult = await repo.search(childCriteria);
       if (childResult === null) {
@@ -99,7 +107,19 @@ async function searchProduct() {
 
 function removeSelected(productId: string) {
   if (isFrozen.value) return;
-  selecteds.value?.remove(productId);
+  const nodeToRemove = selecteds.value?.find(
+    (product) => product.id === productId,
+  );
+  if (nodeToRemove) {
+    selecteds.value = selecteds.value?.filter(
+      (product) => product.id !== productId,
+    );
+  } else {
+    notification.dispatch({
+      title: "Error",
+      message: "Product not found in selected products",
+    });
+  }
   hasUnsavedChanges.value = true;
 }
 
@@ -116,7 +136,7 @@ function addToSelecteds(product: Entity<"product">) {
     throw new Error("selecteds is null");
   }
 
-  selecteds.value.add(product);
+  selecteds.value?.push(product);
   hasUnsavedChanges.value = true;
 
   nameToSearch.value = "";
@@ -130,13 +150,21 @@ function handleInputFocus() {
 }
 
 function commitChanges() {
-  if (!selecteds.value || selecteds.value.total === 0) {
+  if (
+    !selecteds.value ||
+    selecteds.value.length === 0 ||
+    selecteds.value === null
+  ) {
     notification.dispatch({
       title: "Error",
       message: "Please select at least one product",
     });
     return;
   }
+  if (!selecteds.value) {
+    throw new Error("selecteds is null");
+  }
+
   emit("update:initialProduct", selecteds.value);
   hasUnsavedChanges.value = false;
   isFrozen.value = true;

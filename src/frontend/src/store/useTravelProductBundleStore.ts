@@ -21,7 +21,7 @@ export const useTravelProductConfigStore = defineStore(
   "travelProductConfig",
   () => {
     const productId = ref<string>();
-    
+
     const entityData = ref<Entity<"ce_travel_product_config">>();
     const isLoading = ref(false);
     const error = ref<string>();
@@ -68,66 +68,65 @@ export const useTravelProductConfigStore = defineStore(
       }
     }
 
-    async function refreshState(id: string) {
+    async function refreshState() {
       try {
-        const criteria = new data.Classes.Criteria();
-        ASSOCIATION.forEach((a) => criteria.addAssociation(a));
-        criteria.setIds([id]);
-        criteria.setLimit(1);
-        const result = await data
-          .repository("ce_travel_product_config")
-          .search(criteria);
-        const resultData = result?.first();
-        if (!resultData) throw new Error("No entity data found");
-        entityData.value = resultData;
-      } catch (e) {
-        console.error(e);
-      }
-    }
+        if (!entityData.value)
+          throw new Error("[Validation] No entity data found");
 
-    async function upsertUpdatedData() {
-      if (!entityData.value) throw new Error("No entity data found");
-      try {
-        const newData = entityData.value;
         try {
-          await data.repository("ce_travel_product_config").save(newData);
-          refreshState(newData.id);
-
+          await data
+            .repository("ce_travel_product_config")
+            .save(entityData.value);
           notification.dispatch({
             title: "Success",
             message: "Configuration saved",
             variant: "success",
           });
-        } catch (e) {
-          try {
-            await data
-              .repository("ce_travel_product_config")
-              .delete(entityData.value.id);
-            const fresh = new data.Classes.Entity(
-              newData.id,
-              "ce_travel_product_config",
-              newData,
-            );
-            fresh.markAsNew();
-            await data.repository("ce_travel_product_config").save(fresh);
-            refreshState(fresh.id);
-            notification.dispatch({
-              title: "Success",
-              message: "Configuration saved",
-              variant: "success",
-            });
-          } catch (e) {
-            try {
-              tryRefreshData();
-            } catch (e) {
-              console.error(e);
-              error.value = (e as Error).message;
-            }
-          }
+        } catch (saveError) {
+          throw new Error(
+            `[Save] Failed to save entity: ${(saveError as Error).message}`,
+          );
         }
+
+        const criteria = new data.Classes.Criteria();
+        ASSOCIATION.forEach((a) => criteria.addAssociation(a));
+
+        try {
+          criteria.setIds([entityData.value?.id]);
+        } catch (criteriaError) {
+          throw new Error(
+            `[Criteria] Failed to set IDs: ${(criteriaError as Error).message}`,
+          );
+        }
+
+        let result;
+        try {
+          result = await data
+            .repository("ce_travel_product_config")
+            .search(criteria);
+        } catch (searchError) {
+          throw new Error(
+            `[Search] Failed to search repository: ${(searchError as Error).message}`,
+          );
+        }
+
+        const resultData = result?.first();
+        if (!resultData)
+          throw new Error("[SEARCH] No entity data found after refresh");
+
+        entityData.value = resultData;
       } catch (e) {
+        notification.dispatch({
+          title: "Error",
+          message: (e as Error).message,
+          variant: "error",
+        });
+        console.log("error saving entity data", JSON.stringify(e));
+        console.log("data is:", entityData.value);
+        console.log("raw data is:", JSON.stringify(entityData.value, null, 2));
+        console.log("ids are:", entityData.value?.genericBundles?.getIds());
+        console.error(JSON.stringify(e, null, 2));
         console.error(e);
-        error.value = (e as Error).message;
       }
     }
 
@@ -155,28 +154,6 @@ export const useTravelProductConfigStore = defineStore(
       }
     }
 
-    async function tryRefreshData() {
-      try {
-        if (!lastSnapshot.value) throw new Error("No last snapshot found");
-        await deleteDataFromRepo();
-        const repo = data.repository("ce_travel_product_config");
-        await repo.save(lastSnapshot.value);
-        if (!lastSnapshot.value.productId)
-          throw new Error("No product ID found");
-        const newResult = await fetchData(lastSnapshot.value.productId);
-        if (!newResult) throw new Error("No entity data found");
-        entityData.value = newResult;
-        notification.dispatch({
-          title: "Snapshot Restored",
-          message: "Last snapshot has been restored",
-          variant: "error",
-        });
-      } catch (e) {
-        console.error(e);
-        error.value = "Error refreshing data";
-      }
-    }
-
     async function addHotelBundle() {
       try {
         const repo = data.repository("ce_hotel_bundle");
@@ -194,26 +171,18 @@ export const useTravelProductConfigStore = defineStore(
 
     async function addGenericBundleProduct() {
       try {
-        const collection = entityData.value?.genericBundles;
-        if (!collection) {
-          throw new Error("No generic bundles found");
-        }
         const repo = data.repository("ce_generic_bundle");
         const newGenericBundle = await repo.create();
-        if (!newGenericBundle || !entityData.value)
+        if (!newGenericBundle || !entityData.value || !newGenericBundle.id)
           throw new Error("Could not create generic bundle");
-        newGenericBundle.availableOnMinParentQuantity = 1;
-        await repo.save(newGenericBundle);
-        if (!entityData.value.genericBundles) {
-          throw new Error("No generic bundles found");
-        }
-        const freshEntity = await repo.get(newGenericBundle.id);
-        if (!freshEntity) throw new Error("No generic bundle found");
 
-        collection.add(freshEntity);
-        entityData.value.genericBundles =
-          data.Classes.EntityCollection.fromCollection(collection);
-        await upsertUpdatedData();
+        if (!entityData.value.genericBundles) {
+          throw new Error("Generic bundle doesnt exists");
+        }
+    
+        entityData.value.genericBundles.push(newGenericBundle);
+        await refreshState();
+
         notification.dispatch({
           title: "Generic Bundle added",
           message: "Generic Bundle added successfully",
@@ -247,12 +216,12 @@ export const useTravelProductConfigStore = defineStore(
       error,
       fetchData,
       createData,
-      upsertUpdatedData,
+
       deleteDataFromRepo,
-      tryRefreshData,
       addHotelBundle,
       addGenericBundleProduct,
       addChildDiscount,
+      refreshState,
     };
   },
 );
