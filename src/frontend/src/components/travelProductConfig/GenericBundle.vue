@@ -90,7 +90,7 @@ function handleBundleProductChange(
         />
       </div>
 
-      <div class="ewt-form-group">
+      <div class="rm-group">
         <label class="ewt-form-label">Is Parent Operator And?</label>
         <input
           v-model="bundle.isParentOperatorAnd"

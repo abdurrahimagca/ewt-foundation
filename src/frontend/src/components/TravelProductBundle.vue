@@ -6,7 +6,7 @@ import NewGenericBundle from "./travelProductConfig/NewGenericBundle.vue";
 import ChildDiscount from "./travelProductConfig/ChildDiscount.vue";
 import { useTravelProductConfig } from "../composables/useTravelProductBundle";
 import { useTravelProductConfigStore } from "../store/useTravelProductBundleStore";
-import GenericBundle from "./travelProductConfig/GenericBundle.vue"
+import GenericBundle from "./travelProductConfig/GenericBundle.vue";
 
 const activeTab = ref("hotel");
 
@@ -16,19 +16,6 @@ const tabs = [
   { id: "child", label: "Child Discount" },
 ];
 
-const {
-  productId,
-  entityData,
-  isLoading,
-  error,
-  fetchData,
-  createData,
-  upsertUpdatedData,
-  deleteDataFromRepo,
-  addHotelBundle,
-  addGenericBundleProduct,
-  addChildDiscount,
-} = useTravelProductConfig();
 const store = useTravelProductConfigStore();
 
 onMounted(async () => {
@@ -48,23 +35,6 @@ onMounted(async () => {
   }
 
   //*end of store*/
-  const result: any = await data.get({
-    id: "sw-product-detail__product",
-    selectors: ["id"],
-  });
-
-  productId.value = result.id;
-  const existing = await fetchData(productId.value);
-  if (!existing) {
-    const newEntity = await createData(productId.value);
-    if (!newEntity) {
-      throw new Error("Failed to create new entity");
-    } else {
-      entityData.value = newEntity;
-    }
-  } else {
-    entityData.value = existing;
-  }
 
   location.startAutoResizer();
 });
@@ -86,23 +56,30 @@ function handleTabChange(tabId: string) {
 
     <div class="ewt-flex top-bar">
       <div class="ewt-button-group primary-actions">
-        <button @click="upsertUpdatedData" class="ewt-btn ewt-btn--primary">
+        <button
+          @click="store.upsertUpdatedData"
+          class="ewt-btn ewt-btn--primary"
+        >
           Save Changes
         </button>
-        <button @click="store.upsertUpdatedData">save state</button>
-        <button @click="deleteDataFromRepo" class="ewt-btn ewt-btn--danger">
+        <button
+          @click="store.deleteDataFromRepo"
+          class="ewt-btn ewt-btn--danger"
+        >
           Delete Configuration
         </button>
       </div>
     </div>
 
-    <div v-if="isLoading" class="ewt-loading">Loading configuration...</div>
-
-    <div v-else-if="error" class="ewt-error">
-      {{ error }}
+    <div v-if="store.isLoading" class="ewt-loading">
+      Loading configuration...
     </div>
 
-    <div v-else-if="entityData" class="ewt-section">
+    <div v-else-if="store.error" class="ewt-error">
+      {{ store.error }}
+    </div>
+
+    <div v-else-if="store.entityData" class="ewt-section">
       <div class="ewt-tabs">
         <button
           v-for="tab in tabs"
@@ -117,8 +94,8 @@ function handleTabChange(tabId: string) {
 
       <div class="ewt-tab-content">
         <div v-if="activeTab === 'hotel'" class="ewt-tab-pane">
-          <div v-if="entityData.hotelBundle">
-            <HotelBundle
+          <!--   <div v-if="entityData.hotelBundle">
+           <HotelBundle
               @update:data="upsertUpdatedData"
               :inheritedData="entityData.hotelBundle"
             />
@@ -128,14 +105,16 @@ function handleTabChange(tabId: string) {
             <button @click="addHotelBundle" class="ewt-btn ewt-btn--secondary">
               Add Hotel Bundle
             </button>
-          </div>
+          </div> -->
+          uh oh wait bu i got
+          {{ JSON.stringify(store.entityData.hotelBundle) }}
         </div>
 
         <div v-if="activeTab === 'generic'" class="ewt-tab-pane">
           <GenericBundle />
 
           <button
-            @click="addGenericBundleProduct"
+            @click="store.addGenericBundleProduct"
             class="ewt-btn ewt-btn--secondary"
           >
             Add Generic Bundle
@@ -143,7 +122,7 @@ function handleTabChange(tabId: string) {
         </div>
 
         <div v-if="activeTab === 'child'" class="ewt-tab-pane">
-          <div v-if="entityData.childDiscount">
+          <!--  <div v-if="entityData.childDiscount">
             <ChildDiscount
               @update:data="upsertUpdatedData"
               :inheritedData="entityData.childDiscount"
@@ -157,12 +136,14 @@ function handleTabChange(tabId: string) {
             >
               Add Child Discount
             </button>
+         
           </div>
+           -->
         </div>
       </div>
     </div>
 
-    <pre>{{ entityData }}</pre>
+    <pre>{{ store.entityData }}</pre>
   </div>
 </template>
 
