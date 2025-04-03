@@ -5,6 +5,8 @@ import HotelBundle from "./travelProductConfig/HotelBundle.vue";
 import NewGenericBundle from "./travelProductConfig/NewGenericBundle.vue";
 import ChildDiscount from "./travelProductConfig/ChildDiscount.vue";
 import { useTravelProductConfig } from "../composables/useTravelProductBundle";
+import { useTravelProductConfigStore } from "../store/useTravelProductBundleStore";
+import GenericBundle from "./travelProductConfig/GenericBundle.vue"
 
 const activeTab = ref("hotel");
 
@@ -27,8 +29,25 @@ const {
   addGenericBundleProduct,
   addChildDiscount,
 } = useTravelProductConfig();
+const store = useTravelProductConfigStore();
 
 onMounted(async () => {
+  ///** store */
+  const postResult: any = await data.get({
+    id: "sw-product-detail__product",
+    selectors: ["id"],
+  });
+  if (!postResult.id) {
+    throw new Error("no id found");
+  }
+
+  store.productId = postResult.id;
+  const postExisting = await store.fetchData(postResult.id);
+  if (!postExisting) {
+    await store.createData(store.productId ?? "");
+  }
+
+  //*end of store*/
   const result: any = await data.get({
     id: "sw-product-detail__product",
     selectors: ["id"],
@@ -70,6 +89,7 @@ function handleTabChange(tabId: string) {
         <button @click="upsertUpdatedData" class="ewt-btn ewt-btn--primary">
           Save Changes
         </button>
+        <button @click="store.upsertUpdatedData">save state</button>
         <button @click="deleteDataFromRepo" class="ewt-btn ewt-btn--danger">
           Delete Configuration
         </button>
@@ -112,16 +132,8 @@ function handleTabChange(tabId: string) {
         </div>
 
         <div v-if="activeTab === 'generic'" class="ewt-tab-pane">
-          <div
-            v-if="
-              entityData.genericBundles && entityData.genericBundles.length > 0
-            "
-          >
-            <NewGenericBundle
-              @update:data="upsertUpdatedData"
-              :inheritedData="entityData.genericBundles"
-            />
-          </div>
+          <GenericBundle />
+
           <button
             @click="addGenericBundleProduct"
             class="ewt-btn ewt-btn--secondary"
