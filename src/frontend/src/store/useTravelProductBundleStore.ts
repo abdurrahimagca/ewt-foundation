@@ -5,6 +5,7 @@ import { data, notification } from "@shopware-ag/meteor-admin-sdk";
 import type { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
 
 const ASSOCIATION = [
+
   "hotelBundle",
   "genericBundles",
   "genericBundles.parentProducts",
@@ -37,6 +38,8 @@ export const useTravelProductConfigStore = defineStore(
         const repo = data.repository("ce_travel_product_config");
         const result = await repo.search(criteria);
         const resultData = result?.first();
+        //console.log("result data:", resultData);
+        // console.log(JSON.stringify(resultData, null, 2));
         if (!resultData) throw new Error("No entity data found");
 
         entityData.value = resultData;
@@ -74,7 +77,8 @@ export const useTravelProductConfigStore = defineStore(
         if (!entityData.value)
           throw new Error("[Validation] No entity data found");
         try {
-          await saveTravelProductConfigDeep();
+          const repo = data.repository("ce_travel_product_config");
+          await repo.save(entityData.value);
           notification.dispatch({
             title: "Success",
             message: "Configuration saved",
@@ -119,102 +123,19 @@ export const useTravelProductConfigStore = defineStore(
           message: (e as Error).message,
           variant: "error",
         });
-        console.log("error saving entity data", JSON.stringify(e));
-        console.log("data is:", entityData.value);
-        console.log("raw data is:", JSON.stringify(entityData.value, null, 2));
-        console.log("ids are:", entityData.value?.genericBundles?.getIds());
+        //* Detaylı hata logları
+        //  console.log("error saving entity data", JSON.stringify(e));
+        //console.log("data is:", entityData.value);
+        //console.log("raw data is:", JSON.stringify(entityData.value, null, 2));
+        // console.log("generic bundles:", entityData.value?.genericBundles);
+        //console.log(
+        //  "raw generic bundles:",
+        // JSON.stringify(entityData.value?.genericBundles, null, 2),
+        //);
         console.error(JSON.stringify(e, null, 2));
         console.error(e);
       } finally {
         isLoading.value = false;
-      }
-    }
-    async function saveTravelProductConfigDeep() {
-      if (!entityData.value)
-        throw new Error("[Validation] No entity data found");
-
-      try {
-        // 1. Generic Bundle içindeki ürünler
-        if (entityData.value.genericBundles) {
-          for (const bundle of entityData.value.genericBundles) {
-            await data.repository("product").saveAll(bundle.productOptions);
-            await data.repository("product").saveAll(bundle.parentProducts);
-          }
-          await data
-            .repository("ce_generic_bundle")
-            .saveAll(entityData.value.genericBundles);
-        }
-        // 2. Hotel Bundle içindeki Room Bundles ve onların içindeki ürünler
-        // 2. Hotel Bundle ve içeriği
-        const hotelBundle = entityData.value.hotelBundle;
-        if (hotelBundle) {
-          const roomOptions = hotelBundle.roomOptions;
-          if (roomOptions?.length) {
-            for (const roomOption of roomOptions) {
-              // Room Products
-              if (roomOption.roomProducts?.length) {
-                await data
-                  .repository("product")
-                  .saveAll(roomOption.roomProducts);
-              }
-
-              // Sale Rule ve Supplement Rule
-              const saleRule = roomOption.roomSaleRule;
-              if (saleRule) {
-                if (saleRule.supplementRule) {
-                  if (saleRule.supplementRule.supplementProducts?.length) {
-                    await data
-                      .repository("product")
-                      .saveAll(saleRule.supplementRule.supplementProducts);
-                  }
-
-                  await data
-                    .repository("ce_room_supplement_rule")
-                    .save(saleRule.supplementRule);
-                }
-
-                await data.repository("ce_room_sale_rule").save(saleRule);
-              }
-
-              // Room Bundle Save
-              await data
-                .repository("ce_travel_product_config_room_bundle")
-                .save(roomOption);
-            }
-          }
-
-          await data.repository("ce_hotel_bundle").save(hotelBundle);
-        }
-
-        // 3. Child Discount (varsa)
-        if (entityData.value.childDiscount) {
-          await data
-            .repository("ce_custom_child_discount")
-            .save(entityData.value.childDiscount);
-        }
-
-        // 4. Ana product (varsa)
-        if (entityData.value.product) {
-          await data.repository("product").save(entityData.value.product);
-        }
-
-        // 5. En son: ce_travel_product_config
-        await data
-          .repository("ce_travel_product_config")
-          .save(entityData.value);
-
-        notification.dispatch({
-          title: "Success",
-          message: "All data saved successfully",
-          variant: "success",
-        });
-      } catch (e) {
-        console.error("Error while saving travel product config:", e);
-        notification.dispatch({
-          title: "Error",
-          message: "Failed to save data",
-          variant: "error",
-        });
       }
     }
 
@@ -259,25 +180,12 @@ export const useTravelProductConfigStore = defineStore(
 
     async function addGenericBundleProduct() {
       try {
-        await refreshState();
         const repo = data.repository("ce_generic_bundle");
         const newGenericBundle = await repo.create();
-        if (!newGenericBundle || !entityData.value || !newGenericBundle.id)
+        if (!newGenericBundle || !entityData.value)
           throw new Error("Could not create generic bundle");
 
-        if (!entityData.value.genericBundles) {
-          throw new Error("Generic bundle doesnt exists");
-        }
-        newGenericBundle.availableOnMinParentQuantity = 1;
-        entityData.value.genericBundles.add(newGenericBundle);
-
-        await refreshState();
-
-        notification.dispatch({
-          title: "Generic Bundle added",
-          message: "Generic Bundle added successfully",
-          variant: "success",
-        });
+        entityData.value.genericBundles?.add(newGenericBundle);
       } catch (e) {
         console.error(e);
         error.value = (e as Error).message;

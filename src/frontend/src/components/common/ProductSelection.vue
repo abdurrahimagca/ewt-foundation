@@ -16,7 +16,7 @@ const emit = defineEmits<{
 
 const nameToSearch = ref<string | null | undefined>(undefined);
 const selectables = ref<Entity<"product">[]>([]);
-const selecteds = ref<Entity<"product">[] | undefined>(undefined);
+const selecteds = ref<Entity<"product">[]>([]);
 const isDropdownOpen = ref(false);
 const error = ref<string | undefined>(undefined);
 const isFrozen = ref(false);
@@ -25,21 +25,7 @@ const hasUnsavedChanges = ref(false);
 // Initialize local copy
 onMounted(async () => {
   if (props.initialProduct) {
-    selecteds.value = props.initialProduct.map((product) => {
-      return product;
-    });
-  }
-
-  const criteria = new data.Classes.Criteria();
-  criteria.addFilter(data.Classes.Criteria.equals("available", true));
-  criteria.setLimit(1);
-  const repo = data.repository("product");
-  const result = await repo.search(criteria);
-  if (result === null) {
-    throw new Error("No product found");
-  }
-  if (result && result.total && result.total > 0) {
-    selectables.value = result;
+    selecteds.value = [];
   }
 });
 
@@ -53,9 +39,19 @@ async function searchProduct() {
     const repo = data.repository("product");
 
     const criteria = new data.Classes.Criteria();
-    /* criteria.addIncludes({
-      product: ["id", "name", "productNumber", "available"],
-    });*/
+   /* criteria.addIncludes({
+      product: [
+        "id",
+        "name",
+        "productNumber",
+        "available",
+        "versionId",
+        "taxId",
+        "price",
+        "stock",
+        "extensions",
+      ],
+    });  */
     criteria.addFilter(
       data.Classes.Criteria.multi("OR", [
         data.Classes.Criteria.contains("name", nameToSearch.value),
@@ -84,9 +80,19 @@ async function searchProduct() {
       childCriteria.addFilter(
         data.Classes.Criteria.equalsAny("parentId", parentIds),
       );
-      /*childCriteria.addIncludes({
-        product: ["id", "name", "productNumber", "available"],
-      }); */
+   /*  criteria.addIncludes({
+      product: [
+        "id",
+        "name",
+        "productNumber",
+        "available",
+        "versionId",
+        "taxId",
+        "price",
+        "stock",
+        "extensions",
+      ],
+    });*/
 
       const childResult = await repo.search(childCriteria);
       if (childResult === null) {
@@ -150,17 +156,6 @@ function handleInputFocus() {
 }
 
 function commitChanges() {
-  if (
-    !selecteds.value ||
-    selecteds.value.length === 0 ||
-    selecteds.value === null
-  ) {
-    notification.dispatch({
-      title: "Error",
-      message: "Please select at least one product",
-    });
-    return;
-  }
   if (!selecteds.value) {
     throw new Error("selecteds is null");
   }

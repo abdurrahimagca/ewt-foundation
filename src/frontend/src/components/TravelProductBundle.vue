@@ -5,7 +5,7 @@ import HotelBundle from "./travelProductConfig/HotelBundle.vue";
 import ChildDiscount from "./travelProductConfig/ChildDiscount.vue";
 import { useTravelProductConfig } from "../composables/useTravelProductBundle";
 import { useTravelProductConfigStore } from "../store/useTravelProductBundleStore";
-import GenericBundleCollection from "./travelProductConfig/GenericBundleCollection.vue";
+import GenericBundle from "./travelProductConfig/GenericBundle.vue";
 
 const activeTab = ref("hotel");
 
@@ -107,7 +107,7 @@ function handleTabChange(tabId: string) {
         </div>
 
         <div v-if="activeTab === 'generic'" class="ewt-tab-pane">
-          <GenericBundleCollection />
+          <GenericBundle />
 
           <button
             @click="store.addGenericBundleProduct"

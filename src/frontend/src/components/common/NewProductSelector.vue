@@ -9,19 +9,23 @@ const props = defineProps<{
 }>();
 
 const nameToSearch = ref<string | null | undefined>(undefined);
-const selectables = ref<Entity<"product">[]>([]);
+const selectables = ref<EntityCollection<"product"> | null>(null);
 const isDropdownOpen = ref(false);
 const error = ref<string | undefined>(undefined);
 
+defineEmits<{
+  (e: "update:selecteds", selecteds: EntityCollection<"product">): void;
+}>();
+
+
 async function searchProduct() {
   if (!nameToSearch?.value?.trim()) {
-    selectables.value = [];
+    selectables.value = null;
     return;
   }
 
   try {
     const repo = data.repository("product");
-
     const criteria = new data.Classes.Criteria();
     criteria.addFilter(
       data.Classes.Criteria.multi("OR", [
@@ -32,20 +36,9 @@ async function searchProduct() {
 
     const repoSearchResult = await repo.search(criteria);
 
-    const products: Entity<"product">[] = [];
-    if (repoSearchResult === null) {
-      throw new Error("No product found");
-    }
-    for (const product of repoSearchResult) {
-      if (product.available) {
-        products.push(product);
-      }
-    }
-    const parentIds = products.map((p) => p.id);
+    const parentIds = repoSearchResult?.getIds();
 
-    let childProducts: Entity<"product">[] = [];
-
-    if (parentIds.length > 0) {
+    if (parentIds && parentIds.length > 0) {
       const childCriteria = new data.Classes.Criteria();
       childCriteria.addFilter(
         data.Classes.Criteria.equalsAny("parentId", parentIds),
@@ -54,14 +47,14 @@ async function searchProduct() {
       if (childResult === null) {
         throw new Error("No child product found");
       }
-      for (const child of childResult) {
-        if (child.available) {
-          childProducts.push(child);
+      childResult.forEach((child) => {
+        if (!parentIds.includes(child.id)) {
+          repoSearchResult?.add(child);
         }
-      }
+      });
     }
 
-    selectables.value = [...products, ...childProducts];
+    selectables.value = repoSearchResult;
   } catch (e) {
     notification.dispatch({
       title: "Error",
@@ -115,7 +108,7 @@ async function addToSelecteds(product: Entity<"product">) {
     console.error("Error on adding product", e);
   } finally {
     nameToSearch.value = "";
-    selectables.value = [];
+    selectables.value = null;
     isDropdownOpen.value = false;
   }
 }
@@ -207,14 +200,11 @@ watch(nameToSearch, () => {
             {{ error }}
           </div>
 
-          <div
-            v-else-if="selectables.length === 0 && nameToSearch"
-            class="no-results"
-          >
+          <div v-else-if="!selectables && nameToSearch" class="no-results">
             No products found
           </div>
 
-          <div v-else-if="selectables.length > 0" class="options-list">
+          <div v-else-if="selectables" class="options-list">
             <div
               v-for="product in selectables"
               :key="product.id"
