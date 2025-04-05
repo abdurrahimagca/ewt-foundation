@@ -23,6 +23,14 @@ onMounted(() => {
       componentSectionId: "ce-product-view",
     });
 
+    ui.menu.addMenuItem({
+      label: "Travel Product Config",
+      displaySearchBar: true,
+      displaySmartBar: true,
+      locationId: "ewtf-travel-product-config",
+      parent: "sw-catalogue",
+    });
+
     ui.componentSection.add({
       component: "card",
       positionId: "ce-product-view",
@@ -34,4 +42,3 @@ onMounted(() => {
   }
 });
 </script>
-

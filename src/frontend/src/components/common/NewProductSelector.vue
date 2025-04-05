@@ -36,6 +36,7 @@ async function searchProduct() {
   }
   try {
     const repo = data.repository("product");
+  
     const criteria = new data.Classes.Criteria();
     criteria.addFilter(
       data.Classes.Criteria.multi("OR", [
@@ -43,6 +44,9 @@ async function searchProduct() {
         data.Classes.Criteria.contains("productNumber", nameToSearch.value),
       ]),
     );
+    criteria.addIncludes({
+      product: ["id", "name", "productNumber", "available"],
+    });
 
     const repoSearchResult = await repo.search(criteria);
 
@@ -63,6 +67,9 @@ async function searchProduct() {
       childCriteria.addFilter(
         data.Classes.Criteria.equalsAny("parentId", parentIds),
       );
+      childCriteria.addIncludes({
+        product: ["id", "name", "productNumber", "available"],
+      });
       const childResult = await repo.search(childCriteria);
       if (childResult === null) {
         throw new Error("No child product found");
@@ -81,6 +88,7 @@ async function searchProduct() {
 
 function removeSelected(id: string) {
   if (isFrozen.value) return;
+  selecteds.value = selecteds.value.filter((p) => p.id !== id);
   emit("removeFromCollection", id);
   hasUnsavedChanges.value = true;
 }

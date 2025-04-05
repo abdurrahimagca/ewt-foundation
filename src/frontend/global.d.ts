@@ -15,6 +15,8 @@ declare namespace EntitySchema {
     ce_custom_child_discount: ce_custom_child_discount;
     ce_generic_bundle: ce_generic_bundle;
     ce_generic_bundle_product: ce_generic_bundle_product;
+    ce_product_options_map: ce_product_options_map;
+    ce_date_configurator: ce_date_configurator;
   }
 
   interface product {
@@ -92,67 +94,89 @@ declare namespace EntitySchema {
 
   interface ce_travel_product_config {
     id: string;
-    productId?: string;
-    product?: Entity<"product">;
-    hotelBundle?: Entity<"ce_hotel_bundle">;
-    childDiscount?: Entity<"ce_custom_child_discount">;
-    genericBundles?: EntityCollection<"ce_generic_bundle">;
+    productId: string | null;
+    product: Entity<"product"> | null;
+    hotelBundleId: string | null;
+    hotelBundle: Entity<"ce_hotel_bundle"> | null;
+    childDiscountId: string | null;
+    childDiscount: Entity<"ce_custom_child_discount"> | null;
+    genericBundles: EntityCollection<"ce_generic_bundle"> | null;
+    metaInformation: string | null;
+    variantAware: boolean | null;
+    isDateConfigurable: boolean | null;
+    dateConfiguratorId: string | null;
+    dateConfigurator: Entity<"ce_date_configurator"> | null;
   }
 
   interface ce_hotel_bundle {
     id: string;
-    minRoomSelection: number;
-    maxRoomSelection: number;
-    roomOptions?: EntityCollection<"ce_travel_product_config_room_bundle">;
+    minRoomSelection: number | null;
+    maxRoomSelection: number | null;
+    roomOptions: EntityCollection<"ce_room_bundle"> | null;
   }
 
   interface ce_travel_product_config_room_bundle {
     id: string;
-    roomProducts?: EntityCollection<"product">;
-    roomSaleRule?: Entity<"ce_room_sale_rule">;
+    roomProducts: EntityCollection<"ce_product_options_map"> | null;
+    roomSaleRuleId: string | null;
+    roomSaleRule: Entity<"ce_room_sale_rule"> | null;
   }
 
   interface ce_room_sale_rule {
     id: string;
-    minAdults: number;
-    maxAdults: number;
-    minChildren: number;
-    maxChildren: number;
-    childrenStartAge: number;
-    childrenEndAge: number;
-    minInfants: number;
-    maxInfants: number;
-    maxTotalPersons: number;
-    allowPets: boolean;
-    supplementRule?: Entity<"ce_room_supplement_rule">;
+    minAdults: number | null;
+    maxAdults: number | null;
+    minChildren: number | null;
+    maxChildren: number | null;
+    childrenStartAge: number    | null;
+    childrenEndAge: number  | null;
+    minInfants: number  | null;
+    maxInfants: number  | null;
+    maxTotalPersons: number | null;
+    allowPets: boolean  | null;
+    supplementRuleId: string | null;
+    supplementRule: Entity<"ce_room_supplement_rule"> | null;
   }
 
   interface ce_room_supplement_rule {
     id: string;
-    supplementName: string;
-    applyIfAdults: number;
-    applyIfChildren: number;
-    supplementProducts?: EntityCollection<"product">;
+    applyIfAdults: number | null;
+    applyIfChildren: number | null;
+    applyIfInfants: number | null;
+    supplementProducts: EntityCollection<"ce_product_options_map"> | null;
   }
 
   interface ce_custom_child_discount {
     id: string;
-    childDiscountPercentage: number;
-    infantsDiscountPercentage: number;
+    childDiscountPercentage: number | null;
+    infantsDiscountPercentage: number | null;
   }
 
   interface ce_generic_bundle {
     id: string;
-    ceTravelProductConfigGenericBundlesId: string;
-    availableOnMinParentQuantity: number;
-    availableOnMaxParentQuantity: number;
-    isParentOperatorAnd: boolean;
-    matchParentQuantity: boolean;
-    matchTravellers: boolean;
-    isRequired: boolean;
-    allowMultipleSelection: boolean;
-    propagandaText: string;
-    parentProducts?: EntityCollection<"product">;
-    productOptions?: EntityCollection<"product">;
+    ceTravelProductConfigGenericBundlesId: string | null;
+    availableOnMinParentQuantity: number | null;
+    availableOnMaxParentQuantity: number | null;
+    availableOnMinTravellers: number | null;
+    availableOnMaxTravellers: number | null;
+    availabilityOperator: Record<string, unknown> | null;
+    matchParentQuantity: boolean | null;
+    matchTravellers: boolean | null;
+    isRequired: boolean | null;
+    allowMultipleSelection: boolean | null;
+    propagandaText: string | null;
+    parentProductOptions: EntityCollection<"ce_product_options_map">;
+    genericProductOptions: EntityCollection<"ce_product_options_map">;
+  }
+  interface ce_product_options_map {
+    id: string;
+    productOptionId: string | null;
+    equivalentProductId: string | null;
+    productOption: Entity<"product"> | null;
+    equivalentProduct: Entity<"product"> | null;
+    ceGenericBundleParentProductsId: string | null;
+    ceGenericBundleProductOptionsId: string | null;
+    ceRoomBundleRoomProductsId: string | null;
+    ceRoomSupplementRuleSupplementProductsId: string | null;
   }
 }

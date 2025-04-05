@@ -5,102 +5,39 @@ import { data } from "@shopware-ag/meteor-admin-sdk";
 import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
 import { notification } from "@shopware-ag/meteor-admin-sdk";
 import NewProductSelector from "../common/NewProductSelector.vue";
+import EntityCollection from "@shopware-ag/meteor-admin-sdk/es/_internals/data/EntityCollection";
 const store = useTravelProductConfigStore();
 const { entityData } = storeToRefs(store);
-async function removeFromProductOptions(
-  bundle: Entity<"ce_generic_bundle">,
-  id: string,
+async function addToCollection(
+  collection: EntityCollection<"product">,
+  item: Entity<"product">,
 ) {
   try {
-    const ids = bundle.productOptions?.getIds();
-    if (!ids) {
-      throw new Error("Product options not found");
-    }
-    if (ids.length === 0) {
-      throw new Error("Product options not found");
-    }
-    if (!ids.includes(id)) {
-      throw new Error("Product could not remove");
-    }
-    if (!bundle.productOptions?.remove(id)) {
-      console.log(
-        "product could not remove on bundle bundle is ",
-        JSON.stringify(bundle),
-      );
-      throw new Error("Product not found");
-    }
+    collection.add(item);
   } catch (e) {
     notification.dispatch({
       title: "Error",
-      message: "Product not found",
+      message: "Failed to add product to collection",
+      appearance: "system",
+      variant: "error",
     });
   }
 }
-async function removeFromParentProducts(
-  bundle: Entity<"ce_generic_bundle">,
-  id: string,
+async function removeFromCollection(
+  collection: EntityCollection<"product">,
+  itemId: string,
 ) {
   try {
-    const ids = bundle.parentProducts?.getIds();
-    if (!ids) {
-      console.log("ids is null", ids);
-      throw new Error("Product options not found");
-    }
-    if (ids.length === 0) {
-      console.log("ids is empty", ids);
-      throw new Error("Product options not found");
-    }
-    if (!ids.includes(id)) {
-      console.log("ids does nıt include id", ids, id);
-      throw new Error("Product could not remove");
-    }
-    if (!bundle.parentProducts?.remove(id)) {
-      console.log(
-        "product could not remove on bundle bundle is ",
-        JSON.stringify(bundle),
-      );
-      throw new Error("Product not found");
+    if (!collection.remove(itemId)) {
+      console.error("Failed to remove product from collection",  itemId, collection);
+      throw new Error("Failed to remove product from collection");
     }
   } catch (e) {
     notification.dispatch({
       title: "Error",
-      message: "Product not found",
-    });
-  }
-}
-async function addToProductOptions(
-  bundle: Entity<"ce_generic_bundle">,
-  product: Entity<"product">,
-) {
-  try {
-    bundle.productOptions?.add(product);
-  } catch (e) {
-    notification.dispatch({
-      title: "Error",
-      message: "Product not found",
-    });
-  }
-}
-async function addToParentProducts(
-  bundle: Entity<"ce_generic_bundle">,
-  product: Entity<"product">,
-) {
-  try {
-    bundle.parentProducts?.add(product);
-  } catch (e) {
-    notification.dispatch({
-      title: "Error",
-      message: "Product not found",
-    });
-  }
-}
-async function commit(repoName: keyof EntitySchema.Entities, d: any) {
-  try {
-    await data.repository(repoName).save(d);
-  } catch (e) {
-    notification.dispatch({
-      title: "Error",
-      message: "Product not found",
+      message: "Failed to remove product from collection",
+      appearance: "system",
+      variant: "error",
     });
   }
 }
@@ -108,41 +45,19 @@ async function commit(repoName: keyof EntitySchema.Entities, d: any) {
 
 <template>
   <div v-for="d in entityData?.genericBundles">
-    <div v-if="d.isNew()">New Bundle</div>
-    <div>ID: {{ d.id }}</div>
     <div v-if="d.parentProducts">
-      <p>
-        selecteds:
-        {{
-          d.parentProducts.map((p) => ({
-            name: p.name,
-            id: p.id,
-          }))
-        }}
-        <NewProductSelector
-          :collection="d.parentProducts"
-          @removeFromCollection="removeFromParentProducts(d, $event)"
-          @addToCollection="addToParentProducts(d, $event)"
-          @commitChanges="commit('ce_generic_bundle', d)"
-        />
-      </p>
+      <NewProductSelector
+        :collection="d.parentProducts"
+        @removeFromCollection="removeFromCollection(d.parentProducts, $event)"
+        @addToCollection="addToCollection(d.parentProducts, $event)"
+      />
     </div>
 
     <div v-if="d.productOptions">
-      <p>
-        selecteds:
-        {{
-          d.productOptions.map((p) => ({
-            name: p.name,
-            id: p.id,
-          }))
-        }}
-      </p>
       <NewProductSelector
         :collection="d.productOptions"
-        @removeFromCollection="removeFromProductOptions(d, $event)"
-        @addToCollection="addToProductOptions(d, $event)"
-        @commitChanges="commit('ce_generic_bundle', d)"
+        @removeFromCollection="removeFromCollection(d.productOptions, $event)"
+        @addToCollection="addToCollection(d.productOptions, $event)"
       />
     </div>
     <div class="ewt-form-group">
@@ -204,5 +119,15 @@ async function commit(repoName: keyof EntitySchema.Entities, d: any) {
       <label class="ewt-form-label">Propaganda Text</label>
       <input v-model="d.propagandaText" type="text" class="ewt-input" />
     </div>
+    <p>parent collection raw:</p>
+    <pre>
+    {{ JSON.stringify(d.parentProducts, null, 2) }}
+  </pre
+    >
+    <p>product options collection raw:</p>
+    <pre>
+    {{ JSON.stringify(d.productOptions, null, 2) }}
+  </pre
+    >
   </div>
 </template>

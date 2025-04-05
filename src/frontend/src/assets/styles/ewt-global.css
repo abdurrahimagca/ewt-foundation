@@ -1,0 +1,165 @@
+/* EWT Global Styles */
+.ewt-container {
+  padding: 2rem;
+  max-width: 1200px;
+  margin: 0 auto;
+}
+
+.ewt-header {
+  margin-bottom: 2rem;
+  text-align: center;
+}
+
+.ewt-title {
+  font-size: 2.5rem;
+  color: #2c3e50;
+  margin-bottom: 1rem;
+  font-weight: 600;
+}
+
+.ewt-txt {
+  color: #666;
+  font-size: 1.1rem;
+  line-height: 1.5;
+}
+
+.ewt-txt-error {
+  color: #dc3545;
+  font-size: 0.875rem;
+  margin-top: 0.25rem;
+}
+
+.ewt-tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  justify-content: center;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 1rem;
+}
+
+.ewt-button {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  padding: 0.75rem 1.5rem;
+  border: none;
+  background: none;
+  cursor: pointer;
+  font-size: 1rem;
+  color: #666;
+  border-radius: 8px;
+  transition: all 0.3s ease;
+}
+
+.ewt-button:hover {
+  background-color: #f5f5f5;
+  color: #2c3e50;
+}
+
+.ewt-button--active {
+  background-color: #2c3e50;
+  color: white;
+}
+
+.ewt-button i {
+  font-size: 1.2rem;
+}
+
+.ewt-content {
+  background-color: white;
+  border-radius: 12px;
+  padding: 2rem;
+  box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
+}
+
+.ewt-input {
+  width: 100%;
+  padding: 0.75rem 1rem;
+  border: 1px solid #ddd;
+  border-radius: 8px;
+  font-size: 1rem;
+  transition: border-color 0.3s ease;
+}
+
+.ewt-input:focus {
+  outline: none;
+  border-color: #2c3e50;
+}
+
+.ewt-input--error {
+  border-color: #dc3545;
+}
+
+.ewt-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+.ewt-form-group {
+  margin-bottom: 1.5rem;
+}
+
+.ewt-grid {
+  display: grid;
+  gap: 1.5rem;
+}
+
+.ewt-grid--2 {
+  grid-template-columns: repeat(2, 1fr);
+}
+
+.ewt-grid--3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+.ewt-flex {
+  display: flex;
+  gap: 1rem;
+}
+
+.ewt-flex--center {
+  align-items: center;
+}
+
+.ewt-flex--between {
+  justify-content: space-between;
+}
+
+.ewt-card {
+  background: white;
+  border-radius: 12px;
+  padding: 1.5rem;
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+}
+
+.ewt-badge {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.25rem 0.75rem;
+  border-radius: 20px;
+  font-size: 0.875rem;
+  font-weight: 500;
+}
+
+.ewt-badge--success {
+  background-color: #e8f5e9;
+  color: #2e7d32;
+}
+
+.ewt-badge--error {
+  background-color: #ffebee;
+  color: #c62828;
+}
+
+.ewt-badge--warning {
+  background-color: #fff3e0;
+  color: #ef6c00;
+}
+
+.ewt-badge--info {
+  background-color: #e3f2fd;
+  color: #1565c0;
+}
