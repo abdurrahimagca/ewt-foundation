@@ -1,6 +1,7 @@
 <script lang="ts" setup>
 import { context, data, notification } from "@shopware-ag/meteor-admin-sdk";
 import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
+
 import EntityCollection, {
   ApiContext,
 } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/EntityCollection";
@@ -34,24 +35,9 @@ async function searchProduct() {
     selectables.value = [];
     return;
   }
-
   try {
     const repo = data.repository("product");
-
     const criteria = new data.Classes.Criteria();
-   /* criteria.addIncludes({
-      product: [
-        "id",
-        "name",
-        "productNumber",
-        "available",
-        "versionId",
-        "taxId",
-        "price",
-        "stock",
-        "extensions",
-      ],
-    });  */
     criteria.addFilter(
       data.Classes.Criteria.multi("OR", [
         data.Classes.Criteria.contains("name", nameToSearch.value),
@@ -65,47 +51,30 @@ async function searchProduct() {
     if (repoSearchResult === null) {
       throw new Error("No product found");
     }
-    for (const product of repoSearchResult) {
-      if (product.available) {
+    repoSearchResult.forEach((product) => {
+      if (product.available && product !== undefined) {
         products.push(product);
       }
-    }
+    });
 
     const parentIds = products.map((p) => p.id);
-
-    let childProducts: Entity<"product">[] = [];
 
     if (parentIds.length > 0) {
       const childCriteria = new data.Classes.Criteria();
       childCriteria.addFilter(
         data.Classes.Criteria.equalsAny("parentId", parentIds),
       );
-   /*  criteria.addIncludes({
-      product: [
-        "id",
-        "name",
-        "productNumber",
-        "available",
-        "versionId",
-        "taxId",
-        "price",
-        "stock",
-        "extensions",
-      ],
-    });*/
-
       const childResult = await repo.search(childCriteria);
       if (childResult === null) {
         throw new Error("No child product found");
       }
-      for (const child of childResult) {
-        if (child.available) {
-          childProducts.push(child);
+      childResult.forEach((child) => {
+        if (child.available && child !== undefined) {
+          products.push(child);
         }
-      }
+      });
     }
-
-    selectables.value = [...products, ...childProducts];
+    selectables.value = products;
   } catch (e) {
     error.value = (e as Error).message;
   }
@@ -159,8 +128,13 @@ function commitChanges() {
   if (!selecteds.value) {
     throw new Error("selecteds is null");
   }
-
-  emit("update:initialProduct", selecteds.value);
+ 
+  emit(
+    "update:initialProduct",
+    selecteds.value.map((p) => {
+      return new data.Classes.Entity(p.id, "product", p);
+    }),
+  );
   hasUnsavedChanges.value = false;
   isFrozen.value = true;
 }

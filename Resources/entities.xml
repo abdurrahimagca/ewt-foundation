@@ -124,7 +124,7 @@
     <fields>
         <int name="available_on_min_parent_quantity" default="1" store-api-aware="true" />
         <int name="available_on_max_parent_quantity" store-api-aware="true" />   
-        <text name="propaganda_text" store-api-aware="true" />
+        <text name="propaganda_text" store-api-aware="true" translatable="true" />
         <bool name="is_parent_operator_and" store-api-aware="true" />
         <bool name="match_parent_quantity" store-api-aware="true" />
         <bool name="match_travellers" store-api-aware="true" />

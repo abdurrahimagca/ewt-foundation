@@ -22,11 +22,11 @@ declare namespace EntitySchema {
     name: string | null;
     productNumber: string | null;
     taxId: string | null;
+    stock: number | null;
     ceTravelProductConfigRoomBundleRoomProductsId: null | string;
     ceRoomSupplementRuleSupplementProductsId: null | string;
     ceGenericBundleParentProductsId: null | string;
     ceGenericBundleProductOptionsId: null | string;
-    stock: number | null;
     price: {
       currencyId: string | null;
       net: number | null;

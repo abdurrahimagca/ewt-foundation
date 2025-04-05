@@ -9,7 +9,30 @@ import EntityCollection, {
 } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/EntityCollection";
 const store = useTravelProductConfigStore();
 const { entityData } = storeToRefs(store);
-
+async function removeParentProducts(bundle: Entity<"ce_generic_bundle">) {
+  try {
+    const ids = bundle.parentProducts?.getIds();
+    if (!ids) {
+      throw new Error("ID not found");
+    }
+    if (!entityData.value?.genericBundles) {
+      throw new Error("genericBundles not found");
+    }
+    ids.map((id) => {
+      if (!bundle.parentProducts) {
+        throw new Error("Bundle parentProducts not found");
+      }
+      bundle.parentProducts.remove(id);
+    });
+    await data.repository("ce_generic_bundle").save(bundle);
+  } catch (e) {
+    notification.dispatch({
+      title: "error",
+      message: "Error while removing last parent product",
+    });
+    console.error(e);
+  }
+}
 async function handleParentProductChange(
   products: Entity<"product">[],
   id: string,
@@ -29,10 +52,9 @@ async function handleParentProductChange(
       throw new Error("No products selected");
     }
     products.forEach((product) => {
-      if (product === undefined) {
+      if (product === undefined || product.getEntityName() !== "product") {
         throw new Error("Product is undefined");
       }
-      product.ceGenericBundleParentProductsId = bundle.id;
     });
     const collection = bundle.parentProducts;
     const es = new data.Classes.EntityCollection(
@@ -41,10 +63,10 @@ async function handleParentProductChange(
       collection.context,
       collection.criteria,
       products,
-      collection.total,
-      collection.aggregations,
     );
     bundle.parentProducts = es;
+    await data.repository("product").saveAll(bundle.parentProducts);
+    await data.repository("ce_generic_bundle").save(bundle);
   } catch (e) {
     notification.dispatch({
       title: "error",
@@ -72,10 +94,9 @@ async function handleProductOptionChange(
       throw new Error("No products selected");
     }
     products.forEach((product) => {
-      if (product === undefined) {
+      if (product === undefined || product.getEntityName() !== "product") {
         throw new Error("Product is undefined");
       }
-      product.ceGenericBundleProductOptionsId = bundle.id;
     });
     const collection = bundle.productOptions;
     const es = new data.Classes.EntityCollection(
@@ -84,10 +105,11 @@ async function handleProductOptionChange(
       collection.context,
       collection.criteria,
       products,
-      collection.total,
-      collection.aggregations,
     );
     bundle.productOptions = es;
+    await data.repository("product").saveAll(bundle.productOptions);
+    await data.repository("ce_generic_bundle").save(bundle);
+    //await store.refreshState();
   } catch (e) {
     notification.dispatch({
       title: "error",
@@ -110,10 +132,16 @@ async function handleProductOptionChange(
           d.parentProducts.map((p) => ({
             name: p.name,
             id: p.id,
-            ce: p.ceGenericBundleParentProductsId
           }))
         }}
       </p>
+      <button
+        v-if="d.parentProducts.getIds().length > 1"
+        @click="removeParentProducts(d)"
+        class="ewt-button ewt-button--primary"
+      >
+        Remove Last Parent Product
+      </button>
       <ProductSelection
         @update:initial-product="handleParentProductChange($event, d.id)"
         :initial-product="d.parentProducts"
@@ -126,7 +154,6 @@ async function handleProductOptionChange(
           d.productOptions.map((p) => ({
             name: p.name,
             id: p.id,
-            ce: p.ceGenericBundleProductOptionsId
           }))
         }}
       </p>
