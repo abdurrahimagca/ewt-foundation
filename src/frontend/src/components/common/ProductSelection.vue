@@ -13,6 +13,7 @@ const props = defineProps<{
 
 const emit = defineEmits<{
   (e: "update:initialProduct", value: Entity<"product">[]): void;
+  (e: "handle:toggleEditState"): void;
 }>();
 
 const nameToSearch = ref<string | null | undefined>(undefined);

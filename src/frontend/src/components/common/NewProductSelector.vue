@@ -2,28 +2,38 @@
 import { data, notification } from "@shopware-ag/meteor-admin-sdk";
 import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
 import EntityCollection from "@shopware-ag/meteor-admin-sdk/es/_internals/data/EntityCollection";
-import { defineProps, ref, watch } from "vue";
+import { defineProps, ref, watch, defineEmits, onMounted } from "vue";
 
 const props = defineProps<{
-  selecteds: EntityCollection<"product"> | null;
+  collection: EntityCollection<"product">;
+}>();
+
+const emit = defineEmits<{
+  (e: "removeFromCollection", id: string): void;
+  (e: "addToCollection", p: Entity<"product">): void;
+  (e: "commitChanges"): void;
 }>();
 
 const nameToSearch = ref<string | null | undefined>(undefined);
-const selectables = ref<EntityCollection<"product"> | null>(null);
+const selecteds = ref<Entity<"product">[]>([]);
+const selectables = ref<Entity<"product">[]>([]);
 const isDropdownOpen = ref(false);
 const error = ref<string | undefined>(undefined);
-
-defineEmits<{
-  (e: "update:selecteds", selecteds: EntityCollection<"product">): void;
-}>();
-
+const isFrozen = ref(false);
+const hasUnsavedChanges = ref(false);
+onMounted(() => {
+  props.collection.forEach((product) => {
+    if (product.available && product !== undefined) {
+      selecteds.value.push(product);
+    }
+  });
+});
 
 async function searchProduct() {
   if (!nameToSearch?.value?.trim()) {
-    selectables.value = null;
+    selectables.value = [];
     return;
   }
-
   try {
     const repo = data.repository("product");
     const criteria = new data.Classes.Criteria();
@@ -36,9 +46,19 @@ async function searchProduct() {
 
     const repoSearchResult = await repo.search(criteria);
 
-    const parentIds = repoSearchResult?.getIds();
+    const products: Entity<"product">[] = [];
+    if (repoSearchResult === null) {
+      throw new Error("No product found");
+    }
+    repoSearchResult.forEach((product) => {
+      if (product.available && product !== undefined) {
+        products.push(product);
+      }
+    });
 
-    if (parentIds && parentIds.length > 0) {
+    const parentIds = products.map((p) => p.id);
+
+    if (parentIds.length > 0) {
       const childCriteria = new data.Classes.Criteria();
       childCriteria.addFilter(
         data.Classes.Criteria.equalsAny("parentId", parentIds),
@@ -48,72 +68,66 @@ async function searchProduct() {
         throw new Error("No child product found");
       }
       childResult.forEach((child) => {
-        if (!parentIds.includes(child.id)) {
-          repoSearchResult?.add(child);
+        if (child.available && child !== undefined) {
+          products.push(child);
         }
       });
     }
-
-    selectables.value = repoSearchResult;
+    selectables.value = products;
   } catch (e) {
-    notification.dispatch({
-      title: "Error",
-      message: "An error occurred while searching for products.",
-      variant: "error",
-    });
-    console.error("Error on searching products", e);
-    error.value = "An error occurred while searching for products.";
+    error.value = (e as Error).message;
   }
 }
+
 function removeSelected(id: string) {
-  if (!props.selecteds) {
-    console.warn("selecteds is null");
+  if (isFrozen.value) return;
+  emit("removeFromCollection", id);
+  hasUnsavedChanges.value = true;
+}
+
+function addToSelecteds(p: Entity<"product">) {
+  if (isFrozen.value) return;
+  if (!p) {
+    throw new Error("Product is undefined");
+  }
+  if (props.collection.has(p.id)) {
+    notification.dispatch({
+      title: "error",
+      message: "Product already selected",
+    });
     return;
   }
-
-  const index = props.selecteds.findIndex((item) => item.id === id);
-  if (index !== -1) {
-    props.selecteds.remove(id);
-  } else {
-    console.warn("couldnt find data", id);
-  }
-}
-
-async function addToSelecteds(product: Entity<"product">) {
-  try {
-    if (!props.selecteds) {
-      console.warn("selecteds is null");
-      return;
-    }
-
-    const existingProduct = props.selecteds.find(
-      (item) => item.id === product.id,
-    );
-    if (existingProduct) {
-      notification.dispatch({
-        title: "Warning",
-        message: "Product already selected.",
-        variant: "warning",
-      });
-      return;
-    }
-
-    props.selecteds.add(product);
-  } catch (e) {
+  if (p._isNew) {
     notification.dispatch({
-      title: "Error",
-      message: "An error occurred while adding the product.",
-      variant: "error",
+      title: "error",
+      message: "Product is not saved yet",
     });
-    console.error("Error on adding product", e);
-  } finally {
-    nameToSearch.value = "";
-    selectables.value = null;
-    isDropdownOpen.value = false;
+    return;
   }
+  if (p.getEntityName() !== "product") {
+    throw new Error("Product is not a product");
+  }
+  emit("addToCollection", p);
+  hasUnsavedChanges.value = true;
+  nameToSearch.value = "";
+  selectables.value = [];
+  isDropdownOpen.value = false;
 }
+
 function handleInputFocus() {
+  if (isFrozen.value) return;
   isDropdownOpen.value = true;
+}
+
+function commitChanges() {
+  if (isFrozen.value) return;
+  emit("commitChanges");
+  hasUnsavedChanges.value = false;
+  isFrozen.value = true;
+}
+
+function toggleEditState() {
+  isFrozen.value = false;
 }
 
 function openProductDetail(productId: string) {
@@ -122,13 +136,15 @@ function openProductDetail(productId: string) {
 }
 
 watch(nameToSearch, () => {
-  searchProduct();
+  if (!isFrozen.value) {
+    searchProduct();
+  }
 });
 </script>
 
 <template>
   <div class="product-selection-wrapper">
-    <div class="product-selection">
+    <div class="product-selection" :class="{ frozen: isFrozen }">
       <p>
         Please note that product variants may be unnamed. We recommend using the
         Product Number for searching specific products.
@@ -160,6 +176,7 @@ watch(nameToSearch, () => {
                 </svg>
               </button>
               <button
+                v-if="!isFrozen"
                 class="remove-tag"
                 @click.stop="removeSelected(product.id)"
                 title="Remove product"
@@ -192,6 +209,7 @@ watch(nameToSearch, () => {
             placeholder="Search name or product number"
             @focus="handleInputFocus"
             class="search-input"
+            :disabled="isFrozen"
           />
         </div>
 
@@ -200,11 +218,14 @@ watch(nameToSearch, () => {
             {{ error }}
           </div>
 
-          <div v-else-if="!selectables && nameToSearch" class="no-results">
+          <div
+            v-else-if="selectables.length === 0 && nameToSearch"
+            class="no-results"
+          >
             No products found
           </div>
 
-          <div v-else-if="selectables" class="options-list">
+          <div v-else-if="selectables.length > 0" class="options-list">
             <div
               v-for="product in selectables"
               :key="product.id"
@@ -237,6 +258,23 @@ watch(nameToSearch, () => {
             </div>
           </div>
         </div>
+      </div>
+
+      <div class="action-buttons" v-if="selecteds">
+        <span v-if="hasUnsavedChanges" class="unsaved-changes">
+          You have unsaved changes
+        </span>
+        <button
+          v-if="!isFrozen"
+          @click="commitChanges"
+          class="commit-button"
+          :class="{ 'has-changes': hasUnsavedChanges }"
+        >
+          Save Changes
+        </button>
+        <button v-else class="edit-button" @click="toggleEditState">
+          Edit Selection
+        </button>
       </div>
     </div>
   </div>

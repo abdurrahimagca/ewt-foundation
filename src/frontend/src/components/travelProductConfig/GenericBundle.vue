@@ -1,122 +1,107 @@
 <script lang="ts" setup>
 import { useTravelProductConfigStore } from "../../store/useTravelProductBundleStore";
 import { storeToRefs } from "pinia";
-import ProductSelection from "../common/ProductSelection.vue";
+import { data } from "@shopware-ag/meteor-admin-sdk";
 import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
-import { data, notification } from "@shopware-ag/meteor-admin-sdk";
-import EntityCollection, {
-  ApiContext,
-} from "@shopware-ag/meteor-admin-sdk/es/_internals/data/EntityCollection";
+import { notification } from "@shopware-ag/meteor-admin-sdk";
+import NewProductSelector from "../common/NewProductSelector.vue";
 const store = useTravelProductConfigStore();
 const { entityData } = storeToRefs(store);
-async function removeParentProducts(bundle: Entity<"ce_generic_bundle">) {
+async function removeFromProductOptions(
+  bundle: Entity<"ce_generic_bundle">,
+  id: string,
+) {
+  try {
+    const ids = bundle.productOptions?.getIds();
+    if (!ids) {
+      throw new Error("Product options not found");
+    }
+    if (ids.length === 0) {
+      throw new Error("Product options not found");
+    }
+    if (!ids.includes(id)) {
+      throw new Error("Product could not remove");
+    }
+    if (!bundle.productOptions?.remove(id)) {
+      console.log(
+        "product could not remove on bundle bundle is ",
+        JSON.stringify(bundle),
+      );
+      throw new Error("Product not found");
+    }
+  } catch (e) {
+    notification.dispatch({
+      title: "Error",
+      message: "Product not found",
+    });
+  }
+}
+async function removeFromParentProducts(
+  bundle: Entity<"ce_generic_bundle">,
+  id: string,
+) {
   try {
     const ids = bundle.parentProducts?.getIds();
     if (!ids) {
-      throw new Error("ID not found");
+      console.log("ids is null", ids);
+      throw new Error("Product options not found");
     }
-    if (!entityData.value?.genericBundles) {
-      throw new Error("genericBundles not found");
+    if (ids.length === 0) {
+      console.log("ids is empty", ids);
+      throw new Error("Product options not found");
     }
-    ids.map((id) => {
-      if (!bundle.parentProducts) {
-        throw new Error("Bundle parentProducts not found");
-      }
-      bundle.parentProducts.remove(id);
-    });
-    await data.repository("ce_generic_bundle").save(bundle);
+    if (!ids.includes(id)) {
+      console.log("ids does nıt include id", ids, id);
+      throw new Error("Product could not remove");
+    }
+    if (!bundle.parentProducts?.remove(id)) {
+      console.log(
+        "product could not remove on bundle bundle is ",
+        JSON.stringify(bundle),
+      );
+      throw new Error("Product not found");
+    }
   } catch (e) {
     notification.dispatch({
-      title: "error",
-      message: "Error while removing last parent product",
+      title: "Error",
+      message: "Product not found",
     });
-    console.error(e);
   }
 }
-async function handleParentProductChange(
-  products: Entity<"product">[],
-  id: string,
+async function addToProductOptions(
+  bundle: Entity<"ce_generic_bundle">,
+  product: Entity<"product">,
 ) {
   try {
-    if (!entityData.value?.genericBundles) {
-      throw new Error("genericBundles not found");
-    }
-    const bundle = entityData.value.genericBundles.get(id);
-    if (!bundle) {
-      throw new Error("Bundle not found");
-    }
-    if (!bundle.parentProducts) {
-      throw new Error("Bundle parentProducts not found");
-    }
-    if (products.length === 0) {
-      throw new Error("No products selected");
-    }
-    products.forEach((product) => {
-      if (product === undefined || product.getEntityName() !== "product") {
-        throw new Error("Product is undefined");
-      }
-    });
-    const collection = bundle.parentProducts;
-    const es = new data.Classes.EntityCollection(
-      collection.source,
-      collection.entity,
-      collection.context,
-      collection.criteria,
-      products,
-    );
-    bundle.parentProducts = es;
-    await data.repository("product").saveAll(bundle.parentProducts);
-    await data.repository("ce_generic_bundle").save(bundle);
+    bundle.productOptions?.add(product);
   } catch (e) {
     notification.dispatch({
-      title: "error",
-      message: "Error while updating parent products",
+      title: "Error",
+      message: "Product not found",
     });
-    console.error(e);
   }
 }
-async function handleProductOptionChange(
-  products: Entity<"product">[],
-  id: string,
+async function addToParentProducts(
+  bundle: Entity<"ce_generic_bundle">,
+  product: Entity<"product">,
 ) {
   try {
-    if (!entityData.value?.genericBundles) {
-      throw new Error("genericBundles not found");
-    }
-    const bundle = entityData.value.genericBundles.get(id);
-    if (!bundle) {
-      throw new Error("Bundle not found");
-    }
-    if (!bundle.productOptions || bundle.productOptions === undefined) {
-      throw new Error("Bundle productOptions not found");
-    }
-    if (products.length === 0) {
-      throw new Error("No products selected");
-    }
-    products.forEach((product) => {
-      if (product === undefined || product.getEntityName() !== "product") {
-        throw new Error("Product is undefined");
-      }
-    });
-    const collection = bundle.productOptions;
-    const es = new data.Classes.EntityCollection(
-      collection.source,
-      collection.entity,
-      collection.context,
-      collection.criteria,
-      products,
-    );
-    bundle.productOptions = es;
-    await data.repository("product").saveAll(bundle.productOptions);
-    await data.repository("ce_generic_bundle").save(bundle);
-    //await store.refreshState();
+    bundle.parentProducts?.add(product);
   } catch (e) {
     notification.dispatch({
-      title: "error",
-      message: "Error while updating product options",
+      title: "Error",
+      message: "Product not found",
     });
-
-    console.error(e);
+  }
+}
+async function commit(repoName: keyof EntitySchema.Entities, d: any) {
+  try {
+    await data.repository(repoName).save(d);
+  } catch (e) {
+    notification.dispatch({
+      title: "Error",
+      message: "Product not found",
+    });
   }
 }
 </script>
@@ -134,19 +119,15 @@ async function handleProductOptionChange(
             id: p.id,
           }))
         }}
+        <NewProductSelector
+          :collection="d.parentProducts"
+          @removeFromCollection="removeFromParentProducts(d, $event)"
+          @addToCollection="addToParentProducts(d, $event)"
+          @commitChanges="commit('ce_generic_bundle', d)"
+        />
       </p>
-      <button
-        v-if="d.parentProducts.getIds().length > 1"
-        @click="removeParentProducts(d)"
-        class="ewt-button ewt-button--primary"
-      >
-        Remove Last Parent Product
-      </button>
-      <ProductSelection
-        @update:initial-product="handleParentProductChange($event, d.id)"
-        :initial-product="d.parentProducts"
-      />
     </div>
+
     <div v-if="d.productOptions">
       <p>
         selecteds:
@@ -157,9 +138,11 @@ async function handleProductOptionChange(
           }))
         }}
       </p>
-      <ProductSelection
-        @update:initial-product="handleProductOptionChange($event, d.id)"
-        :initial-product="d.productOptions"
+      <NewProductSelector
+        :collection="d.productOptions"
+        @removeFromCollection="removeFromProductOptions(d, $event)"
+        @addToCollection="addToProductOptions(d, $event)"
+        @commitChanges="commit('ce_generic_bundle', d)"
       />
     </div>
     <div class="ewt-form-group">
