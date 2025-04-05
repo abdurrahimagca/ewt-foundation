@@ -3,7 +3,7 @@ import { useTravelProductConfigStore } from "../../store/useTravelProductBundleS
 import { storeToRefs } from "pinia";
 import ProductSelection from "../common/ProductSelection.vue";
 import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
-import { data } from "@shopware-ag/meteor-admin-sdk";
+import { data, notification } from "@shopware-ag/meteor-admin-sdk";
 import EntityCollection, {
   ApiContext,
 } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/EntityCollection";
@@ -25,8 +25,31 @@ async function handleParentProductChange(
     if (!bundle.parentProducts) {
       throw new Error("Bundle parentProducts not found");
     }
-    bundle.parentProducts = products as EntityCollection<"product">;
+    if (products.length === 0) {
+      throw new Error("No products selected");
+    }
+    products.forEach((product) => {
+      if (product === undefined) {
+        throw new Error("Product is undefined");
+      }
+      product.ceGenericBundleParentProductsId = bundle.id;
+    });
+    const collection = bundle.parentProducts;
+    const es = new data.Classes.EntityCollection(
+      collection.source,
+      collection.entity,
+      collection.context,
+      collection.criteria,
+      products,
+      collection.total,
+      collection.aggregations,
+    );
+    bundle.parentProducts = es;
   } catch (e) {
+    notification.dispatch({
+      title: "error",
+      message: "Error while updating parent products",
+    });
     console.error(e);
   }
 }
@@ -45,26 +68,32 @@ async function handleProductOptionChange(
     if (!bundle.productOptions || bundle.productOptions === undefined) {
       throw new Error("Bundle productOptions not found");
     }
-    bundle.productOptions.getIds().forEach((id) => {
-      if (!bundle.productOptions) {
-        throw new Error("Bundle productOptions not found");
-      }
-      const isSuccess = bundle.productOptions.remove(id);
-      console.log("isSuccess", isSuccess);
-      console.log("after remove", JSON.stringify(bundle.productOptions.total));
-      if (!isSuccess) {
-        throw new Error("Bundle productOptions not found");
-      }
-    });
+    if (products.length === 0) {
+      throw new Error("No products selected");
+    }
     products.forEach((product) => {
-      if (!bundle.productOptions || !product.__identifier__ || !product) {
-        throw new Error("Bundle productOptions not found");
+      if (product === undefined) {
+        throw new Error("Product is undefined");
       }
-
-      bundle.productOptions.add(product);
-      console.log("after add", JSON.stringify(bundle.productOptions.total));
+      product.ceGenericBundleProductOptionsId = bundle.id;
     });
+    const collection = bundle.productOptions;
+    const es = new data.Classes.EntityCollection(
+      collection.source,
+      collection.entity,
+      collection.context,
+      collection.criteria,
+      products,
+      collection.total,
+      collection.aggregations,
+    );
+    bundle.productOptions = es;
   } catch (e) {
+    notification.dispatch({
+      title: "error",
+      message: "Error while updating product options",
+    });
+
     console.error(e);
   }
 }
@@ -81,6 +110,7 @@ async function handleProductOptionChange(
           d.parentProducts.map((p) => ({
             name: p.name,
             id: p.id,
+            ce: p.ceGenericBundleParentProductsId
           }))
         }}
       </p>
@@ -96,6 +126,7 @@ async function handleProductOptionChange(
           d.productOptions.map((p) => ({
             name: p.name,
             id: p.id,
+            ce: p.ceGenericBundleProductOptionsId
           }))
         }}
       </p>

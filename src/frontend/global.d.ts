@@ -20,22 +20,19 @@ declare namespace EntitySchema {
   interface product {
     id: string;
     name: string | null;
-    productNumber: string;
-    taxId: string;
+    productNumber: string | null;
+    taxId: string | null;
     ceTravelProductConfigRoomBundleRoomProductsId: null | string;
     ceRoomSupplementRuleSupplementProductsId: null | string;
     ceGenericBundleParentProductsId: null | string;
     ceGenericBundleProductOptionsId: null | string;
-    stock: number;
+    stock: number | null;
     price: {
-      currencyId: string;
-      net: number;
-      gross: number;
-      linked: boolean;
+      currencyId: string | null;
+      net: number | null;
+      gross: number | null;
     };
     available: boolean;
-    extensions: unknown;
-    _isNew: boolean;
   }
 
   interface ce_traveller {
