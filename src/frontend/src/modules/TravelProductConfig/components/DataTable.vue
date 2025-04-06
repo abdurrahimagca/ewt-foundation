@@ -1,33 +1,25 @@
 <script lang="ts" setup>
 import { data } from "@shopware-ag/meteor-admin-sdk";
-import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
-import EntityCollection from "@shopware-ag/meteor-admin-sdk/es/_internals/data/EntityCollection";
 import { onMounted, ref, computed } from "vue";
-import { useDataStore } from "../store/useDataStore";
+import { useTravelProductConfig } from "../store/useTravelProductConfig";
 
-const entityDatas = ref<EntityCollection<"ce_travel_product_config"> | null>(
-  null,
-);
-const store = useDataStore();
-
+const store = useTravelProductConfig();
 const currentPage = ref(1);
 const itemsPerPage = 10;
-const totalItems = ref(0);
 
 const paginatedData = computed(() => {
-  if (!entityDatas.value) return [];
+  if (!store.dataToOverview) return [];
   const start = (currentPage.value - 1) * itemsPerPage;
   const end = start + itemsPerPage;
-  return entityDatas.value.slice(start, end);
+  return store.dataToOverview.slice(start, end);
 });
 
-const totalPages = computed(() => {
-  return Math.ceil(totalItems.value / itemsPerPage);
-});
+const totalItems = computed(() => store.dataToOverview?.length || 0);
+const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage));
+
 const toggleEdit = (id: string) => {
   try {
     store.setResource(id);
-    store.toggleEdit();
   } catch (e) {
     console.error("Error toggling edit mode:", e);
   }
@@ -38,52 +30,30 @@ const fetchData = async (page: number) => {
   criteria.setLimit(itemsPerPage);
   criteria.setPage(page);
   criteria.addAssociation("product");
-
-  const searchResult = await data
-    .repository("ce_travel_product_config")
-    .search(criteria);
-
-  if (!searchResult) return;
-
-  entityDatas.value = searchResult;
-  totalItems.value = searchResult.total || 0;
+  await store.searchResources(criteria);
 };
 
 const changePage = async (page: number) => {
   currentPage.value = page;
   await fetchData(page);
 };
+
 const createResource = async () => {
   try {
-    const newResource = await data
-      .repository("ce_travel_product_config")
-      .create();
-
-    if (!newResource) {
-      console.error("Failed to create new resource");
-      return;
-    }
-    newResource.variantAware = false;
-    entityDatas.value?.add(newResource);
-    await data.repository("ce_travel_product_config").save(newResource);
-    await fetchData(1);
+    await store.createNewResource();
   } catch (e) {
     console.error("Error creating resource:", e);
   }
 };
+
 const deleteResource = async (id: string) => {
   try {
-    const resource = await data.repository("ce_travel_product_config").get(id);
-    if (!resource) {
-      console.error("Resource not found");
-      return;
-    }
-    await data.repository("ce_travel_product_config").delete(resource.id);
-    await fetchData(currentPage.value);
+    await store.deleteResource(id);
   } catch (e) {
     console.error("Error deleting resource:", e);
   }
 };
+
 onMounted(async () => {
   await fetchData(1);
 });
@@ -103,6 +73,7 @@ onMounted(async () => {
         <thead>
           <tr>
             <th>Product Name</th>
+            <th>Product Number</th>
             <th>Configuration ID</th>
             <th>Variant Aware</th>
             <th>Meta Information</th>
@@ -111,7 +82,14 @@ onMounted(async () => {
         </thead>
         <tbody>
           <tr v-for="item in paginatedData" :key="item.id">
-            <td>{{ item.product?.name || "N/A" }}</td>
+            <td class="ewt-product-display">
+              <span class="ewt-product-name">
+                {{
+                  item.productsToApply?.first()?.name || "No Product Selected"
+                }}
+              </span>
+            </td>
+            <td>{{ item.productsToApply?.first()?.productNumber || "N/A" }}</td>
             <td>{{ item.id }}</td>
             <td>
               <span
@@ -124,7 +102,8 @@ onMounted(async () => {
               </span>
             </td>
             <td class="ewt-meta-info">
-              {{ item.metaInformation || "No meta information" }}
+              {{ item.configurationName || "No Config name" }}
+              {{ item.configurationIdentifier || "No Config ID" }}
             </td>
             <td class="ewt-actions">
               <button
@@ -294,5 +273,14 @@ onMounted(async () => {
 .ewt-badge--info {
   background-color: #e3f2fd;
   color: #1565c0;
+}
+
+.ewt-product-display {
+  padding: 0.5rem;
+}
+
+.ewt-product-name {
+  color: #2c3e50;
+  font-weight: 500;
 }
 </style>

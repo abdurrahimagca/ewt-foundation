@@ -5,12 +5,15 @@ import EntityCollection from "@shopware-ag/meteor-admin-sdk/es/_internals/data/E
 import { defineProps, ref, watch, defineEmits, onMounted } from "vue";
 
 const props = defineProps<{
-  collection: EntityCollection<"product"> | null;
+  collection: EntityCollection<"product">;
+  maxLimit: number;
+  minLimit: number;
 }>();
 
 const emit = defineEmits<{
   (e: "removeFromCollection", id: string): void;
   (e: "addToCollection", p: Entity<"product">): void;
+  (e: "commitChanges"): void;
 }>();
 
 const nameToSearch = ref<string | null | undefined>(undefined);
@@ -43,9 +46,6 @@ async function searchProduct() {
         data.Classes.Criteria.contains("productNumber", nameToSearch.value),
       ]),
     );
-    criteria.addIncludes({
-      product: ["id", "name", "productNumber", "available"],
-    });
 
     const repoSearchResult = await repo.search(criteria);
 
@@ -66,9 +66,7 @@ async function searchProduct() {
       childCriteria.addFilter(
         data.Classes.Criteria.equalsAny("parentId", parentIds),
       );
-      childCriteria.addIncludes({
-        product: ["id", "name", "productNumber", "available"],
-      });
+
       const childResult = await repo.search(childCriteria);
       if (childResult === null) {
         throw new Error("No child product found");
@@ -87,6 +85,20 @@ async function searchProduct() {
 
 function removeSelected(id: string) {
   if (isFrozen.value) return;
+  if (!id) {
+    throw new Error("Product ID is undefined");
+  }
+  if(selecteds.value.find((p) => p.id === id) === undefined) {
+    throw new Error("Product not found in selecteds");
+  }
+  if(selecteds.value.length -1 < props.minLimit) {
+    notification.dispatch({
+      title: "Info",
+      message: `You need to select at least ${props.minLimit} products`,
+      variant: "info"
+    });
+    return;
+  }
   selecteds.value = selecteds.value.filter((p) => p.id !== id);
   emit("removeFromCollection", id);
   hasUnsavedChanges.value = true;
@@ -114,6 +126,13 @@ function addToSelecteds(p: Entity<"product">) {
   if (p.getEntityName() !== "product") {
     throw new Error("Product is not a product");
   }
+  if (selecteds.value.length >= props.maxLimit) {
+    notification.dispatch({
+      title: "error",
+      message: `You can only select ${props.maxLimit} products`,
+    });
+    return;
+  }
   emit("addToCollection", p);
   selecteds.value.push(p);
   hasUnsavedChanges.value = true;
@@ -129,7 +148,24 @@ function handleInputFocus() {
 
 function commitChanges() {
   if (isFrozen.value) return;
+  if (selecteds.value.length > props.maxLimit) {
+    notification.dispatch({
+      title: "error",
+      message: `You need to select ${props.maxLimit} products`,
+      variant: "error",
+    });
+    return;
+  }
+  if (selecteds.value.length < props.minLimit) {
+    notification.dispatch({
+      title: "error",
+      message: `You need to select at least ${props.minLimit} products`,
+      variant: "error",
+    });
+    return;
+  }
 
+  emit("commitChanges");
   hasUnsavedChanges.value = false;
   isFrozen.value = true;
 }

@@ -1,28 +1,57 @@
 <script setup lang="ts">
 import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
-import EntityCollection from "@shopware-ag/meteor-admin-sdk/es/_internals/data/EntityCollection";
-import ProductSelector from "./ProductSelector.vue";
 import ProductCollectionSelector from "../../../modules/shared/ProductCollectionSelector.vue";
-defineProps<{
-  ds?: Entity<"ce_product_options_map"> | null;
+import { notification } from "@shopware-ag/meteor-admin-sdk";
+const props = defineProps<{
+  swData: Entity<"ce_product_options_map">;
+  label: string;
+  maxLimit: number;
+  minLimit: number;
 }>();
+
+const handleAddToCollection = async (productOption: Entity<"product">) => {
+  try {
+    if (!props.swData.productOptions) {
+      throw new Error("Product option is not defined");
+    }
+    props.swData.productOptions.add(productOption);
+  } catch (e) {
+    notification.dispatch({
+      title: "Error",
+      message: "Failed to add product to collection",
+      appearance: "notification",
+      variant: "error",
+    });
+  }
+};
+
+const handleRemoveFromCollection = async (id: string) => {
+  try {
+    if (!props.swData.productOptions) {
+      throw new Error("Product option is not defined");
+    }
+    props.swData.productOptions.remove(id);
+  } catch (e) {
+    notification.dispatch({
+      title: "Error",
+      message: "Failed to remove product from collection",
+      appearance: "notification",
+      variant: "error",
+    });
+  }
+};
 </script>
 <template>
-    <p>Product Options Selection</p>
+  <div>
+    <label class="sw-field__label">{{ label }}</label>
+    <div v-if="props.swData?.productOptions">
       <ProductCollectionSelector
-        :collection="ds?.productOption ? ds.productOption : null"
-        @addToCollection="(productOption) => {
-            if (ds?.productOption) {
-              ds.productOption.add(productOption);
-            }
-          }"
-        "
-        @removeFromCollection="
-          (id) => {
-            if (ds?.productOption) {
-              ds.productOption.remove(id);
-            }
-          }
-        "
+        :minLimit="minLimit"
+        :maxLimit="maxLimit"
+        :collection="props.swData.productOptions"
+        @addToCollection="handleAddToCollection"
+        @removeFromCollection="handleRemoveFromCollection"
       />
+    </div>
+  </div>
 </template>

@@ -1,9 +1,7 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
-import { useDataStore } from "../store/useDataStore";
+import { useTravelProductConfig } from "../store/useTravelProductConfig";
 import { data } from "@shopware-ag/meteor-admin-sdk";
-import ProductSelector from "../components/ProductSelector.vue";
-import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
 import ProductOptionsMap from "../components/ProductOptionsMap.vue";
 /*interface ce_generic_bundle {
     id: string;
@@ -32,42 +30,18 @@ import ProductOptionsMap from "../components/ProductOptionsMap.vue";
     ceRoomBundleRoomProductsId: string | null;
     ceRoomSupplementRuleSupplementProductsId: string | null;
   }*/
-const createNewProductOptions = async (): Promise<
-  Entity<"ce_product_options_map">
-> => {
-  const newProductOptions = await data
-    .repository("ce_product_options_map")
-    .create();
-  if (!newProductOptions) {
-    console.error("Failed to create new product options");
-    return Promise.reject(new Error("Failed to create new product options"));
-  }
-  return newProductOptions;
-};
 const addGenericBundle = async () => {
   const newGenericBundle = await data.repository("ce_generic_bundle").create();
-  const productOptions = await createNewProductOptions();
-  const parentProductOptions = await createNewProductOptions();
-  if (!productOptions || !parentProductOptions) {
-    console.error("Failed to create new product options");
-    return;
-  }
-  if (!newGenericBundle) {
-    console.error("Failed to create new generic bundle");
-    return;
-  }
-  newGenericBundle.parentProductOptions = parentProductOptions;
-  newGenericBundle.genericProductOptions = productOptions;
   if (!newGenericBundle) {
     console.error("Failed to create new generic bundle");
     return;
   }
   newGenericBundle.availableOnMinTravellers = 1;
-  ds?.add(newGenericBundle);
-  await store.upsertResorce();
+  swDatas?.add(newGenericBundle);
+  await store.upsertResource();
 };
-const store = useDataStore();
-const ds = storeToRefs(store).travelProductConfigData.value?.genericBundles;
+const store = useTravelProductConfig();
+const swDatas = storeToRefs(store).dataToEdit.value?.genericBundles;
 </script>
 <template>
   <div class="ewt-card ewt-flex ewt-flex--between" style="margin-bottom: 2rem">
@@ -78,63 +52,46 @@ const ds = storeToRefs(store).travelProductConfigData.value?.genericBundles;
   </div>
 
   <div
-    v-if="ds && ds.length > 0"
-    v-for="d in ds"
-    :key="d.id"
+    v-if="swDatas"
+    v-for="swData in swDatas"
+    :key="swData.id"
     class="generic-bundle-container"
   >
     <div class="generic-bundle-header ewt-flex ewt-flex--between">
       <h4 class="ewt-title" style="margin: 0; font-size: 1.5rem">
         Bundle Configuration
       </h4>
-      <button @click="ds.remove(d.id)" class="ewt-btn ewt-btn--danger">
+      <button @click="swDatas.remove(swData.id)" class="ewt-btn ewt-btn--danger">
         Remove Bundle
       </button>
     </div>
     <div class="generic-bundle-content">
       <div class="ewt-card" style="margin-bottom: 1rem">
-        <div>
-          <ProductOptionsMap :ds="d.parentProductOptions" />
-        </div>
-        <div class="button-group">
-          <button
-            @click="
-              async () => {
-                const newProductOptions = await createNewProductOptions();
-                d.parentProductOptions = newProductOptions;
-              }
-            "
-            class="ewt-btn ewt-btn--secondary"
-          >
-            Add Parent Product Option
-          </button>
+        <div v-if="swData.parentProductOptions">
+          <ProductOptionsMap
+            :label="'Parent Product Options'"
+            :max-limit="20"
+            :min-limit="1"
+            :sw-data="swData.parentProductOptions"
+          />
         </div>
       </div>
 
       <div class="ewt-card" style="margin-bottom: 1rem">
-        <p>generic product is {{ typeof d.genericProductOptions }}</p>
-        <div>
-          <ProductOptionsMap :ds="d.genericProductOptions" />
-        </div>
-        <div class="button-group">
-          <button
-            @click="
-              async () => {
-                const newProductOptions = await createNewProductOptions();
-                d.genericProductOptions = newProductOptions;
-              }
-            "
-            class="ewt-btn ewt-btn--secondary"
-          >
-            Add Generic Product Option
-          </button>
+        <div v-if="swData.genericProductOptions">
+          <ProductOptionsMap
+            :label="'Generic Product Options'"
+            :max-limit="20"
+            :min-limit="1"
+            :sw-data="swData.genericProductOptions"
+          />
         </div>
       </div>
 
       <div class="ewt-form-group">
         <input
           type="text"
-          v-model="d.propagandaText"
+          v-model="swData.propagandaText"
           placeholder="Propaganda Text"
           class="ewt-input"
         />
@@ -144,7 +101,7 @@ const ds = storeToRefs(store).travelProductConfigData.value?.genericBundles;
         <div class="ewt-form-group">
           <label class="ewt-form-label">Available On Min Parent Quantity</label>
           <input
-            v-model="d.availableOnMinParentQuantity"
+            v-model="swData.availableOnMinParentQuantity"
             type="number"
             class="ewt-input"
           />
@@ -153,7 +110,7 @@ const ds = storeToRefs(store).travelProductConfigData.value?.genericBundles;
         <div class="ewt-form-group">
           <label class="ewt-form-label">Available On Max Parent Quantity</label>
           <input
-            v-model="d.availableOnMaxParentQuantity"
+            v-model="swData.availableOnMaxParentQuantity"
             type="number"
             class="ewt-input"
           />
@@ -162,7 +119,7 @@ const ds = storeToRefs(store).travelProductConfigData.value?.genericBundles;
         <div class="ewt-form-group">
           <label class="ewt-form-label">Available On Min Travellers</label>
           <input
-            v-model="d.availableOnMinTravellers"
+            v-model="swData.availableOnMinTravellers"
             type="number"
             class="ewt-input"
           />
@@ -171,7 +128,7 @@ const ds = storeToRefs(store).travelProductConfigData.value?.genericBundles;
         <div class="ewt-form-group">
           <label class="ewt-form-label">Available On Max Travellers</label>
           <input
-            v-model="d.availableOnMaxTravellers"
+            v-model="swData.availableOnMaxTravellers"
             type="number"
             class="ewt-input"
           />
@@ -182,7 +139,7 @@ const ds = storeToRefs(store).travelProductConfigData.value?.genericBundles;
         <div class="ewt-form-group">
           <div class="ewt-checkbox-group">
             <input
-              v-model="d.matchParentQuantity"
+              v-model="swData.matchParentQuantity"
               type="checkbox"
               class="ewt-checkbox"
             />
@@ -193,7 +150,7 @@ const ds = storeToRefs(store).travelProductConfigData.value?.genericBundles;
         <div class="ewt-form-group">
           <div class="ewt-checkbox-group">
             <input
-              v-model="d.matchTravellers"
+              v-model="swData.matchTravellers"
               type="checkbox"
               class="ewt-checkbox"
             />
@@ -204,7 +161,7 @@ const ds = storeToRefs(store).travelProductConfigData.value?.genericBundles;
         <div class="ewt-form-group">
           <div class="ewt-checkbox-group">
             <input
-              v-model="d.isRequired"
+              v-model="swData.isRequired"
               type="checkbox"
               class="ewt-checkbox"
             />
@@ -215,7 +172,7 @@ const ds = storeToRefs(store).travelProductConfigData.value?.genericBundles;
         <div class="ewt-form-group">
           <div class="ewt-checkbox-group">
             <input
-              v-model="d.allowMultipleSelection"
+              v-model="swData.allowMultipleSelection"
               type="checkbox"
               class="ewt-checkbox"
             />

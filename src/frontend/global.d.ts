@@ -90,15 +90,14 @@ declare namespace EntitySchema {
   //***product config */
 
   interface ce_travel_product_config {
-    id: string;
-    productId: string | null;
-    product: Entity<"product"> | null;
+    productsToApply: EntityCollection<"product"> | null;
     hotelBundleId: string | null;
     hotelBundle: Entity<"ce_hotel_bundle"> | null;
     childDiscountId: string | null;
     childDiscount: Entity<"ce_custom_child_discount"> | null;
     genericBundles: EntityCollection<"ce_generic_bundle"> | null;
-    metaInformation: string | null;
+    configurationName: string | null;
+    configurationIdentifier: string | null;
     variantAware: boolean | null;
     isDateConfigurable: boolean | null;
     dateConfiguratorId: string | null;
@@ -169,10 +168,7 @@ declare namespace EntitySchema {
   }
   interface ce_product_options_map {
     id: string;
-    //productOptionId: string | null;
-   // equivalentProductId: string | null;
-    productOption: EntityCollection<"product"> | null;
-   // equivalentProduct: Entity<"product"> | null;
+    productOptions: EntityCollection<"product"> | null;
     ceGenericBundleParentProductsId: string | null;
     ceGenericBundleProductOptionsId: string | null;
     ceRoomBundleRoomProductsId: string | null;

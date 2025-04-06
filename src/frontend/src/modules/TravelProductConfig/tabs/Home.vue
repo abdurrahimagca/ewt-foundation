@@ -13,45 +13,34 @@
   }*/
 
 import { storeToRefs } from "pinia";
-import { useDataStore } from "../store/useDataStore";
-import ProductSelector from "../components/ProductSelector.vue";
-const store = useDataStore();
-const d = storeToRefs(store).travelProductConfigData;
+import { useTravelProductConfig } from "../store/useTravelProductConfig";
+const store = useTravelProductConfig();
+const swData = storeToRefs(store).dataToEdit;
 </script>
 
 <template>
-  <div v-if="d && d !== null">
+  <div v-if="swData">
+    <h2 class="ewt-form-title">{{ swData.configurationIdentifier }}</h2>
     <label class="ewt-form-label">Assocatied Product</label>
     <p>
       This is the product that will be associated with the travel product
       configuration.
     </p>
     <ProductSelector
-      :initial-product="d.product ? [d.product] : null"
-      :limit="1"
-      @handle:commit-changes="
-        (p) => {
-          if (d && d !== null) {
-            d.productId = p[0].id;
-            d.product = p[0];
-          }
-        }
-      "
+      :swData="swData?.productsToApply"
+      :label="'Select Product'"
+      :maxLimit="20"
+      :minLimit="1"
     />
-    <label class="ewt-form-label">Meta Information</label>
-    <p>
-      This just for adminstration purposes. It helps to distinct each Resource
-    </p>
-    <input
-      type="text"
-      v-model="d.metaInformation"
-      placeholder="Meta Information"
-      class="ewt-input"
-    />
+
     <div class="ewt-form-group">
       <label class="ewt-form-label">Variant Aware</label>
       <div class="ewt-checkbox-group">
-        <input v-model="d.variantAware" type="checkbox" class="ewt-checkbox" />
+        <input
+          v-model="swData.variantAware"
+          type="checkbox"
+          class="ewt-checkbox"
+        />
         <span class="ewt-checkbox-label">Yes</span>
       </div>
     </div>
@@ -59,12 +48,18 @@ const d = storeToRefs(store).travelProductConfigData;
       <label class="ewt-form-label">Is Date Configurable</label>
       <div class="ewt-checkbox-group">
         <input
-          v-model="d.isDateConfigurable"
+          v-model="swData.isDateConfigurable"
           type="checkbox"
           class="ewt-checkbox"
         />
         <span class="ewt-checkbox-label">Yes</span>
       </div>
     </div>
+    <input
+      v-model="swData.configurationName"
+      type="text"
+      placeholder="Configuration Name"
+      class="ewt-input"
+    />
   </div>
 </template>

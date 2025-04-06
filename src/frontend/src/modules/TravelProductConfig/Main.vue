@@ -4,10 +4,10 @@ import Home from "./tabs/Home.vue";
 import GenericBundle from "./tabs/GenericBundle.vue";
 import { ref, computed } from "vue";
 
-import { useDataStore } from "./store/useDataStore";
+import { useTravelProductConfig } from "./store/useTravelProductConfig";
 import { storeToRefs } from "pinia";
 import DataTable from "./components/DataTable.vue";
-const store = useDataStore();
+const store = useTravelProductConfig();
 const isEditMode = storeToRefs(store).isEditing;
 const isLoading = storeToRefs(store).isLoading;
 const tabs = [
@@ -69,7 +69,7 @@ const switchTab = (tabName: string) => {
         <component :is="activeComponent" />
         <button
           class="ewt-button ewt-button--primary"
-          @click="store.upsertResorce"
+          @click="store.upsertResource"
         >
           <i class="fas fa-plus"></i> Save
         </button>
@@ -86,7 +86,7 @@ const switchTab = (tabName: string) => {
   </div>
   <pre>
     <code>
-      {{ JSON.stringify(store.travelProductConfigData, null, 2) }}
+      {{ JSON.stringify(store.dataToEdit, null, 2) }}
     </code>
   </pre>
 </template>
