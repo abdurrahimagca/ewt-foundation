@@ -1,4 +1,4 @@
-import { data } from "@shopware-ag/meteor-admin-sdk";
+import { data, notification } from "@shopware-ag/meteor-admin-sdk";
 import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
 import { defineStore } from "pinia";
 import { ref } from "vue";
@@ -64,6 +64,13 @@ export const useDataStore = defineStore("travelProductConfig", () => {
         throw new Error("No entity data found");
       }
       await repo.save(travelProductConfigData.value);
+      notification.dispatch(
+        {
+          title: "Success",
+          message: "Data saved successfully",
+          variant: "success"
+        });
+      await setResource(travelProductConfigData.value.id);
     } catch (e) {
       console.error(e);
       error.value = (e as Error).message;

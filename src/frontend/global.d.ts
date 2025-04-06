@@ -25,10 +25,7 @@ declare namespace EntitySchema {
     productNumber: string | null;
     taxId: string | null;
     stock: number | null;
-    ceTravelProductConfigRoomBundleRoomProductsId: null | string;
-    ceRoomSupplementRuleSupplementProductsId: null | string;
-    ceGenericBundleParentProductsId: null | string;
-    ceGenericBundleProductOptionsId: null | string;
+    ceProductOptionsMapId: string | null;
     price: {
       currencyId: string | null;
       net: number | null;
@@ -165,15 +162,17 @@ declare namespace EntitySchema {
     isRequired: boolean | null;
     allowMultipleSelection: boolean | null;
     propagandaText: string | null;
-    parentProductOptions: EntityCollection<"ce_product_options_map">;
-    genericProductOptions: EntityCollection<"ce_product_options_map">;
+    parentProductOptionsId: string | null;
+    genericProductOptionsId: string | null;
+    parentProductOptions: Entity<"ce_product_options_map"> | null;
+    genericProductOptions: Entity<"ce_product_options_map"> | null;
   }
   interface ce_product_options_map {
     id: string;
-    productOptionId: string | null;
-    equivalentProductId: string | null;
-    productOption: Entity<"product"> | null;
-    equivalentProduct: Entity<"product"> | null;
+    //productOptionId: string | null;
+   // equivalentProductId: string | null;
+    productOption: EntityCollection<"product"> | null;
+   // equivalentProduct: Entity<"product"> | null;
     ceGenericBundleParentProductsId: string | null;
     ceGenericBundleProductOptionsId: string | null;
     ceRoomBundleRoomProductsId: string | null;

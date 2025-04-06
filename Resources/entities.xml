@@ -135,14 +135,14 @@
         <bool name="match_travellers" store-api-aware="true" />
         <bool name="is_required" store-api-aware="true" />
         <bool name="allow_multiple_selection" store-api-aware="true" />
-        <one-to-many name="parent_product_options" reference="ce_product_options_map" store-api-aware="true" on-delete="set-null" />
-        <one-to-many name="generic_product_options" reference="ce_product_options_map" store-api-aware="true" on-delete="set-null" />
+        <one-to-one name="parent_product_options" reference="ce_product_options_map" store-api-aware="true" on-delete="set-null" />
+        <one-to-one name="generic_product_options" reference="ce_product_options_map" store-api-aware="true" on-delete="set-null" />
     </fields>
 </entity>
 <entity name="ce_product_options_map">
 <fields>
-    <one-to-one name="product_option" reference="product" store-api-aware="true" on-delete="set-null" />
-    <one-to-one name="equivalent_product" reference="product" store-api-aware="true" on-delete="set-null" />
+    <one-to-many name="product_option" reference="product" store-api-aware="true" on-delete="set-null" />
+    <one-to-many name="equivalent_product" reference="product" store-api-aware="true" on-delete="set-null" />
   <!-- expremential may be later <one-to-one name="equivalent_product_tag" reference="tag" store-api-aware="true" on-delete="set-null" /> -->
   <!-- expremential may be later <one-to-one name="equivalent_product_category" reference="category" store-api-aware="true" on-delete="set-null" /> -->
     
