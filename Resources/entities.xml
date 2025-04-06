@@ -64,7 +64,7 @@
  
     <entity name="ce_travel_product_config">
         <fields>
-            <many-to-one name="products_to_apply" reference="product" store-api-aware="true" on-delete="set-null" />
+            <one-to-one name="products_to_apply" reference="ce_product_options_map" store-api-aware="true" on-delete="set-null" />
             <one-to-one name="hotel_bundle" store-api-aware="true" reference="ce_hotel_bundle" on-delete="set-null"/>
             <one-to-one name="child_discount" store-api-aware="true" reference="ce_custom_child_discount" on-delete="set-null"/>
             <one-to-many name="generic_bundles" reference="ce_generic_bundle" store-api-aware="true" on-delete="set-null" />

@@ -1,21 +1,16 @@
 <script lang="ts" setup>
-import { data } from "@shopware-ag/meteor-admin-sdk";
-import { onMounted, ref, computed } from "vue";
+import { data, notification } from "@shopware-ag/meteor-admin-sdk";
+import { onMounted, computed } from "vue";
 import { useTravelProductConfig } from "../store/useTravelProductConfig";
 
 const store = useTravelProductConfig();
-const currentPage = ref(1);
 const itemsPerPage = 10;
 
-const paginatedData = computed(() => {
-  if (!store.dataToOverview) return [];
-  const start = (currentPage.value - 1) * itemsPerPage;
-  const end = start + itemsPerPage;
-  return store.dataToOverview.slice(start, end);
-});
-
-const totalItems = computed(() => store.dataToOverview?.length || 0);
-const totalPages = computed(() => Math.ceil(totalItems.value / itemsPerPage));
+const paginatedData = computed(() => store.dataToOverview || []);
+const currentPage = computed(() => store.currentPage || 1);
+const totalPages = computed(() =>
+  Math.ceil((store.totalCount || 0) / itemsPerPage),
+);
 
 const toggleEdit = (id: string) => {
   try {
@@ -26,21 +21,33 @@ const toggleEdit = (id: string) => {
 };
 
 const fetchData = async (page: number) => {
-  const criteria = new data.Classes.Criteria();
-  criteria.setLimit(itemsPerPage);
-  criteria.setPage(page);
-  criteria.addAssociation("product");
-  await store.searchResources(criteria);
+  try {
+    const criteria = new data.Classes.Criteria();
+    criteria.setLimit(itemsPerPage);
+    criteria.setPage(page);
+    criteria.addAssociation("productsToApply");
+    criteria.addAssociation("productsToApply.productOptions");
+    await store.searchResources(criteria);
+  } catch (e) {
+    console.error("Error fetching data:", e);
+    notification.dispatch({
+      title: "Error",
+      message: "Failed to fetch data",
+      appearance: "notification",
+      variant: "error",
+    });
+  }
 };
 
 const changePage = async (page: number) => {
-  currentPage.value = page;
+  if (page < 1 || page > totalPages.value) return;
   await fetchData(page);
 };
 
 const createResource = async () => {
   try {
     await store.createNewResource();
+    await fetchData(1);
   } catch (e) {
     console.error("Error creating resource:", e);
   }
@@ -49,13 +56,20 @@ const createResource = async () => {
 const deleteResource = async (id: string) => {
   try {
     await store.deleteResource(id);
+    if (currentPage.value > 1 && paginatedData.value.length === 1) {
+      await changePage(currentPage.value - 1);
+    } else {
+      await fetchData(currentPage.value);
+    }
   } catch (e) {
     console.error("Error deleting resource:", e);
   }
 };
 
 onMounted(async () => {
-  await fetchData(1);
+  if (!store.dataToOverview) {
+    await fetchData(1);
+  }
 });
 </script>
 
@@ -85,11 +99,11 @@ onMounted(async () => {
             <td class="ewt-product-display">
               <span class="ewt-product-name">
                 {{
-                  item.productsToApply?.first()?.name || "No Product Selected"
+                  item.productsToApply?.productOptions?.first()?.name || "No Product Selected"
                 }}
               </span>
             </td>
-            <td>{{ item.productsToApply?.first()?.productNumber || "N/A" }}</td>
+            <td>{{ item.productsToApply?.productOptions?.first()?.productNumber || "N/A" }}</td>
             <td>{{ item.id }}</td>
             <td>
               <span
@@ -147,140 +161,5 @@ onMounted(async () => {
 </template>
 
 <style scoped>
-.ewt-table-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-}
-
-.ewt-table {
-  width: 100%;
-  border-collapse: collapse;
-  margin-bottom: 1.5rem;
-  background: white;
-  border-radius: 8px;
-  overflow: hidden;
-  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
-}
-
-.ewt-table th,
-.ewt-table td {
-  padding: 1rem;
-  text-align: left;
-  border-bottom: 1px solid #eee;
-}
-
-.ewt-table th {
-  background-color: #f8f9fa;
-  font-weight: 600;
-  color: #2c3e50;
-  white-space: nowrap;
-}
-
-.ewt-table tr:hover {
-  background-color: #f8f9fa;
-}
-
-.ewt-meta-info {
-  max-width: 300px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.ewt-actions {
-  display: flex;
-  gap: 0.5rem;
-  white-space: nowrap;
-}
-
-.ewt-button {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  border: none;
-  border-radius: 6px;
-  font-size: 0.9rem;
-  cursor: pointer;
-  transition: all 0.2s ease;
-}
-
-.ewt-button--primary {
-  background-color: #2c3e50;
-  color: white;
-}
-
-.ewt-button--primary:hover {
-  background-color: #34495e;
-}
-
-.ewt-button--edit {
-  background-color: #3498db;
-  color: white;
-}
-
-.ewt-button--edit:hover {
-  background-color: #2980b9;
-}
-
-.ewt-button--delete {
-  background-color: #e74c3c;
-  color: white;
-}
-
-.ewt-button--delete:hover {
-  background-color: #c0392b;
-}
-
-.ewt-pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
-  margin-top: 2rem;
-  padding: 1rem;
-  background-color: #f8f9fa;
-  border-radius: 8px;
-}
-
-.ewt-pagination-info {
-  color: #666;
-  font-size: 0.9rem;
-  font-weight: 500;
-}
-
-.ewt-button:disabled {
-  opacity: 0.5;
-  cursor: not-allowed;
-}
-
-.ewt-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.25rem 0.75rem;
-  border-radius: 20px;
-  font-size: 0.875rem;
-  font-weight: 500;
-}
-
-.ewt-badge--success {
-  background-color: #e8f5e9;
-  color: #2e7d32;
-}
-
-.ewt-badge--info {
-  background-color: #e3f2fd;
-  color: #1565c0;
-}
-
-.ewt-product-display {
-  padding: 0.5rem;
-}
-
-.ewt-product-name {
-  color: #2c3e50;
-  font-weight: 500;
-}
+/* All styles moved to global CSS */
 </style>

@@ -90,7 +90,7 @@ declare namespace EntitySchema {
   //***product config */
 
   interface ce_travel_product_config {
-    productsToApply: EntityCollection<"product"> | null;
+    productsToApply: Entity<"ce_product_options_map"> | null;
     hotelBundleId: string | null;
     hotelBundle: Entity<"ce_hotel_bundle"> | null;
     childDiscountId: string | null;
@@ -139,7 +139,7 @@ declare namespace EntitySchema {
     applyIfAdults: number | null;
     applyIfChildren: number | null;
     applyIfInfants: number | null;
-    supplementProducts: EntityCollection<"ce_product_options_map"> | null;
+    supplementProducts: Entity<"ce_product_options_map"> | null;
   }
 
   interface ce_custom_child_discount {

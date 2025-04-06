@@ -3,27 +3,25 @@ import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity"
 import EntityCollection from "@shopware-ag/meteor-admin-sdk/es/_internals/data/EntityCollection";
 import { defineStore } from "pinia";
 import { ref } from "vue";
+
 const ASSOCIATIONS = [
   "productsToApply",
+  "productsToApply.productOptions",
   "hotelBundle",
   "childDiscount",
   "genericBundles",
   "dateConfigurator",
   "hotelBundle.roomOptions",
   "hotelBundle.roomOptions.roomProducts",
-  "hotelBundle.roomOptions.roomProducts.productOption",
-  "hotelBundle.roomOptions.roomProducts.equivalentProduct",
+  "hotelBundle.roomOptions.roomProducts.productOptions",
   "hotelBundle.roomOptions.roomSaleRule",
   "hotelBundle.roomOptions.roomSaleRule.supplementRule",
   "hotelBundle.roomOptions.roomSaleRule.supplementRule.supplementProducts",
-  "hotelBundle.roomOptions.roomSaleRule.supplementRule.supplementProducts.productOption",
-  "hotelBundle.roomOptions.roomSaleRule.supplementRule.supplementProducts.equivalentProduct",
+  "hotelBundle.roomOptions.roomSaleRule.supplementRule.supplementProducts.productOptions",
   "genericBundles.parentProductOptions",
   "genericBundles.genericProductOptions",
-  "genericBundles.genericProductOptions.productOption",
-  "genericBundles.parentProductOptions.equivalentProduct",
-  "genericBundles.parentProductOptions.productOption",
-  "genericBundles.genericProductOptions.equivalentProduct",
+  "genericBundles.genericProductOptions.productOptions",
+  "genericBundles.parentProductOptions.productOptions",
 ];
 
 export const useTravelProductConfig = defineStore("travelProductConfig", () => {
@@ -32,6 +30,8 @@ export const useTravelProductConfig = defineStore("travelProductConfig", () => {
   const isEditing = ref(false);
   const dataToOverview =
     ref<EntityCollection<"ce_travel_product_config"> | null>(null);
+  const currentPage = ref(1);
+  const totalCount = ref(0);
 
   const searchResources = async (
     criteria?: InstanceType<typeof data.Classes.Criteria>,
@@ -39,13 +39,31 @@ export const useTravelProductConfig = defineStore("travelProductConfig", () => {
     try {
       isLoading.value = true;
       const repo = data.repository("ce_travel_product_config");
-      //TODO: create a default criteria
-      const result = await repo.search(
-        criteria ? criteria : new data.Classes.Criteria(),
-      );
+      const searchCriteria = criteria || new data.Classes.Criteria();
+
+      // Ensure we have the productsToApply association
+      if (!searchCriteria.getAssociation("productsToApply")) {
+        searchCriteria.addAssociation("productsToApply");
+      }
+
+      const result = await repo.search(searchCriteria);
+
+      if (!result) {
+        dataToOverview.value = null;
+        totalCount.value = 0;
+        return;
+      }
+
       dataToOverview.value = result;
+      totalCount.value = result.total || 0;
+
+      if (searchCriteria.getPage()) {
+        currentPage.value = searchCriteria.getPage();
+      }
     } catch (e) {
       console.error(e);
+      dataToOverview.value = null;
+      totalCount.value = 0;
       notification.dispatch({
         title: "Error",
         message: (e as Error).message,
@@ -69,6 +87,9 @@ export const useTravelProductConfig = defineStore("travelProductConfig", () => {
       newEntity.variantAware = false;
       newEntity.isDateConfigurable = false;
       await repo.save(newEntity);
+
+      // Reset to first page after creation
+      currentPage.value = 1;
       await searchResources();
     } catch (e) {
       console.error(e);
@@ -81,11 +102,18 @@ export const useTravelProductConfig = defineStore("travelProductConfig", () => {
       isLoading.value = false;
     }
   };
+
   const deleteResource = async (id: string) => {
     try {
       isLoading.value = true;
       const repo = data.repository("ce_travel_product_config");
       await repo.delete(id);
+
+      // If we're on a page with only one item and it's deleted, go to previous page
+      if (dataToOverview.value?.length === 1 && currentPage.value > 1) {
+        currentPage.value--;
+      }
+
       await searchResources();
       notification.dispatch({
         title: "Success",
@@ -156,6 +184,30 @@ export const useTravelProductConfig = defineStore("travelProductConfig", () => {
       isEditing.value = false;
     }
   };
+
+  const createFreshEntity = async <K extends keyof EntitySchema.Entities>(
+    key: K,
+  ): Promise<Entity<K>> => {
+    try {
+      const repo = data.repository(key);
+      const newEntity = await repo.create();
+
+      if (!newEntity) {
+        throw new Error(`Could not create entity of type ${key}`);
+      }
+
+      return newEntity;
+    } catch (e) {
+      console.error(e);
+      notification.dispatch({
+        title: "Error",
+        message: (e as Error).message,
+        variant: "error",
+      });
+      throw e;
+    }
+  };
+
   return {
     dataToEdit,
     dataToOverview,
@@ -166,5 +218,8 @@ export const useTravelProductConfig = defineStore("travelProductConfig", () => {
     setResource,
     upsertResource,
     isEditing,
+    currentPage,
+    totalCount,
+    createFreshEntity,
   };
 });

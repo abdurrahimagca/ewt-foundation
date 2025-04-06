@@ -31,14 +31,22 @@ import ProductOptionsMap from "../components/ProductOptionsMap.vue";
     ceRoomSupplementRuleSupplementProductsId: string | null;
   }*/
 const addGenericBundle = async () => {
-  const newGenericBundle = await data.repository("ce_generic_bundle").create();
+  const newGenericBundle = await store.createFreshEntity("ce_generic_bundle");
   if (!newGenericBundle) {
     console.error("Failed to create new generic bundle");
     return;
   }
   newGenericBundle.availableOnMinTravellers = 1;
   swDatas?.add(newGenericBundle);
-  await store.upsertResource();
+};
+const removeGenericBundle = async (id: string) => {
+  try {
+    if (!swDatas?.remove(id)) {
+      throw new Error("Failed to remove generic bundle");
+    }
+  } catch (e) {
+    console.error("Error removing generic bundle:", e);
+  }
 };
 const store = useTravelProductConfig();
 const swDatas = storeToRefs(store).dataToEdit.value?.genericBundles;
@@ -53,15 +61,18 @@ const swDatas = storeToRefs(store).dataToEdit.value?.genericBundles;
 
   <div
     v-if="swDatas"
-    v-for="swData in swDatas"
+    v-for="(swData, index) in swDatas"
     :key="swData.id"
     class="generic-bundle-container"
   >
     <div class="generic-bundle-header ewt-flex ewt-flex--between">
       <h4 class="ewt-title" style="margin: 0; font-size: 1.5rem">
-        Bundle Configuration
+        Bundle Configuration #{{ index + 1 }}
       </h4>
-      <button @click="swDatas.remove(swData.id)" class="ewt-btn ewt-btn--danger">
+      <button
+        @click="removeGenericBundle(swData.id)"
+        class="ewt-btn ewt-btn--danger"
+      >
         Remove Bundle
       </button>
     </div>
@@ -75,6 +86,24 @@ const swDatas = storeToRefs(store).dataToEdit.value?.genericBundles;
             :sw-data="swData.parentProductOptions"
           />
         </div>
+        <button
+          @click="
+            async () => {
+              const newProductOption = await store.createFreshEntity(
+                'ce_product_options_map',
+              );
+              if (!newProductOption) {
+                console.error('Failed to create new product option');
+                return;
+              }
+              swData.parentProductOptions = newProductOption;
+            }
+          "
+          class="ewt-btn ewt-btn--secondary"
+          style="margin-top: 1rem"
+        >
+          Add Parent Product Option
+        </button>
       </div>
 
       <div class="ewt-card" style="margin-bottom: 1rem">
@@ -86,6 +115,24 @@ const swDatas = storeToRefs(store).dataToEdit.value?.genericBundles;
             :sw-data="swData.genericProductOptions"
           />
         </div>
+        <button
+          @click="
+            async () => {
+              const newProductOption = await store.createFreshEntity(
+                'ce_product_options_map',
+              );
+              if (!newProductOption) {
+                console.error('Failed to create new product option');
+                return;
+              }
+              swData.genericProductOptions = newProductOption;
+            }
+          "
+          class="ewt-btn ewt-btn--secondary"
+          style="margin-top: 1rem"
+        >
+          Add Generic Product Option
+        </button>
       </div>
 
       <div class="ewt-form-group">

@@ -24,6 +24,7 @@ const error = ref<string | undefined>(undefined);
 const isFrozen = ref(false);
 const hasUnsavedChanges = ref(false);
 onMounted(() => {
+
   props?.collection?.forEach((product) => {
     if (product.available && product !== undefined) {
       selecteds.value.push(product);

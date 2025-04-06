@@ -14,6 +14,8 @@
 
 import { storeToRefs } from "pinia";
 import { useTravelProductConfig } from "../store/useTravelProductConfig";
+import ProductCollectionSelector from "../../shared/ProductCollectionSelector.vue";
+
 const store = useTravelProductConfig();
 const swData = storeToRefs(store).dataToEdit;
 </script>
@@ -21,40 +23,81 @@ const swData = storeToRefs(store).dataToEdit;
 <template>
   <div v-if="swData">
     <h2 class="ewt-form-title">{{ swData.configurationIdentifier }}</h2>
-    <label class="ewt-form-label">Assocatied Product</label>
+    <label class="ewt-form-label">Associated Product</label>
     <p>
       This is the product that will be associated with the travel product
       configuration.
     </p>
-    <ProductSelector
-      :swData="swData?.productsToApply"
-      :label="'Select Product'"
-      :maxLimit="20"
-      :minLimit="1"
-    />
+    <div v-if="swData?.productsToApply?.productOptions">
+      >
+      <ProductCollectionSelector
+        :minLimit="1"
+        :maxLimit="Infinity"
+        :collection="swData.productsToApply.productOptions"
+        @addToCollection="
+          (product) => {
+            if (!swData || !swData.productsToApply?.productOptions) {
+              throw new Error('Product collection is not defined');
+            }
+            swData.productsToApply.productOptions.add(product);
+          }
+        "
+        @removeFromCollection="
+          (id) => {
+            if (!swData || !swData.productsToApply?.productOptions) {
+              throw new Error('Product collection is not defined');
+            }
+            swData.productsToApply.productOptions.remove(id);
+          }
+        "
+      />
+    </div>
+    <div v-else>
+      <p>No product selected yet</p>
+      <button
+        class="ewt-button ewt-button--primary"
+        @click="
+          async () => {
+            if (!swData) {
+              throw new Error('swData is not defined');
+            }
+            const n = await store.createFreshEntity('ce_product_options_map');
+            if (!n) {
+              throw new Error('Failed to create new product');
+            }
 
-    <div class="ewt-form-group">
-      <label class="ewt-form-label">Variant Aware</label>
-      <div class="ewt-checkbox-group">
-        <input
-          v-model="swData.variantAware"
-          type="checkbox"
-          class="ewt-checkbox"
-        />
-        <span class="ewt-checkbox-label">Yes</span>
+            swData.productsToApply = n;
+          }
+        "
+      >
+        <i class="fas fa-plus"></i> Add Product
+      </button>
+    </div>
+
+    <div class="ewt-grid ewt-grid--2">
+      <div class="ewt-form-group">
+        <div class="ewt-checkbox-group">
+          <input
+            v-model="swData.variantAware"
+            type="checkbox"
+            class="ewt-checkbox"
+          />
+          <label class="ewt-checkbox-label">Variant Aware</label>
+        </div>
+      </div>
+
+      <div class="ewt-form-group">
+        <div class="ewt-checkbox-group">
+          <input
+            v-model="swData.isDateConfigurable"
+            type="checkbox"
+            class="ewt-checkbox"
+          />
+          <label class="ewt-checkbox-label">Is Date Configurable</label>
+        </div>
       </div>
     </div>
-    <div class="ewt-form-group">
-      <label class="ewt-form-label">Is Date Configurable</label>
-      <div class="ewt-checkbox-group">
-        <input
-          v-model="swData.isDateConfigurable"
-          type="checkbox"
-          class="ewt-checkbox"
-        />
-        <span class="ewt-checkbox-label">Yes</span>
-      </div>
-    </div>
+
     <input
       v-model="swData.configurationName"
       type="text"
@@ -63,3 +106,7 @@ const swData = storeToRefs(store).dataToEdit;
     />
   </div>
 </template>
+
+<style scoped>
+/* All styles moved to global CSS */
+</style>
