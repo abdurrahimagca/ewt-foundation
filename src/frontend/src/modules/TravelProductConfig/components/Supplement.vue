@@ -85,13 +85,14 @@ const handleRemoveFromCollection = async (id: string) => {
     </div>
 
     <div
-      v-if="swData.supplementProducts?.productOptions"
+      v-if="swData.supplementProducts"
       class="ewt-form-group"
     >
       <label class="ewt-form-label">Supplement Products</label>
       <p class="ewt-txt ewt-mb-3">These products will be added to cart</p>
       <ProductCollectionSelector
-        :collection="swData.supplementProducts?.productOptions"
+        v-if="swData.supplementProducts?.productOptions"
+        :collection="swData.supplementProducts.productOptions"
         :min-limit="1"
         :max-limit="5"
         @add-to-collection="handleAddToCollection"

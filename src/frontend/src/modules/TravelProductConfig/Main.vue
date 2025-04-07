@@ -9,6 +9,7 @@ import { storeToRefs } from "pinia";
 import DataTable from "./components/DataTable.vue";
 import DateConfigurator from "./tabs/DateConfigurator.vue";
 import ChildDiscount from "./components/ChildDiscount.vue";
+const showRawData = ref(false);
 const store = useTravelProductConfig();
 const isEditMode = storeToRefs(store).isEditing;
 const isLoading = storeToRefs(store).isLoading;
@@ -118,6 +119,13 @@ const handleCancel = () => {
 
       <main class="ewt-content">
         <component :is="activeComponent" />
+        <div v-if="showRawData">
+          <pre>{{ JSON.stringify(storeToRefs(store).dataToEdit.value, null, 2) }}</pre>
+        </div>
+        <div v-else>
+          <p>Raw data is hidden</p>
+          <button @click="showRawData = true">Show Raw Data</button>
+        </div>
       </main>
     </div>
   </div>
