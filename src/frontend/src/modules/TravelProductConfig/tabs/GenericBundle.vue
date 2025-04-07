@@ -1,8 +1,12 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import { useTravelProductConfig } from "../store/useTravelProductConfig";
-import { data } from "@shopware-ag/meteor-admin-sdk";
 import ProductOptionsMap from "../components/ProductOptionsMap.vue";
+import { z } from "zod";
+import ParentOperator from "../../shared/ParentOperator.vue";
+import { computed } from "vue";
+import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
+import EntityCollection from "@shopware-ag/meteor-admin-sdk/es/_internals/data/EntityCollection";
 /*interface ce_generic_bundle {
     id: string;
     ceTravelProductConfigGenericBundlesId: string | null;
@@ -30,6 +34,7 @@ import ProductOptionsMap from "../components/ProductOptionsMap.vue";
     ceRoomBundleRoomProductsId: string | null;
     ceRoomSupplementRuleSupplementProductsId: string | null;
   }*/
+
 const addGenericBundle = async () => {
   const newGenericBundle = await store.createFreshEntity("ce_generic_bundle");
   if (!newGenericBundle) {
@@ -50,6 +55,28 @@ const removeGenericBundle = async (id: string) => {
 };
 const store = useTravelProductConfig();
 const swDatas = storeToRefs(store).dataToEdit.value?.genericBundles;
+
+const transformProductForLogicStatement = (
+  p: EntityCollection<"product"> | undefined | null,
+) => {
+  if (!p) {
+    return [];
+  }
+  return Object.values(p)
+    .filter(
+      (product): product is Entity<"product"> =>
+        product !== null &&
+        typeof product === "object" &&
+        "id" in product &&
+        "productNumber" in product &&
+        "name" in product,
+    )
+    .map((product) => ({
+      id: product.id || "",
+      productNumber: product.productNumber || "",
+      name: product.name || "",
+    }));
+};
 </script>
 <template>
   <div class="ewt-card ewt-flex ewt-flex--between" style="margin-bottom: 2rem">
@@ -226,6 +253,18 @@ const swDatas = storeToRefs(store).dataToEdit.value?.genericBundles;
             <label class="ewt-checkbox-label">Allow Multiple Selection</label>
           </div>
         </div>
+      </div>
+
+      <label class="ewt-form-label">Availability Operator</label>
+      <div class="ewt-checkbox-group">
+        <p style="color: red">expremential its not effects anything for now</p>
+        <ParentOperator
+          :products="
+            transformProductForLogicStatement(
+              swData?.parentProductOptions?.productOptions || null,
+            )
+          "
+        />
       </div>
     </div>
   </div>
