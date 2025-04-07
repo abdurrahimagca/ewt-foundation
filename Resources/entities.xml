@@ -112,7 +112,7 @@
             <int name="apply_if_adults" store-api-aware="true"/>
             <int name="apply_if_children" store-api-aware="true"/>
             <int name="apply_if_infants" store-api-aware="true" />
-            <one-to-many name="supplement_products" store-api-aware="true" reference="ce_product_options_map" on-delete="set-null"/>
+            <one-to-one name="supplement_products" store-api-aware="true" reference="ce_product_options_map" on-delete="set-null"/>
         </fields>
     </entity>
 

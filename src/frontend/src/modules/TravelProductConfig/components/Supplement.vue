@@ -1,6 +1,4 @@
 <script setup lang="ts">
-import ProductCollectionSelector from "../../shared/components/ProductCollectionSelector.vue";
-import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
 import { useSw } from "@/modules/shared/composables/useSw";
 const { createSwEntity } = useSw();
 const props = defineProps<{
@@ -10,22 +8,13 @@ import { useTravelProductConfig } from "../store/useTravelProductConfig";
 import { computed } from "vue";
 import { storeToRefs } from "pinia";
 import { notification } from "@shopware-ag/meteor-admin-sdk";
+import ProductOptionsMap from "./ProductOptionsMap.vue";
 const store = useTravelProductConfig();
 const swData = computed(() => {
   return storeToRefs(store).dataToEdit.value?.hotelBundle?.roomOptions?.get(
     props.id,
   )?.roomSaleRule?.supplementRule;
 });
-const handleAddToCollection = async (product: Entity<"product">) => {
-  try {
-    if (!swData.value || !swData.value.supplementProducts?.productOptions) {
-      throw new Error("Failed to add product to collection");
-    }
-    swData.value.supplementProducts.productOptions.add(product);
-  } catch (e) {
-    console.error("Error adding product to collection:", e);
-  }
-};
 const handleCreateSupplementProductsResource = async () => {
   try {
     if (!swData.value) throw new Error("Could not create new resource");
@@ -42,18 +31,6 @@ const handleCreateSupplementProductsResource = async () => {
       title: "Error",
       message: "Could not create resoruce",
     });
-  }
-};
-const handleRemoveFromCollection = async (id: string) => {
-  try {
-    if (!swData.value || !swData.value.supplementProducts?.productOptions) {
-      throw new Error("Failed to remove product from collection");
-    }
-    if (!swData.value.supplementProducts.productOptions.remove(id)) {
-      throw new Error("Failed to remove product from collection");
-    }
-  } catch (e) {
-    console.error("Error removing product from collection:", e);
   }
 };
 </script>
@@ -84,28 +61,24 @@ const handleRemoveFromCollection = async (id: string) => {
       </div>
     </div>
 
-    <div
-      v-if="swData.supplementProducts"
-      class="ewt-form-group"
-    >
+    <div v-if="swData.supplementProducts" class="ewt-form-group">
       <label class="ewt-form-label">Supplement Products</label>
       <p class="ewt-txt ewt-mb-3">These products will be added to cart</p>
-      <ProductCollectionSelector
-        v-if="swData.supplementProducts?.productOptions"
-        :collection="swData.supplementProducts.productOptions"
+      <ProductOptionsMap
+        :sw-data="swData.supplementProducts"
+        :max-limit="Infinity"
         :min-limit="1"
-        :max-limit="5"
-        @add-to-collection="handleAddToCollection"
-        @remove-from-collection="handleRemoveFromCollection"
+        label="Supplement Products"
       />
-    </div>
-    <div v-else class="ewt-mt-4">
-      <button
-        @click="handleCreateSupplementProductsResource"
-        class="ewt-button ewt-button--primary"
-      >
-        Initialize Supplement Products Resource
-      </button>
+      <div v-if="!swData.supplementProducts.productOptions">
+        <p class="ewt-txt ewt-mb-3">No product selected yet. Please add one.</p>
+        <button
+          @click="handleCreateSupplementProductsResource"
+          class="ewt-button ewt-button--primary"
+        >
+          <i class="fa-solid fa-plus"></i> Initialize Supplement Products
+        </button>
+      </div>
     </div>
   </div>
 </template>

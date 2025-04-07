@@ -1,10 +1,10 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import { useTravelProductConfig } from "../store/useTravelProductConfig";
-import ProductCollectionSelector from "../../shared/components/ProductCollectionSelector.vue";
 import { computed } from "vue";
 import { useSw } from "@/modules/shared/composables/useSw";
 import { notification } from "@shopware-ag/meteor-admin-sdk";
+import ProductOptionsMap from "../components/ProductOptionsMap.vue";
 const { createSwEntity } = useSw();
 const store = useTravelProductConfig();
 const swData = computed(() => storeToRefs(store).dataToEdit.value);
@@ -33,26 +33,13 @@ const handleNewResource = async () => {
       This is the product that will be associated with the travel product
       configuration.
     </p>
-    <div v-if="swData?.productsToApply?.productOptions">
+    <div v-if="swData?.productsToApply">
       >
-      <ProductCollectionSelector
+      <ProductOptionsMap
+        :swData="swData.productsToApply"
+        label="Product Options"
+        :maxLimit="1"
         :minLimit="1"
-        :maxLimit="Infinity"
-        :collection="swData.productsToApply.productOptions"
-        @add-to-collection="
-          (product) => {
-            if (!swData || !swData.productsToApply?.productOptions)
-              throw new Error('Product collection is not defined');
-            swData.productsToApply.productOptions.add(product);
-          }
-        "
-        @remove-from-collection="
-          (id) => {
-            if (!swData || !swData.productsToApply?.productOptions)
-              throw new Error('Product collection is not defined');
-            swData.productsToApply.productOptions.remove(id);
-          }
-        "
       />
     </div>
     <div v-else>

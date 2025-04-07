@@ -2,11 +2,11 @@
 import { storeToRefs } from "pinia";
 import { useTravelProductConfig } from "../store/useTravelProductConfig";
 import { computed } from "vue";
-import ProductCollectionSelector from "../../shared/components/ProductCollectionSelector.vue";
 import { notification } from "@shopware-ag/meteor-admin-sdk";
 import RoomSaleRules from "./RoomSaleRules.vue";
 import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
 import { useSw } from "@/modules/shared/composables/useSw";
+import ProductOptionsMap from "./ProductOptionsMap.vue";
 const { createSwEntity } = useSw();
 const store = useTravelProductConfig();
 const swDatas = computed(() => {
@@ -25,7 +25,9 @@ const handleDeleteResource = async (id: string) => {
     });
   }
 };
-const addRoomProductCollection = async (room: Entity<"ce_room_bundle">) => {
+const handleNewProducOptionsResource = async (
+  room: Entity<"ce_room_bundle">,
+) => {
   const newRoomOption = await createSwEntity("ce_product_options_map");
   if (!newRoomOption) {
     console.error("Failed to create new room option");
@@ -59,52 +61,18 @@ const addSaleRuleToRoomOption = async (room: Entity<"ce_room_bundle">) => {
       </button>
     </div>
 
-    <div v-if="swData.roomProducts?.productOptions" class="ewt-mb-4">
-      <ProductCollectionSelector
-        :collection="swData.roomProducts?.productOptions"
+    <div v-if="swData.roomProducts" class="ewt-mb-4">
+      <ProductOptionsMap
+        :sw-data="swData.roomProducts"
+        :max-limit="Infinity"
         :min-limit="1"
-        :max-limit="5"
-        :label="`Room ${index + 1} Products`"
-        @remove-from-collection="
-          (id) => {
-            try {
-              if (!swData.roomProducts?.productOptions?.remove(id)) {
-                notification.dispatch({
-                  title: 'Error',
-                  message: 'Could not remove product from collection',
-                  appearance: 'notification',
-                });
-              }
-            } catch (e) {
-              notification.dispatch({
-                title: 'Error',
-                message: 'Failed to remove product from collection',
-                appearance: 'notification',
-              });
-            }
-          }
-        "
-        @add-to-collection="
-          async (p) => {
-            if (!p) {
-              notification.dispatch({
-                title: 'Error',
-                message: 'Invalid product data',
-                appearance: 'notification',
-              });
-              return;
-            }
-            if (swData.roomProducts?.productOptions) {
-              swData.roomProducts.productOptions.add(p);
-            }
-          }
-        "
+        label="Room Products"
       />
     </div>
 
     <div v-if="!swData.roomProducts" class="ewt-button-group ewt-mb-4">
       <button
-        @click="addRoomProductCollection(swData)"
+        @click="handleNewProducOptionsResource(swData)"
         class="ewt-button ewt-button--secondary"
       >
         <i class="fa-solid fa-plus"></i>
