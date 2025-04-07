@@ -70,11 +70,11 @@ const transformProductForLogicStatement = (
 };
 </script>
 <template>
-  <div class="ewt-card ewt-flex ewt-flex--between" style="margin-bottom: 2rem">
-    <h3 class="ewt-title" style="margin: 0">Generic Bundles</h3>
+  <div class="ewt-card ewt-flex ewt-flex--between ewt-mb-4">
+    <h3 class="ewt-title ewt-mb-0">Generic Bundles</h3>
     <button
       @click="handleNewGenericBundleResource"
-      class="ewt-btn ewt-btn--secondary"
+      class="ewt-button ewt-button--secondary"
     >
       Add Generic Bundle Resource
     </button>
@@ -87,18 +87,16 @@ const transformProductForLogicStatement = (
     class="generic-bundle-container"
   >
     <div class="generic-bundle-header ewt-flex ewt-flex--between">
-      <h4 class="ewt-title" style="margin: 0; font-size: 1.5rem">
-        Bundle Configuration #{{ index + 1 }}
-      </h4>
+      <h4 class="ewt-title ewt-mb-0">Bundle Configuration #{{ index + 1 }}</h4>
       <button
         @click="handleDeleteResource(swData.id)"
-        class="ewt-btn ewt-btn--danger"
+        class="ewt-button ewt-button--danger"
       >
         Remove Bundle
       </button>
     </div>
     <div class="generic-bundle-content">
-      <div class="ewt-card" style="margin-bottom: 1rem">
+      <div class="ewt-card ewt-mb-3">
         <div v-if="swData.parentProductOptions">
           <ProductOptionsMap
             :label="'Parent Product Options'"
@@ -107,34 +105,38 @@ const transformProductForLogicStatement = (
             :sw-data="swData.parentProductOptions"
           />
         </div>
-        <button
-          @click="
-            async () => {
-              try {
-                const newProductOption = await createSwEntity(
-                  'ce_product_options_map',
-                );
-                if (!newProductOption) {
-                  throw new Error('Failed to create new product option');
+        <div v-else>
+          <p class="ewt-txt ewt-mb-3">
+            No parent product options available. Please add one.
+          </p>
+          <button
+            @click="
+              async () => {
+                try {
+                  const newProductOption = await createSwEntity(
+                    'ce_product_options_map',
+                  );
+                  if (!newProductOption) {
+                    throw new Error('Failed to create new product option');
+                  }
+                  swData.parentProductOptions = newProductOption;
+                } catch (e) {
+                  console.error('Error creating new product option:', e);
+                  notification.dispatch({
+                    title: 'error',
+                    message: 'Failed to create new product option',
+                  });
                 }
-                swData.parentProductOptions = newProductOption;
-              } catch (e) {
-                console.error('Error creating new product option:', e);
-                notification.dispatch({
-                  title: 'error',
-                  message: 'Failed to create new product option',
-                });
               }
-            }
-          "
-          class="ewt-btn ewt-btn--secondary"
-          style="margin-top: 1rem"
-        >
-          Add Parent Product Option
-        </button>
+            "
+            class="ewt-button ewt-button--secondary ewt-mt-3"
+          >
+            Add Parent Product Option
+          </button>
+        </div>
       </div>
 
-      <div class="ewt-card" style="margin-bottom: 1rem">
+      <div class="ewt-card ewt-mb-3">
         <div v-if="swData.genericProductOptions">
           <ProductOptionsMap
             :label="'Generic Product Options'"
@@ -143,33 +145,39 @@ const transformProductForLogicStatement = (
             :sw-data="swData.genericProductOptions"
           />
         </div>
-        <button
-          @click="
-            async () => {
-              try {
-                const newProductOption = await createSwEntity(
-                  'ce_product_options_map',
-                );
-                if (!newProductOption) {
-                  throw new Error('Failed to create new product option');
-                }
-                swData.genericProductOptions = newProductOption;
-              } catch (e) {
-                console.error('Error creating new product option:', e);
-                notification.dispatch({
-                  title: 'error',
-                  message: 'Failed to create new product option',
-                });
-              }
-            }
-          "
-          class="ewt-btn ewt-btn--secondary"
-          style="margin-top: 1rem"
-        >
-          Add Generic Product Option
-        </button>
-      </div>
+        <div v-else>
+          <p class="ewt-txt ewt-mb-3">
+            No generic product options available. Please add one.
+          </p>
 
+          <button
+            @click="
+              async () => {
+                try {
+                  const newProductOption = await createSwEntity(
+                    'ce_product_options_map',
+                  );
+                  if (!newProductOption) {
+                    throw new Error('Failed to create new product option');
+                  }
+                  swData.genericProductOptions = newProductOption;
+                } catch (e) {
+                  console.error('Error creating new product option:', e);
+                  notification.dispatch({
+                    title: 'error',
+                    message: 'Failed to create new product option',
+                  });
+                }
+              }
+            "
+            class="ewt-button ewt-button--secondary ewt-mt-3"
+          >
+            Add Generic Product Option
+          </button>
+        </div>
+      </div>
+      <label class="ewt-form-label">Propaganda Text</label>
+      <p>This is not translateable for now</p>
       <div class="ewt-form-group">
         <input
           type="text"

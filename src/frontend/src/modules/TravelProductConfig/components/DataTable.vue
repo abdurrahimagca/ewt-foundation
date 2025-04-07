@@ -77,9 +77,9 @@ onMounted(async () => {
   <div class="ewt-container">
     <div class="ewt-content">
       <div class="ewt-table-header">
-        <h2 class="ewt-title">Travel Product Configurations</h2>
-        <button class="ewt-button ewt-button--primary" @click="createResource">
-          <i class="fas fa-plus"></i> Create New Resource
+        <h2 class="ewt-card-title">Travel Product Configurations</h2>
+        <button @click="createResource" class="ewt-button ewt-button--primary">
+          <i class="fa-solid fa-plus"></i> Create New Resource
         </button>
       </div>
 
@@ -99,11 +99,17 @@ onMounted(async () => {
             <td class="ewt-product-display">
               <span class="ewt-product-name">
                 {{
-                  item.productsToApply?.productOptions?.first()?.name || "No Product Selected"
+                  item.productsToApply?.productOptions?.first()?.name ||
+                  "No Product Selected"
                 }}
               </span>
             </td>
-            <td>{{ item.productsToApply?.productOptions?.first()?.productNumber || "N/A" }}</td>
+            <td>
+              {{
+                item.productsToApply?.productOptions?.first()?.productNumber ||
+                "N/A"
+              }}
+            </td>
             <td>{{ item.id }}</td>
             <td>
               <span
@@ -124,13 +130,13 @@ onMounted(async () => {
                 class="ewt-button ewt-button--edit"
                 @click="toggleEdit(item.id)"
               >
-                <i class="fas fa-edit"></i> Edit
+                <i class="fa-solid fa-pen"></i> Edit
               </button>
               <button
                 class="ewt-button ewt-button--delete"
                 @click="deleteResource(item.id)"
               >
-                <i class="fas fa-trash"></i> Delete
+                <i class="fa-solid fa-trash"></i> Delete
               </button>
             </td>
           </tr>
@@ -143,7 +149,7 @@ onMounted(async () => {
           :disabled="currentPage === 1"
           @click="changePage(currentPage - 1)"
         >
-          <i class="fas fa-chevron-left"></i> Previous
+          <i class="fa-solid fa-chevron-left"></i> Previous
         </button>
         <span class="ewt-pagination-info">
           Page {{ currentPage }} of {{ totalPages }}
@@ -153,7 +159,7 @@ onMounted(async () => {
           :disabled="currentPage === totalPages"
           @click="changePage(currentPage + 1)"
         >
-          Next <i class="fas fa-chevron-right"></i>
+          Next <i class="fa-solid fa-chevron-right"></i>
         </button>
       </div>
     </div>

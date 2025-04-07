@@ -24,11 +24,47 @@ onMounted(() => {
 <template>
   <div class="ewt-app-container">
     <header class="ewt-app-header">
-      <h3>EWT Foundation App</h3>
+      <div class="ewt-flex ewt-flex--between ewt-flex--center">
+        <div class="ewt-header-nav">
+          <h3>EWT Foundation</h3>
+          <div class="ewt-badge ewt-badge--info">v1.0</div>
+        </div>
+        <div class="ewt-flex ewt-flex--center">
+          <span class="ewt-badge">Admin Dashboard</span>
+        </div>
+      </div>
     </header>
-    <Location v-if="showLocation" />
-    <TravelOrderInfo v-if="showTravelOrder" />
-    <ProductView v-if="showProductView" />
-    <Main v-if="showTravelProductConfig" />
+    <div class="ewt-main-content">
+      <Location v-if="showLocation" />
+      <TravelOrderInfo v-if="showTravelOrder" />
+      <ProductView v-if="showProductView" />
+      <Main v-if="showTravelProductConfig" />
+    </div>
   </div>
 </template>
+
+<style scoped>
+.ewt-app-header-meta {
+  display: flex;
+  align-items: center;
+  gap: 1rem;
+}
+
+.ewt-app-header .ewt-badge {
+  background: rgba(255, 255, 255, 0.15);
+  color: white;
+  backdrop-filter: blur(8px);
+  font-size: 0.85rem;
+  padding: 0.35rem 0.75rem;
+}
+
+.ewt-main-content {
+  flex: 1;
+  padding: 1.5rem;
+}
+
+.ewt-header-nav .ewt-badge {
+  font-size: 0.75rem;
+  margin-left: 0.5rem;
+}
+</style>

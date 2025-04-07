@@ -12,7 +12,19 @@ const store = useTravelProductConfig();
 const swDatas = computed(() => {
   return storeToRefs(store).dataToEdit.value?.hotelBundle?.roomOptions;
 });
-
+const handleDeleteResource = async (id: string) => {
+  try {
+    if (!swDatas.value?.remove(id)) {
+      throw new Error("Failed to remove room option");
+    }
+  } catch (e) {
+    console.error("Error removing room option:", e);
+    notification.dispatch({
+      title: "error",
+      message: "Failed to remove room option",
+    });
+  }
+};
 const addRoomProductCollection = async (room: Entity<"ce_room_bundle">) => {
   const newRoomOption = await createSwEntity("ce_product_options_map");
   if (!newRoomOption) {
@@ -36,25 +48,38 @@ const addSaleRuleToRoomOption = async (room: Entity<"ce_room_bundle">) => {
     :key="swData.id"
     class="ewt-card ewt-card--secondary ewt-mb-4"
   >
-    <h3 class="ewt-heading ewt-heading--h3">Room Option {{ index + 1 }}</h3>
+    <div class="ewt-card-header">
+      <h2 class="ewt-card-title">Room Option {{ index + 1 }}</h2>
+      <button
+        @click="handleDeleteResource(swData.id)"
+        class="ewt-button ewt-button--danger"
+      >
+        <i class="fa-solid fa-trash"></i>
+        Delete Room Option
+      </button>
+    </div>
+
     <div v-if="swData.roomProducts?.productOptions" class="ewt-mb-4">
       <ProductCollectionSelector
         :collection="swData.roomProducts?.productOptions"
         :min-limit="1"
         :max-limit="5"
-        :label="`Room Option ${index + 1} Products`"
+        :label="`Room ${index + 1} Products`"
         @remove-from-collection="
           (id) => {
             try {
               if (!swData.roomProducts?.productOptions?.remove(id)) {
-                console.error('Failed to remove product from collection', id);
+                notification.dispatch({
+                  title: 'Error',
+                  message: 'Could not remove product from collection',
+                  appearance: 'notification',
+                });
               }
             } catch (e) {
               notification.dispatch({
                 title: 'Error',
                 message: 'Failed to remove product from collection',
-                appearance: 'system',
-                variant: 'error',
+                appearance: 'notification',
               });
             }
           }
@@ -62,7 +87,11 @@ const addSaleRuleToRoomOption = async (room: Entity<"ce_room_bundle">) => {
         @add-to-collection="
           async (p) => {
             if (!p) {
-              console.error('Failed to create new product option');
+              notification.dispatch({
+                title: 'Error',
+                message: 'Invalid product data',
+                appearance: 'notification',
+              });
               return;
             }
             if (swData.roomProducts?.productOptions) {
@@ -72,22 +101,33 @@ const addSaleRuleToRoomOption = async (room: Entity<"ce_room_bundle">) => {
         "
       />
     </div>
+
     <div v-if="!swData.roomProducts" class="ewt-button-group ewt-mb-4">
       <button
         @click="addRoomProductCollection(swData)"
         class="ewt-button ewt-button--secondary"
       >
+        <i class="fa-solid fa-plus"></i>
         Initialize Room Products
       </button>
     </div>
+
     <RoomSaleRules v-if="swData.roomSaleRule" :id="swData.id" />
+
     <div v-else class="ewt-button-group">
       <button
         @click="addSaleRuleToRoomOption(swData)"
         class="ewt-button ewt-button--secondary"
       >
+        <i class="fa-solid fa-plus"></i>
         Add Sale Rules
       </button>
     </div>
   </div>
 </template>
+
+<style scoped>
+.ewt-button i {
+  margin-right: 0.5rem;
+}
+</style>

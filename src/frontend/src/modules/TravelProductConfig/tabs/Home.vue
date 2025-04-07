@@ -58,7 +58,7 @@ const handleNewResource = async () => {
     <div v-else>
       <p>No product selected yet</p>
       <button class="ewt-button ewt-button--primary" @click="handleNewResource">
-        <i class="fas fa-plus"></i> Add Product
+        <i class="fa-solid fa-plus"></i> Add Product
       </button>
     </div>
 

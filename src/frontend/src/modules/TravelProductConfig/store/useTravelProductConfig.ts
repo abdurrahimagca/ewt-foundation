@@ -160,6 +160,10 @@ export const useTravelProductConfig = defineStore("travelProductConfig", () => {
       isLoading.value = false;
     }
   };
+  const cancelEdit = () => {
+    dataToEdit.value = null;
+    isEditing.value = false;
+  };
 
   return {
     dataToEdit,
@@ -172,6 +176,7 @@ export const useTravelProductConfig = defineStore("travelProductConfig", () => {
     upsertResource,
     isEditing,
     currentPage,
+    cancelEdit,
     totalCount,
   };
 });
