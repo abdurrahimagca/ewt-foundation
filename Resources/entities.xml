@@ -86,7 +86,7 @@
 
     <entity name="ce_room_bundle">
         <fields>
-            <one-to-many name="room_products" store-api-aware="true" reference="ce_product_options_map" on-delete="set-null"/>
+            <one-to-one name="room_products" store-api-aware="true" reference="ce_product_options_map" on-delete="set-null"/>
             <one-to-one name="room_sale_rule" store-api-aware="true" reference="ce_room_sale_rule" on-delete="set-null"/>
         </fields>
     </entity>

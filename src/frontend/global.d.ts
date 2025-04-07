@@ -9,7 +9,7 @@ declare namespace EntitySchema {
     ce_additional_generic_product_info: ce_additional_generic_product_info;
     ce_travel_product_config: ce_travel_product_config;
     ce_hotel_bundle: ce_hotel_bundle;
-    ce_travel_product_config_room_bundle: ce_travel_product_config_room_bundle;
+    ce_room_bundle: ce_room_bundle;
     ce_room_sale_rule: ce_room_sale_rule;
     ce_room_supplement_rule: ce_room_supplement_rule;
     ce_custom_child_discount: ce_custom_child_discount;
@@ -111,9 +111,9 @@ declare namespace EntitySchema {
     roomOptions: EntityCollection<"ce_room_bundle"> | null;
   }
 
-  interface ce_travel_product_config_room_bundle {
+  interface ce_room_bundle {
     id: string;
-    roomProducts: EntityCollection<"ce_product_options_map"> | null;
+    roomProducts: Entity<"ce_product_options_map"> | null;
     roomSaleRuleId: string | null;
     roomSaleRule: Entity<"ce_room_sale_rule"> | null;
   }
@@ -124,12 +124,12 @@ declare namespace EntitySchema {
     maxAdults: number | null;
     minChildren: number | null;
     maxChildren: number | null;
-    childrenStartAge: number    | null;
-    childrenEndAge: number  | null;
-    minInfants: number  | null;
-    maxInfants: number  | null;
+    childrenStartAge: number | null;
+    childrenEndAge: number | null;
+    minInfants: number | null;
+    maxInfants: number | null;
     maxTotalPersons: number | null;
-    allowPets: boolean  | null;
+    allowPets: boolean | null;
     supplementRuleId: string | null;
     supplementRule: Entity<"ce_room_supplement_rule"> | null;
   }
@@ -165,6 +165,22 @@ declare namespace EntitySchema {
     genericProductOptionsId: string | null;
     parentProductOptions: Entity<"ce_product_options_map"> | null;
     genericProductOptions: Entity<"ce_product_options_map"> | null;
+  }
+  /*<entity name="ce_date_configurator">
+    <fields>
+    <date name="accept_from" store-api-aware="true" />
+    <date name="accept_to" store-api-aware="true" />
+    <int name="max_days" store-api-aware="true" />
+    <int name="min_days" store-api-aware="true" /> 
+</fields>
+
+
+</entity>*/
+  interface ce_date_configurator {
+    acceptFrom: string;
+    acceptTo: string;
+    maxDays: number;
+    minDays: number;
   }
   interface ce_product_options_map {
     id: string;

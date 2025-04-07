@@ -7,6 +7,8 @@ import { ref, computed } from "vue";
 import { useTravelProductConfig } from "./store/useTravelProductConfig";
 import { storeToRefs } from "pinia";
 import DataTable from "./components/DataTable.vue";
+import DateConfigurator from "./tabs/DateConfigurator.vue";
+import ChildDiscount from "./components/ChildDiscount.vue";
 const store = useTravelProductConfig();
 const isEditMode = storeToRefs(store).isEditing;
 const isLoading = storeToRefs(store).isLoading;
@@ -28,6 +30,18 @@ const tabs = [
     component: GenericBundle,
     label: "Generic Bundle",
     icon: "mdi-package-variant-closed",
+  },
+  {
+    name: "dateConfigurator",
+    component: DateConfigurator,
+    label: "Date Configurator",
+    icon: "mdi-calendar-range",
+  },
+  {
+    name: "childDiscount",
+    component: ChildDiscount,
+    label: "Child Discount",
+    icon: "mdi-account-child",
   },
 ];
 

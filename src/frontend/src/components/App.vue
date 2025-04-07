@@ -4,7 +4,6 @@ import { location } from "@shopware-ag/meteor-admin-sdk";
 import Location from "./Location.vue";
 import TravelOrderInfo from "./TravelOrderInfo.vue";
 import ProductView from "./TravelProductBundle.vue";
-import TravelProductConfigMain from "./newTravelProductConfig/TravelProductConfigMain.vue";
 const showTravelOrder = ref(false);
 const showLocation = ref(false);
 const showProductView = ref(false);

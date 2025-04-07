@@ -256,8 +256,9 @@ const transformProductForLogicStatement = (
       </div>
 
       <label class="ewt-form-label">Availability Operator</label>
+      <h2 style="color: red;">EXPREMENTIAL DO NOT USE NOW</h2>
       <div class="ewt-checkbox-group">
-        <p style="color: red">expremential its not effects anything for now</p>
+       
         <ParentOperator
           :products="
             transformProductForLogicStatement(
