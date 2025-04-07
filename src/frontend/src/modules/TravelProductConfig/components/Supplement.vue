@@ -1,41 +1,53 @@
 <script setup lang="ts">
-import ProductCollectionSelector from "../../../modules/shared/ProductCollectionSelector.vue";
+import ProductCollectionSelector from "../../shared/components/ProductCollectionSelector.vue";
 import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
-
+import { useSw } from "@/modules/shared/composables/useSw";
+const {createSwEntity } = useSw();
 const props = defineProps<{
-  swData: Entity<"ce_room_supplement_rule">;
+  id: string;
 }>();
 import { useTravelProductConfig } from "../store/useTravelProductConfig";
+import { computed } from "vue";
+import { storeToRefs } from "pinia";
+import { notification } from "@shopware-ag/meteor-admin-sdk";
 const store = useTravelProductConfig();
-const handleAddToCollection = async (product: any) => {
+const swData = computed(() => {
+  return storeToRefs(store).dataToEdit.value?.hotelBundle?.roomOptions?.get(
+    props.id,
+  )?.roomSaleRule?.supplementRule;
+});
+const handleAddToCollection = async (product: Entity<"product">) => {
   try {
-    if (!props.swData.supplementProducts?.productOptions) {
+    if (!swData.value || !swData.value.supplementProducts?.productOptions) {
       throw new Error("Failed to add product to collection");
     }
-    props.swData.supplementProducts.productOptions.add(product);
+    swData.value.supplementProducts.productOptions.add(product);
   } catch (e) {
     console.error("Error adding product to collection:", e);
   }
 };
 const handleCreateSupplementProductsResource = async () => {
   try {
-    const newSupplementProducts = await store.createFreshEntity(
-      "ce_product_options_map",
-    );
+    if(!swData.value) throw new Error("Could not create new resource")
+    const newSupplementProducts = await createSwEntity("ce_product_options_map");
     if (!newSupplementProducts) {
       throw new Error("Failed to create new supplement products");
     }
-    props.swData.supplementProducts = newSupplementProducts;
+    swData.value.supplementProducts = newSupplementProducts;
   } catch (e) {
     console.error("Error creating supplement products resource:", e);
+    notification.dispatch({
+      "title":"Error",
+      "message": "Could not create resoruce"
+    })
   }
 };
 const handleRemoveFromCollection = async (id: string) => {
   try {
-    if (!props.swData.supplementProducts?.productOptions) {
+    if (!swData.value || !swData.value.supplementProducts?.productOptions) {
       throw new Error("Failed to remove product from collection");
     }
-    if (!props.swData.supplementProducts.productOptions.remove(id)) {
+    if (!swData.value.supplementProducts.productOptions.remove(id)) {
       throw new Error("Failed to remove product from collection");
     }
   } catch (e) {

@@ -3,12 +3,14 @@ import { computed } from "vue";
 import { useTravelProductConfig } from "../store/useTravelProductConfig";
 import { storeToRefs } from "pinia";
 const store = useTravelProductConfig();
+import { useSw } from "@/modules/shared/composables/useSw";
+const {createSwEntity} = useSw();
 const swData = computed(() => {
   return storeToRefs(store).dataToEdit.value?.childDiscount;
 });
 const handleNewResource = async () => {
   try {
-    const n = await store.createFreshEntity("ce_custom_child_discount");
+    const n = await createSwEntity("ce_custom_child_discount");
     if (!n || !store.dataToEdit) {
       console.error("Failed to create new child discount resource");
       return;

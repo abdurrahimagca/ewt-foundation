@@ -1,22 +1,37 @@
 <script setup lang="ts">
 import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
 import Supplement from "./Supplement.vue";
-import { data } from "@shopware-ag/meteor-admin-sdk";
+import { useSw } from "@/modules/shared/composables/useSw";
 
+const { createSwEntity } = useSw();
 const props = defineProps<{
-  swData: Entity<"ce_room_sale_rule">;
+  id: string;
 }>();
+const swData = computed(() => {
+  return storeToRefs(store).dataToEdit.value?.hotelBundle?.roomOptions?.get(
+    props.id,
+  )?.roomSaleRule;
+});
 import { useTravelProductConfig } from "../store/useTravelProductConfig";
+import { computed } from "vue";
+import { storeToRefs } from "pinia";
+import { notification } from "@shopware-ag/meteor-admin-sdk";
 const store = useTravelProductConfig();
 async function handleCreateSupplementRuleResource() {
-  const newSupplementRule = await store.createFreshEntity(
-    "ce_room_supplement_rule",
-  );
-  if (newSupplementRule === null) {
-    throw new Error("Could not create new supplement rule");
+  try {
+    if (!swData.value) throw new Error("SwData is null");
+    const newSupplementRule = await createSwEntity("ce_room_supplement_rule");
+    if (newSupplementRule === null) {
+      throw new Error("Could not create new supplement rule");
+    }
+    swData.value.supplementRule = newSupplementRule;
+  } catch (e) {
+    console.log(e);
+    notification.dispatch({
+      title: "Error",
+      message: "Couldnt create Resoruce",
+    });
   }
-
-  props.swData.supplementRule = newSupplementRule;
 }
 </script>
 <template>
@@ -147,7 +162,7 @@ async function handleCreateSupplementRuleResource() {
       </div>
     </div>
     <div v-if="swData.supplementRule">
-      <Supplement :sw-data="swData.supplementRule" />
+      <Supplement :id="props.id" />
     </div>
     <div v-else>
       <button

@@ -1,20 +1,13 @@
 <script setup lang="ts">
-/*<entity name="ce_date_configurator">
-    <fields>
-    <date name="accept_from" store-api-aware="true" />
-    <date name="accept_to" store-api-aware="true" />
-    <int name="max_days" store-api-aware="true" />
-    <int name="min_days" store-api-aware="true" />
-</fields>
-</entity>*/
+
 
 import { computed } from "vue";
 import { useTravelProductConfig } from "../store/useTravelProductConfig";
 import { storeToRefs } from "pinia";
 import { notification } from "@shopware-ag/meteor-admin-sdk";
-
+import { useSw } from "@/modules/shared/composables/useSw";
+const { createSwEntity } = useSw();
 const store = useTravelProductConfig();
-
 // Format date for Turkish display (DD/MM/YYYY)
 const formatDateTurkish = (isoDate: string | null) => {
   if (!isoDate) return "";
@@ -25,8 +18,6 @@ const formatDateTurkish = (isoDate: string | null) => {
     year: "numeric",
   });
 };
-
-// Format date for input field (YYYY-MM-DD)
 const formatDateForInput = (isoDate: string | null) => {
   if (!isoDate) return "";
   return new Date(isoDate).toISOString().split("T")[0];
@@ -56,7 +47,7 @@ const acceptTo = computed({
 
 const handleNewResource = async () => {
   try {
-    const n = await store.createFreshEntity("ce_date_configurator");
+    const n = await createSwEntity("ce_date_configurator");
     if (!n || !store.dataToEdit) {
       throw new Error("Failed to create resource expection");
     }

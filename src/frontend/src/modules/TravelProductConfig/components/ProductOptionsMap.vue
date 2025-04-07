@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
-import ProductCollectionSelector from "../../../modules/shared/ProductCollectionSelector.vue";
+import ProductCollectionSelector from "../../shared/components/ProductCollectionSelector.vue";
 import { notification } from "@shopware-ag/meteor-admin-sdk";
 const props = defineProps<{
   swData: Entity<"ce_product_options_map">;

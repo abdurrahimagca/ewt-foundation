@@ -6,13 +6,14 @@ const store = useTravelProductConfig();
 import { storeToRefs } from "pinia";
 import { computed } from "vue";
 import RoomBundle from "../components/RoomBundle.vue";
-
+import { useSw } from "@/modules/shared/composables/useSw";
+const {createSwEntity } = useSw();
 const swData = computed(() => {
   return storeToRefs(store).dataToEdit.value?.hotelBundle;
 });
 const handleCreateRoomBundleResource = async () => {
   try {
-    const newEntity = await store.createFreshEntity("ce_room_bundle");
+    const newEntity = await createSwEntity("ce_room_bundle");
     if (!newEntity) {
       console.error("Failed to create new room bundle");
       return;
@@ -36,7 +37,7 @@ const handleCreateRoomBundleResource = async () => {
 
 const handleCreateHotelBundle = async () => {
   try {
-    const newEntity = await store.createFreshEntity("ce_hotel_bundle");
+    const newEntity = await createSwEntity("ce_hotel_bundle");
     if (!newEntity) {
       console.error("Failed to create new hotel bundle");
       return;

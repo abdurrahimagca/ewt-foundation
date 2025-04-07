@@ -2,18 +2,19 @@
 import { storeToRefs } from "pinia";
 import { useTravelProductConfig } from "../store/useTravelProductConfig";
 import { computed } from "vue";
-import ProductCollectionSelector from "../../shared/ProductCollectionSelector.vue";
+import ProductCollectionSelector from "../../shared/components/ProductCollectionSelector.vue";
 import { notification } from "@shopware-ag/meteor-admin-sdk";
 import RoomSaleRules from "./RoomSaleRules.vue";
 import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
-
+import { useSw } from "@/modules/shared/composables/useSw";
+const { createSwEntity } = useSw();
 const store = useTravelProductConfig();
 const swDatas = computed(() => {
   return storeToRefs(store).dataToEdit.value?.hotelBundle?.roomOptions;
 });
 
 const addRoomProductCollection = async (room: Entity<"ce_room_bundle">) => {
-  const newRoomOption = await store.createFreshEntity("ce_product_options_map");
+  const newRoomOption = await createSwEntity("ce_product_options_map");
   if (!newRoomOption) {
     console.error("Failed to create new room option");
     return;
@@ -21,7 +22,7 @@ const addRoomProductCollection = async (room: Entity<"ce_room_bundle">) => {
   room.roomProducts = newRoomOption;
 };
 const addSaleRuleToRoomOption = async (room: Entity<"ce_room_bundle">) => {
-  const newRoomSaleRule = await store.createFreshEntity("ce_room_sale_rule");
+  const newRoomSaleRule = await createSwEntity("ce_room_sale_rule");
   if (!newRoomSaleRule) {
     console.error("Failed to create new room sale rule");
     return;
@@ -79,7 +80,7 @@ const addSaleRuleToRoomOption = async (room: Entity<"ce_room_bundle">) => {
         Initialize Room Products
       </button>
     </div>
-    <RoomSaleRules v-if="swData.roomSaleRule" :swData="swData.roomSaleRule" />
+    <RoomSaleRules v-if="swData.roomSaleRule" :id="swData.id" />
     <div v-else class="ewt-button-group">
       <button
         @click="addSaleRuleToRoomOption(swData)"

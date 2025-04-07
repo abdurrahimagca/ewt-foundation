@@ -1,23 +1,28 @@
 <script setup lang="ts">
-/* interface ce_travel_product_config {
-    id: string;
-    productId: string | null;
-    product: Entity<"product"> | null;
-    hotelBundleId: string | null;
-    hotelBundle: Entity<"ce_hotel_bundle"> | null;
-    childDiscountId: string | null;
-    childDiscount: Entity<"ce_custom_child_discount"> | null;
-    genericBundles: EntityCollection<"ce_generic_bundle"> | null; 
-    dateConfiguratorId: string | null;
-    dateConfigurator: Entity<"ce_date_configurator"> | null;
-  }*/
-
 import { storeToRefs } from "pinia";
 import { useTravelProductConfig } from "../store/useTravelProductConfig";
-import ProductCollectionSelector from "../../shared/ProductCollectionSelector.vue";
-
+import ProductCollectionSelector from "../../shared/components/ProductCollectionSelector.vue";
+import { computed } from "vue";
+import { useSw } from "@/modules/shared/composables/useSw";
+import { notification } from "@shopware-ag/meteor-admin-sdk";
+const { createSwEntity } = useSw();
 const store = useTravelProductConfig();
-const swData = storeToRefs(store).dataToEdit;
+const swData = computed(() => storeToRefs(store).dataToEdit.value);
+
+const handleNewResource = async () => {
+  try {
+    if (!swData.value) throw new Error("swData is not defined");
+    const n = await createSwEntity("ce_product_options_map");
+    if (!n) throw new Error("Failed to create new product");
+    swData.value.productsToApply = n;
+  } catch (e) {
+    console.error("Error creating new resource:", e);
+    notification.dispatch({
+      title: "error",
+      message: "Failed to create new resource",
+    });
+  }
+};
 </script>
 
 <template>
@@ -34,19 +39,17 @@ const swData = storeToRefs(store).dataToEdit;
         :minLimit="1"
         :maxLimit="Infinity"
         :collection="swData.productsToApply.productOptions"
-        @addToCollection="
+        @add-to-collection="
           (product) => {
-            if (!swData || !swData.productsToApply?.productOptions) {
+            if (!swData || !swData.productsToApply?.productOptions)
               throw new Error('Product collection is not defined');
-            }
             swData.productsToApply.productOptions.add(product);
           }
         "
-        @removeFromCollection="
+        @remove-from-collection="
           (id) => {
-            if (!swData || !swData.productsToApply?.productOptions) {
+            if (!swData || !swData.productsToApply?.productOptions)
               throw new Error('Product collection is not defined');
-            }
             swData.productsToApply.productOptions.remove(id);
           }
         "
@@ -54,22 +57,7 @@ const swData = storeToRefs(store).dataToEdit;
     </div>
     <div v-else>
       <p>No product selected yet</p>
-      <button
-        class="ewt-button ewt-button--primary"
-        @click="
-          async () => {
-            if (!swData) {
-              throw new Error('swData is not defined');
-            }
-            const n = await store.createFreshEntity('ce_product_options_map');
-            if (!n) {
-              throw new Error('Failed to create new product');
-            }
-
-            swData.productsToApply = n;
-          }
-        "
-      >
+      <button class="ewt-button ewt-button--primary" @click="handleNewResource">
         <i class="fas fa-plus"></i> Add Product
       </button>
     </div>

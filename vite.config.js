@@ -1,13 +1,19 @@
 import { defineConfig } from "vite";
 import vue from "@vitejs/plugin-vue";
+import path from "path";
 
 export default defineConfig({
   plugins: [vue()],
   root: "./src/frontend",
+  resolve: {
+    alias: {
+      "@": path.resolve(__dirname, "./src/frontend/src"),
+    },
+  },
   build: {
     outDir: "../../dist/frontend",
     assetsDir: "assets",
-    emptyOutDir: true, 
+    emptyOutDir: true,
     rollupOptions: {
       output: {
         assetFileNames: "assets/[name]-[hash][extname]",
@@ -16,5 +22,5 @@ export default defineConfig({
       },
     },
   },
-  base: "/public/frontend/", 
+  base: "/public/frontend/",
 });

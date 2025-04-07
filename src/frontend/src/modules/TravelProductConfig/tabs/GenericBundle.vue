@@ -2,59 +2,50 @@
 import { storeToRefs } from "pinia";
 import { useTravelProductConfig } from "../store/useTravelProductConfig";
 import ProductOptionsMap from "../components/ProductOptionsMap.vue";
-import { z } from "zod";
-import ParentOperator from "../../shared/ParentOperator.vue";
+import ParentOperator from "../../shared/components/ParentOperator.vue";
 import { computed } from "vue";
 import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
 import EntityCollection from "@shopware-ag/meteor-admin-sdk/es/_internals/data/EntityCollection";
-/*interface ce_generic_bundle {
-    id: string;
-    ceTravelProductConfigGenericBundlesId: string | null;
-    availableOnMinParentQuantity: number | null;
-    availableOnMaxParentQuantity: number | null;
-    availableOnMinTravellers: number | null;
-    availableOnMaxTravellers: number | null;
-    availabilityOperator: Record<string, unknown> | null;
-    matchParentQuantity: boolean | null;
-    matchTravellers: boolean | null;
-    isRequired: boolean | null;
-    allowMultipleSelection: boolean | null;
-    propagandaText: string | null;
-    parentProductOptions: EntityCollection<"ce_product_options_map">;
-    genericProductOptions: EntityCollection<"ce_product_options_map">;
-  }
-  interface ce_product_options_map {
-    id: string;
-    productOptionId: string | null;
-    equivalentProductId: string | null;
-    productOption: Entity<"product"> | null;
-    equivalentProduct: Entity<"product"> | null;
-    ceGenericBundleParentProductsId: string | null;
-    ceGenericBundleProductOptionsId: string | null;
-    ceRoomBundleRoomProductsId: string | null;
-    ceRoomSupplementRuleSupplementProductsId: string | null;
-  }*/
+import { useSw } from "@/modules/shared/composables/useSw";
+import { notification } from "@shopware-ag/meteor-admin-sdk";
+const { createSwEntity } = useSw();
 
-const addGenericBundle = async () => {
-  const newGenericBundle = await store.createFreshEntity("ce_generic_bundle");
-  if (!newGenericBundle) {
-    console.error("Failed to create new generic bundle");
-    return;
-  }
-  newGenericBundle.availableOnMinTravellers = 1;
-  swDatas?.add(newGenericBundle);
-};
-const removeGenericBundle = async (id: string) => {
+const handleNewGenericBundleResource = async () => {
   try {
-    if (!swDatas?.remove(id)) {
+    if (!swDatas.value) {
+      throw new Error("swDatas is not defined");
+    }
+    const newGenericBundle = await createSwEntity("ce_generic_bundle");
+    if (!newGenericBundle) {
+      throw new Error("Failed to create new generic bundle");
+    }
+    newGenericBundle.availableOnMinTravellers = 1;
+    swDatas.value.add(newGenericBundle);
+  } catch (e) {
+    console.error("Error creating new resource:", e);
+    notification.dispatch({
+      title: "error",
+      message: "Failed to create new resource",
+    });
+  }
+};
+const handleDeleteResource = async (id: string) => {
+  try {
+    if (!swDatas.value?.remove(id)) {
       throw new Error("Failed to remove generic bundle");
     }
   } catch (e) {
     console.error("Error removing generic bundle:", e);
+    notification.dispatch({
+      title: "error",
+      message: "Failed to remove generic bundle",
+    });
   }
 };
 const store = useTravelProductConfig();
-const swDatas = storeToRefs(store).dataToEdit.value?.genericBundles;
+const swDatas = computed(
+  () => storeToRefs(store).dataToEdit.value?.genericBundles,
+);
 
 const transformProductForLogicStatement = (
   p: EntityCollection<"product"> | undefined | null,
@@ -81,7 +72,10 @@ const transformProductForLogicStatement = (
 <template>
   <div class="ewt-card ewt-flex ewt-flex--between" style="margin-bottom: 2rem">
     <h3 class="ewt-title" style="margin: 0">Generic Bundles</h3>
-    <button @click="addGenericBundle" class="ewt-btn ewt-btn--secondary">
+    <button
+      @click="handleNewGenericBundleResource"
+      class="ewt-btn ewt-btn--secondary"
+    >
       Add Generic Bundle Resource
     </button>
   </div>
@@ -97,7 +91,7 @@ const transformProductForLogicStatement = (
         Bundle Configuration #{{ index + 1 }}
       </h4>
       <button
-        @click="removeGenericBundle(swData.id)"
+        @click="handleDeleteResource(swData.id)"
         class="ewt-btn ewt-btn--danger"
       >
         Remove Bundle
@@ -116,14 +110,21 @@ const transformProductForLogicStatement = (
         <button
           @click="
             async () => {
-              const newProductOption = await store.createFreshEntity(
-                'ce_product_options_map',
-              );
-              if (!newProductOption) {
-                console.error('Failed to create new product option');
-                return;
+              try {
+                const newProductOption = await createSwEntity(
+                  'ce_product_options_map',
+                );
+                if (!newProductOption) {
+                  throw new Error('Failed to create new product option');
+                }
+                swData.parentProductOptions = newProductOption;
+              } catch (e) {
+                console.error('Error creating new product option:', e);
+                notification.dispatch({
+                  title: 'error',
+                  message: 'Failed to create new product option',
+                });
               }
-              swData.parentProductOptions = newProductOption;
             }
           "
           class="ewt-btn ewt-btn--secondary"
@@ -145,14 +146,21 @@ const transformProductForLogicStatement = (
         <button
           @click="
             async () => {
-              const newProductOption = await store.createFreshEntity(
-                'ce_product_options_map',
-              );
-              if (!newProductOption) {
-                console.error('Failed to create new product option');
-                return;
+              try {
+                const newProductOption = await createSwEntity(
+                  'ce_product_options_map',
+                );
+                if (!newProductOption) {
+                  throw new Error('Failed to create new product option');
+                }
+                swData.genericProductOptions = newProductOption;
+              } catch (e) {
+                console.error('Error creating new product option:', e);
+                notification.dispatch({
+                  title: 'error',
+                  message: 'Failed to create new product option',
+                });
               }
-              swData.genericProductOptions = newProductOption;
             }
           "
           class="ewt-btn ewt-btn--secondary"
@@ -256,9 +264,8 @@ const transformProductForLogicStatement = (
       </div>
 
       <label class="ewt-form-label">Availability Operator</label>
-      <h2 style="color: red;">EXPREMENTIAL DO NOT USE NOW</h2>
+      <h2 style="color: red">EXPREMENTIAL DO NOT USE NOW</h2>
       <div class="ewt-checkbox-group">
-       
         <ParentOperator
           :products="
             transformProductForLogicStatement(
