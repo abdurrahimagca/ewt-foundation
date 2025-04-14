@@ -35,6 +35,7 @@ export function useSw() {
     key: T,
   ): Promise<Entity<T> | null> {
     const entity = data.repository(key).create();
+
     return entity;
   }
   async function saveSwEntityCollection<T extends keyof EntitySchema.Entities>(

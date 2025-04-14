@@ -2,27 +2,10 @@
 import { storeToRefs } from "pinia";
 import { useTravelProductConfig } from "../store/useTravelProductConfig";
 import { computed } from "vue";
-import { useSw } from "@/modules/shared/composables/useSw";
-import { notification } from "@shopware-ag/meteor-admin-sdk";
-import ProductOptionsMap from "../components/ProductOptionsMap.vue";
-const { createSwEntity } = useSw();
+import ProductCollectionSelector from "@/modules/shared/components/ProductCollectionSelector.vue";
+
 const store = useTravelProductConfig();
 const swData = computed(() => storeToRefs(store).dataToEdit.value);
-
-const handleNewResource = async () => {
-  try {
-    if (!swData.value) throw new Error("swData is not defined");
-    const n = await createSwEntity("ce_product_options_map");
-    if (!n) throw new Error("Failed to create new product");
-    swData.value.productsToApply = n;
-  } catch (e) {
-    console.error("Error creating new resource:", e);
-    notification.dispatch({
-      title: "error",
-      message: "Failed to create new resource",
-    });
-  }
-};
 </script>
 
 <template>
@@ -35,18 +18,11 @@ const handleNewResource = async () => {
     </p>
     <div v-if="swData?.productsToApply">
       >
-      <ProductOptionsMap
-        :swData="swData.productsToApply"
-        label="Product Options"
-        :maxLimit="1"
-        :minLimit="1"
+      <ProductCollectionSelector
+        v-model="swData.productsToApply"
+        :maxLimit="Infinity"
+        :minLimit="0"
       />
-    </div>
-    <div v-else>
-      <p>No product selected yet</p>
-      <button class="ewt-button ewt-button--primary" @click="handleNewResource">
-        <i class="fa-solid fa-plus"></i> Add Product
-      </button>
     </div>
 
     <div class="ewt-grid ewt-grid--2">

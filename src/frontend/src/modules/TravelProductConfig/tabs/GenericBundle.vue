@@ -1,31 +1,41 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import { useTravelProductConfig } from "../store/useTravelProductConfig";
-import ProductOptionsMap from "../components/ProductOptionsMap.vue";
 import ParentOperator from "../../shared/components/ParentOperator.vue";
-import { computed } from "vue";
+import { computed, toRaw } from "vue";
 import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
-import EntityCollection from "@shopware-ag/meteor-admin-sdk/es/_internals/data/EntityCollection";
+import EntityCollection, {
+  ApiContext,
+} from "@shopware-ag/meteor-admin-sdk/es/_internals/data/EntityCollection";
 import { useSw } from "@/modules/shared/composables/useSw";
-import { notification } from "@shopware-ag/meteor-admin-sdk";
-const { createSwEntity } = useSw();
+import { notification, data } from "@shopware-ag/meteor-admin-sdk"; // Import data
+import ProductCollectionSelector from "@/modules/shared/components/ProductCollectionSelector.vue";
+const { createSwEntity, saveSwEntity } = useSw();
+const store = useTravelProductConfig();
+const swDatas = computed(
+  () => storeToRefs(store).dataToEdit.value?.genericBundles,
+);
 
 const handleNewGenericBundleResource = async () => {
   try {
-    if (!swDatas.value) {
-      throw new Error("swDatas is not defined");
+    if (!swDatas.value || !store?.dataToEdit?.id) {
+      throw new Error("swDatas (genericBundles collection) is not defined");
     }
     const newGenericBundle = await createSwEntity("ce_generic_bundle");
     if (!newGenericBundle) {
       throw new Error("Failed to create new generic bundle");
     }
+
     newGenericBundle.availableOnMinTravellers = 1;
-    swDatas.value.add(newGenericBundle);
+    newGenericBundle.ceTravelProductConfigGenericBundlesId =
+      store.dataToEdit.id;
+    await saveSwEntity("ce_generic_bundle", newGenericBundle);
+    await store.reFetchResource();
   } catch (e) {
     console.error("Error creating new resource:", e);
     notification.dispatch({
       title: "error",
-      message: "Failed to create new resource",
+      message: e instanceof Error ? e.message : "Failed to create new resource",
     });
   }
 };
@@ -42,10 +52,21 @@ const handleDeleteResource = async (id: string) => {
     });
   }
 };
-const store = useTravelProductConfig();
-const swDatas = computed(
-  () => storeToRefs(store).dataToEdit.value?.genericBundles,
-);
+const handleSaveBundle = async (bundle: Entity<"ce_generic_bundle">) => {
+  const d = toRaw(bundle);
+  try {
+    await saveSwEntity("ce_generic_bundle", d);
+  } catch (e) {
+    console.error("Error saving bundle:", e);
+    console.log(d);
+    console.log(typeof d);
+    console.log(JSON.stringify(d, null, 2));
+    notification.dispatch({
+      title: "error",
+      message: "Failed to save bundle",
+    });
+  }
+};
 
 const transformProductForLogicStatement = (
   p: EntityCollection<"product"> | undefined | null,
@@ -95,85 +116,29 @@ const transformProductForLogicStatement = (
         Remove Bundle
       </button>
     </div>
+    <div>
+      <button @click="handleSaveBundle(swData)">Save Bundle</button>
+    </div>
     <div class="generic-bundle-content">
       <div class="ewt-card ewt-mb-3">
         <div v-if="swData.parentProductOptions">
-          <ProductOptionsMap
+          <ProductCollectionSelector
+            v-model="swData.parentProductOptions"
             :label="'Parent Product Options'"
             :max-limit="20"
             :min-limit="1"
-            :sw-data="swData.parentProductOptions"
           />
-        </div>
-        <div v-else>
-          <p class="ewt-txt ewt-mb-3">
-            No parent product options available. Please add one.
-          </p>
-          <button
-            @click="
-              async () => {
-                try {
-                  const newProductOption = await createSwEntity(
-                    'ce_product_options_map',
-                  );
-                  if (!newProductOption) {
-                    throw new Error('Failed to create new product option');
-                  }
-                  swData.parentProductOptions = newProductOption;
-                } catch (e) {
-                  console.error('Error creating new product option:', e);
-                  notification.dispatch({
-                    title: 'error',
-                    message: 'Failed to create new product option',
-                  });
-                }
-              }
-            "
-            class="ewt-button ewt-button--secondary ewt-mt-3"
-          >
-            Add Parent Product Option
-          </button>
         </div>
       </div>
 
       <div class="ewt-card ewt-mb-3">
         <div v-if="swData.genericProductOptions">
-          <ProductOptionsMap
+          <ProductCollectionSelector
+            v-model="swData.genericProductOptions"
             :label="'Generic Product Options'"
             :max-limit="20"
             :min-limit="1"
-            :sw-data="swData.genericProductOptions"
           />
-        </div>
-        <div v-else>
-          <p class="ewt-txt ewt-mb-3">
-            No generic product options available. Please add one.
-          </p>
-
-          <button
-            @click="
-              async () => {
-                try {
-                  const newProductOption = await createSwEntity(
-                    'ce_product_options_map',
-                  );
-                  if (!newProductOption) {
-                    throw new Error('Failed to create new product option');
-                  }
-                  swData.genericProductOptions = newProductOption;
-                } catch (e) {
-                  console.error('Error creating new product option:', e);
-                  notification.dispatch({
-                    title: 'error',
-                    message: 'Failed to create new product option',
-                  });
-                }
-              }
-            "
-            class="ewt-button ewt-button--secondary ewt-mt-3"
-          >
-            Add Generic Product Option
-          </button>
         </div>
       </div>
       <label class="ewt-form-label">Propaganda Text</label>
@@ -277,7 +242,7 @@ const transformProductForLogicStatement = (
         <ParentOperator
           :products="
             transformProductForLogicStatement(
-              swData?.parentProductOptions?.productOptions || null,
+              swData?.parentProductOptions || null,
             )
           "
         />

@@ -15,7 +15,6 @@ declare namespace EntitySchema {
     ce_custom_child_discount: ce_custom_child_discount;
     ce_generic_bundle: ce_generic_bundle;
     ce_generic_bundle_product: ce_generic_bundle_product;
-    ce_product_options_map: ce_product_options_map;
     ce_date_configurator: ce_date_configurator;
   }
 
@@ -90,7 +89,7 @@ declare namespace EntitySchema {
   //***product config */
 
   interface ce_travel_product_config {
-    productsToApply: Entity<"ce_product_options_map"> | null;
+    productsToApply: EntityCollection<"product"> | null;
     hotelBundleId: string | null;
     hotelBundle: Entity<"ce_hotel_bundle"> | null;
     childDiscountId: string | null;
@@ -113,7 +112,7 @@ declare namespace EntitySchema {
 
   interface ce_room_bundle {
     id: string;
-    roomProducts: Entity<"ce_product_options_map"> | null;
+    roomProducts: EntityCollection<"product"> | null;
     roomSaleRuleId: string | null;
     roomSaleRule: Entity<"ce_room_sale_rule"> | null;
   }
@@ -139,7 +138,7 @@ declare namespace EntitySchema {
     applyIfAdults: number | null;
     applyIfChildren: number | null;
     applyIfInfants: number | null;
-    supplementProducts: Entity<"ce_product_options_map"> | null;
+    supplementProducts: EntityCollection<"product"> | null;
   }
 
   interface ce_custom_child_discount {
@@ -161,10 +160,8 @@ declare namespace EntitySchema {
     isRequired: boolean | null;
     allowMultipleSelection: boolean | null;
     propagandaText: string | null;
-    parentProductOptionsId: string | null;
-    genericProductOptionsId: string | null;
-    parentProductOptions: Entity<"ce_product_options_map"> | null;
-    genericProductOptions: Entity<"ce_product_options_map"> | null;
+    parentProductOptions: EntityCollection<"product"> | null;
+    genericProductOptions: EntityCollection<"product"> | null;
   }
   /*<entity name="ce_date_configurator">
     <fields>
@@ -181,13 +178,5 @@ declare namespace EntitySchema {
     acceptTo: string;
     maxDays: number;
     minDays: number;
-  }
-  interface ce_product_options_map {
-    id: string;
-    productOptions: EntityCollection<"product"> | null;
-    ceGenericBundleParentProductsId: string | null;
-    ceGenericBundleProductOptionsId: string | null;
-    ceRoomBundleRoomProductsId: string | null;
-    ceRoomSupplementRuleSupplementProductsId: string | null;
   }
 }

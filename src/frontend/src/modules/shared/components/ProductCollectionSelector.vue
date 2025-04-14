@@ -3,18 +3,15 @@ import { data, notification } from "@shopware-ag/meteor-admin-sdk";
 import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
 import EntityCollection from "@shopware-ag/meteor-admin-sdk/es/_internals/data/EntityCollection";
 import { defineProps, ref, watch, defineEmits, onMounted } from "vue";
+import { useSw } from "../composables/useSw";
+
+const { saveSwEntityCollection } = useSw();
 
 const props = defineProps<{
-  collection: EntityCollection<"product">;
   maxLimit: number;
   minLimit: number;
 }>();
-
-const emit = defineEmits<{
-  (e: "removeFromCollection", id: string): void;
-  (e: "addToCollection", p: Entity<"product">): void;
-  (e: "commitChanges"): void;
-}>();
+const model = defineModel<EntityCollection<"product">>({ required: true });
 
 const nameToSearch = ref<string | null | undefined>(undefined);
 const selecteds = ref<Entity<"product">[]>([]);
@@ -24,8 +21,7 @@ const error = ref<string | undefined>(undefined);
 const isFrozen = ref(false);
 const hasUnsavedChanges = ref(false);
 onMounted(() => {
-
-  props?.collection?.forEach((product) => {
+  model.value.forEach((product) => {
     if (product.available && product !== undefined) {
       selecteds.value.push(product);
     }
@@ -47,6 +43,9 @@ async function searchProduct() {
         data.Classes.Criteria.contains("productNumber", nameToSearch.value),
       ]),
     );
+    criteria.addIncludes({
+      product: ["name", "productNumber", "available", "id", "versionId"],
+    });
 
     const repoSearchResult = await repo.search(criteria);
 
@@ -89,19 +88,19 @@ function removeSelected(id: string) {
   if (!id) {
     throw new Error("Product ID is undefined");
   }
-  if(selecteds.value.find((p) => p.id === id) === undefined) {
+  if (selecteds.value.find((p) => p.id === id) === undefined) {
     throw new Error("Product not found in selecteds");
   }
-  if(selecteds.value.length -1 < props.minLimit) {
+  if (selecteds.value.length - 1 < props.minLimit) {
     notification.dispatch({
       title: "Info",
       message: `You need to select at least ${props.minLimit} products`,
-      variant: "info"
+      variant: "info",
     });
     return;
   }
   selecteds.value = selecteds.value.filter((p) => p.id !== id);
-  emit("removeFromCollection", id);
+  model.value.remove(id);
   hasUnsavedChanges.value = true;
 }
 
@@ -110,7 +109,7 @@ function addToSelecteds(p: Entity<"product">) {
   if (!p) {
     throw new Error("Product is undefined");
   }
-  if (props?.collection?.has(p.id)) {
+  if (model.value.has(p.id)) {
     notification.dispatch({
       title: "error",
       message: "Product already selected",
@@ -134,7 +133,7 @@ function addToSelecteds(p: Entity<"product">) {
     });
     return;
   }
-  emit("addToCollection", p);
+  model.value.add(p);
   selecteds.value.push(p);
   hasUnsavedChanges.value = true;
   nameToSearch.value = "";
@@ -147,7 +146,7 @@ function handleInputFocus() {
   isDropdownOpen.value = true;
 }
 
-function commitChanges() {
+async function commitChanges() {
   if (isFrozen.value) return;
   if (selecteds.value.length > props.maxLimit) {
     notification.dispatch({
@@ -165,10 +164,18 @@ function commitChanges() {
     });
     return;
   }
-
-  emit("commitChanges");
-  hasUnsavedChanges.value = false;
-  isFrozen.value = true;
+  try {
+   // await saveSwEntityCollection("product", model.value);
+    hasUnsavedChanges.value = false;
+    isFrozen.value = true;
+  } catch (e) {
+    notification.dispatch({
+      title: "error",
+      message: "Failed to save products",
+    });
+    console.log(model.value);
+    console.error(e);
+  }
 }
 
 function toggleEditState() {

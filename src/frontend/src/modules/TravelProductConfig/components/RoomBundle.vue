@@ -6,7 +6,7 @@ import { notification } from "@shopware-ag/meteor-admin-sdk";
 import RoomSaleRules from "./RoomSaleRules.vue";
 import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
 import { useSw } from "@/modules/shared/composables/useSw";
-import ProductOptionsMap from "./ProductOptionsMap.vue";
+import ProductCollectionSelector from "@/modules/shared/components/ProductCollectionSelector.vue";
 const { createSwEntity } = useSw();
 const store = useTravelProductConfig();
 const swDatas = computed(() => {
@@ -25,16 +25,7 @@ const handleDeleteResource = async (id: string) => {
     });
   }
 };
-const handleNewProducOptionsResource = async (
-  room: Entity<"ce_room_bundle">,
-) => {
-  const newRoomOption = await createSwEntity("ce_product_options_map");
-  if (!newRoomOption) {
-    console.error("Failed to create new room option");
-    return;
-  }
-  room.roomProducts = newRoomOption;
-};
+
 const addSaleRuleToRoomOption = async (room: Entity<"ce_room_bundle">) => {
   const newRoomSaleRule = await createSwEntity("ce_room_sale_rule");
   if (!newRoomSaleRule) {
@@ -62,22 +53,11 @@ const addSaleRuleToRoomOption = async (room: Entity<"ce_room_bundle">) => {
     </div>
 
     <div v-if="swData.roomProducts" class="ewt-mb-4">
-      <ProductOptionsMap
-        :sw-data="swData.roomProducts"
-        :max-limit="Infinity"
-        :min-limit="1"
-        label="Room Products"
+      <ProductCollectionSelector
+        v-model="swData.roomProducts"
+        :maxLimit="Infinity"
+        :minLimit="0"
       />
-    </div>
-
-    <div v-if="!swData.roomProducts" class="ewt-button-group ewt-mb-4">
-      <button
-        @click="handleNewProducOptionsResource(swData)"
-        class="ewt-button ewt-button--secondary"
-      >
-        <i class="fa-solid fa-plus"></i>
-        Initialize Room Products
-      </button>
     </div>
 
     <RoomSaleRules v-if="swData.roomSaleRule" :id="swData.id" />

@@ -64,15 +64,15 @@
  
     <entity name="ce_travel_product_config">
         <fields>
-            <one-to-one name="products_to_apply" reference="ce_product_options_map" store-api-aware="true" on-delete="set-null" />
-            <one-to-one name="hotel_bundle" store-api-aware="true" reference="ce_hotel_bundle" on-delete="set-null"/>
-            <one-to-one name="child_discount" store-api-aware="true" reference="ce_custom_child_discount" on-delete="set-null"/>
-            <one-to-many name="generic_bundles" reference="ce_generic_bundle" store-api-aware="true" on-delete="set-null" />
+            <many-to-many name="products_to_apply" reference="product" store-api-aware="true" />
+            <one-to-one name="hotel_bundle" store-api-aware="true" reference="ce_hotel_bundle" on-delete="cascade"/>
+            <one-to-one name="child_discount" store-api-aware="true" reference="ce_custom_child_discount" on-delete="cascade"/>
+            <one-to-many name="generic_bundles" reference="ce_generic_bundle" store-api-aware="true" on-delete="cascade" />
             <bool name="variant_aware" store-api-aware="true" />
             <text name="configuration_name" store-api-aware="true" />
             <text name="configuration_identifier" store-api-aware="true" />
             <bool name="is_date_configurable" store-api-aware="true" />
-            <one-to-one name="date_configurator" reference="ce_date_configurator" store-api-aware="true" on-delete="set-null" />
+            <one-to-one name="date_configurator" reference="ce_date_configurator" store-api-aware="true" on-delete="cascade" />
         </fields>
     </entity>
 
@@ -86,8 +86,8 @@
 
     <entity name="ce_room_bundle">
         <fields>
-            <one-to-one name="room_products" store-api-aware="true" reference="ce_product_options_map" on-delete="set-null"/>
-            <one-to-one name="room_sale_rule" store-api-aware="true" reference="ce_room_sale_rule" on-delete="set-null"/>
+            <many-to-many name="room_products" store-api-aware="true" reference="product"/>
+            <one-to-one name="room_sale_rule" store-api-aware="true" reference="ce_room_sale_rule" on-delete="cascade"/>
         </fields>
     </entity>
 
@@ -103,7 +103,7 @@
             <int name="max_infants" store-api-aware="true"/>
             <int name="max_total_persons" store-api-aware="true"/>
             <bool name="allow_pets" store-api-aware="true"/>
-            <one-to-one name="supplement_rule" store-api-aware="true" reference="ce_room_supplement_rule" on-delete="set-null"/>
+            <one-to-one name="supplement_rule" store-api-aware="true" reference="ce_room_supplement_rule" on-delete="cascade"/>
         </fields>
     </entity>
 
@@ -112,13 +112,12 @@
             <int name="apply_if_adults" store-api-aware="true"/>
             <int name="apply_if_children" store-api-aware="true"/>
             <int name="apply_if_infants" store-api-aware="true" />
-            <one-to-one name="supplement_products" store-api-aware="true" reference="ce_product_options_map" on-delete="set-null"/>
+            <many-to-many name="supplement_products" store-api-aware="true" reference="product" />
         </fields>
     </entity>
 
     <entity name="ce_custom_child_discount">
-        <fields> 
-           
+        <fields>   
             <float name="child_discount_percentage" store-api-aware="true"/>
             <float name="infants_discount_percentage" store-api-aware="true" />
         </fields>
@@ -136,15 +135,11 @@
         <bool name="match_travellers" store-api-aware="true" />
         <bool name="is_required" store-api-aware="true" />
         <bool name="allow_multiple_selection" store-api-aware="true" />
-        <one-to-one name="parent_product_options" reference="ce_product_options_map" store-api-aware="true" on-delete="set-null" />
-        <one-to-one name="generic_product_options" reference="ce_product_options_map" store-api-aware="true" on-delete="set-null" />
+        <many-to-many name="parent_product_options" reference="product" store-api-aware="true"  />
+        <many-to-many name="generic_product_options" reference="product" store-api-aware="true"  />
     </fields>
 </entity>
-<entity name="ce_product_options_map">
-<fields>
-    <one-to-many name="product_options" reference="product" store-api-aware="true" on-delete="set-null" />
-</fields>
-</entity>
+
 <entity name="ce_date_configurator">
     <fields>
     <date name="accept_from" store-api-aware="true" />

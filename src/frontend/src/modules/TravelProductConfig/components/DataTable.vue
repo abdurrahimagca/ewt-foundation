@@ -26,7 +26,6 @@ const fetchData = async (page: number) => {
     criteria.setLimit(itemsPerPage);
     criteria.setPage(page);
     criteria.addAssociation("productsToApply");
-    criteria.addAssociation("productsToApply.productOptions");
     await store.searchResources(criteria);
   } catch (e) {
     console.error("Error fetching data:", e);
@@ -99,14 +98,14 @@ onMounted(async () => {
             <td class="ewt-product-display">
               <span class="ewt-product-name">
                 {{
-                  item.productsToApply?.productOptions?.first()?.name ||
+                  item.productsToApply?.first()?.name ||
                   "No Product Selected"
                 }}
               </span>
             </td>
             <td>
               {{
-                item.productsToApply?.productOptions?.first()?.productNumber ||
+                item.productsToApply?.first()?.productNumber ||
                 "N/A"
               }}
             </td>
