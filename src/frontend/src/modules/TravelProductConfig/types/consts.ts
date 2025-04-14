@@ -12,6 +12,7 @@ const ASSOCIATIONS = [
   "hotelBundle.roomOptions.roomSaleRule",
   "hotelBundle.roomOptions.roomSaleRule.supplementRule",
   "hotelBundle.roomOptions.roomSaleRule.supplementRule.supplementProducts",
+  
   "genericBundles.parentProductOptions",
   "genericBundles.genericProductOptions",
 ];

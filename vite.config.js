@@ -5,6 +5,13 @@ import path from "path";
 export default defineConfig({
   plugins: [vue()],
   root: "./src/frontend",
+  optimizeDeps: {
+    include: [
+      "@shopware-ag/meteor-admin-sdk",
+      "@shopware-ag/meteor-component-library",
+    ],
+  },
+  appType: "custom",
   resolve: {
     alias: {
       "@": path.resolve(__dirname, "./src/frontend/src"),
@@ -13,8 +20,8 @@ export default defineConfig({
   build: {
     outDir: "../../dist/frontend",
     assetsDir: "assets",
+    minify: "false",
     sourcemap: true,
-    minify: false,
 
     emptyOutDir: true,
     rollupOptions: {

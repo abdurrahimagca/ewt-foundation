@@ -3,9 +3,6 @@ import { data, notification } from "@shopware-ag/meteor-admin-sdk";
 import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
 import EntityCollection from "@shopware-ag/meteor-admin-sdk/es/_internals/data/EntityCollection";
 import { defineProps, ref, watch, defineEmits, onMounted } from "vue";
-import { useSw } from "../composables/useSw";
-
-const { saveSwEntityCollection } = useSw();
 
 const props = defineProps<{
   maxLimit: number;
@@ -165,7 +162,7 @@ async function commitChanges() {
     return;
   }
   try {
-   // await saveSwEntityCollection("product", model.value);
+    // await saveSwEntityCollection("product", model.value);
     hasUnsavedChanges.value = false;
     isFrozen.value = true;
   } catch (e) {

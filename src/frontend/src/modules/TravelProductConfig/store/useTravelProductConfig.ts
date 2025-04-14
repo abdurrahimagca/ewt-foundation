@@ -14,7 +14,6 @@ const {
   deleteSwEntity,
   saveSwEntity,
   createSwEntity,
-  saveSwEntityCollection,
 } = useSw();
 
 export const useTravelProductConfig = defineStore("travelProductConfig", () => {
@@ -144,8 +143,14 @@ export const useTravelProductConfig = defineStore("travelProductConfig", () => {
       isLoading.value = true;
       isEditing.value = false;
       if (!dataToEdit.value) throw new Error("No entity data found");
-     
-      await saveSwEntity("ce_travel_product_config", dataToEdit.value);
+      const entity = toRaw(dataToEdit.value);
+      const changes = new data.Classes.Entity(
+        entity.id,
+        "ce_travel_product_config",
+        entity.getDraft(),
+      );
+
+      await saveSwEntity("ce_travel_product_config", changes);
       await setResource(dataToEdit.value.id);
 
       notification.dispatch({
@@ -189,7 +194,7 @@ export const useTravelProductConfig = defineStore("travelProductConfig", () => {
     } finally {
       isLoading.value = false;
     }
-  }
+  };
 
   return {
     dataToEdit,

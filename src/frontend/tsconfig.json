@@ -29,7 +29,6 @@
     "noFallthroughCasesInSwitch": true,
     "noImplicitAny": true,
 
-    
     "typeRoots": ["./node_modules/@types", "./global.d.ts"]
   },
   "include": [

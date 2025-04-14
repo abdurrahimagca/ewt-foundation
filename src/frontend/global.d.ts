@@ -24,11 +24,14 @@ declare namespace EntitySchema {
     productNumber: string | null;
     taxId: string | null;
     stock: number | null;
-    ceProductOptionsMapId: string | null;
     price: {
       currencyId: string | null;
       net: number | null;
       gross: number | null;
+      linked: boolean | null;
+      listPrice: number | null;
+      percentage: number | null;
+      regulationPrice: number | null;
     };
     available: boolean;
   }
@@ -149,6 +152,7 @@ declare namespace EntitySchema {
 
   interface ce_generic_bundle {
     id: string;
+    ceTravelProductConfigGenericBundle: Entity<"ce_travel_product_config"> | null;
     ceTravelProductConfigGenericBundlesId: string | null;
     availableOnMinParentQuantity: number | null;
     availableOnMaxParentQuantity: number | null;

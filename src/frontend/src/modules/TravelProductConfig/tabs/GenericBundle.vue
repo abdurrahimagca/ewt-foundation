@@ -4,11 +4,9 @@ import { useTravelProductConfig } from "../store/useTravelProductConfig";
 import ParentOperator from "../../shared/components/ParentOperator.vue";
 import { computed, toRaw } from "vue";
 import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
-import EntityCollection, {
-  ApiContext,
-} from "@shopware-ag/meteor-admin-sdk/es/_internals/data/EntityCollection";
+import EntityCollection from "@shopware-ag/meteor-admin-sdk/es/_internals/data/EntityCollection";
 import { useSw } from "@/modules/shared/composables/useSw";
-import { notification, data } from "@shopware-ag/meteor-admin-sdk"; // Import data
+import { notification } from "@shopware-ag/meteor-admin-sdk"; // Import data
 import ProductCollectionSelector from "@/modules/shared/components/ProductCollectionSelector.vue";
 const { createSwEntity, saveSwEntity } = useSw();
 const store = useTravelProductConfig();
