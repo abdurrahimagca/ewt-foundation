@@ -151,6 +151,7 @@
 
     <entity name="ce_extra_day_configurator">
         <fields>
+            <int name="max_total_extra_days" store-api-aware="true" />
             <int name="max_extra_pre_days" store-api-aware="true" />
             <int name="max_extra_post_days" store-api-aware="true" />
             <int name="max_travellers_accepted" store-api-aware="true" />

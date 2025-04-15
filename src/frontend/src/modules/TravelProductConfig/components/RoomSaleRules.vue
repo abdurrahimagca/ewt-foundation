@@ -1,5 +1,4 @@
 <script setup lang="ts">
-import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
 import Supplement from "./Supplement.vue";
 import { useSw } from "@/modules/shared/composables/useSw";
 

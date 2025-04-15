@@ -192,6 +192,7 @@ declare namespace EntitySchema {
     id: string;
     maxExtraPreDays: number | null;
     maxExtraPostDays: number | null;
+    maxTotalExtraDays: number | null;
     maxTravellersAccepted: number | null;
   }
 }

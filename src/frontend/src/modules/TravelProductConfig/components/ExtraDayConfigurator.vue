@@ -64,30 +64,41 @@ const handleNewResource = async () => {
           />
         </div>
       </div>
-
       <div class="ewt-form-group">
-        <label class="ewt-form-label">Max Extra Pre Days</label>
         <div class="ewt-form-control">
           <input
-            v-model="swData.maxExtraPreDays"
+            v-model="swData.maxTotalExtraDays"
             type="number"
             class="ewt-input"
             min="0"
-            placeholder="Enter max pre days"
+            placeholder="Enter max total days"
           />
         </div>
-      </div>
+        <label class="ewt-form-label">Max Extra Pre Days</label>
+        <div class="ewt-form-group">
+          <label class="ewt-form-label">Max Extra Pre Days</label>
+          <div class="ewt-form-control">
+            <input
+              v-model="swData.maxExtraPreDays"
+              type="number"
+              class="ewt-input"
+              min="0"
+              placeholder="Enter max pre days"
+            />
+          </div>
+        </div>
 
-      <div class="ewt-form-group">
-        <label class="ewt-form-label">Max Travellers Accepted</label>
-        <div class="ewt-form-control">
-          <input
-            v-model="swData.maxTravellersAccepted"
-            type="number"
-            class="ewt-input"
-            min="1"
-            placeholder="Enter max travellers"
-          />
+        <div class="ewt-form-group">
+          <label class="ewt-form-label">Max Travellers Accepted</label>
+          <div class="ewt-form-control">
+            <input
+              v-model="swData.maxTravellersAccepted"
+              type="number"
+              class="ewt-input"
+              min="1"
+              placeholder="Enter max travellers"
+            />
+          </div>
         </div>
       </div>
     </div>
