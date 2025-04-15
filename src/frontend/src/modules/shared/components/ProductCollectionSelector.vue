@@ -2,7 +2,7 @@
 import { data, notification } from "@shopware-ag/meteor-admin-sdk";
 import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
 import EntityCollection from "@shopware-ag/meteor-admin-sdk/es/_internals/data/EntityCollection";
-import { defineProps, ref, watch, defineEmits, onMounted } from "vue";
+import { defineProps, ref, watch, defineEmits } from "vue";
 
 const props = defineProps<{
   maxLimit: number;
@@ -11,19 +11,9 @@ const props = defineProps<{
 const model = defineModel<EntityCollection<"product">>({ required: true });
 
 const nameToSearch = ref<string | null | undefined>(undefined);
-const selecteds = ref<Entity<"product">[]>([]);
 const selectables = ref<Entity<"product">[]>([]);
 const isDropdownOpen = ref(false);
 const error = ref<string | undefined>(undefined);
-const isFrozen = ref(false);
-const hasUnsavedChanges = ref(false);
-onMounted(() => {
-  model.value.forEach((product) => {
-    if (product.available && product !== undefined) {
-      selecteds.value.push(product);
-    }
-  });
-});
 
 async function searchProduct() {
   if (!nameToSearch?.value?.trim()) {
@@ -80,15 +70,14 @@ async function searchProduct() {
   }
 }
 
-function removeSelected(id: string) {
-  if (isFrozen.value) return;
+function removeSelected(id?: string) {
   if (!id) {
     throw new Error("Product ID is undefined");
   }
-  if (selecteds.value.find((p) => p.id === id) === undefined) {
+  if (model.value.getIds() === undefined) {
     throw new Error("Product not found in selecteds");
   }
-  if (selecteds.value.length - 1 < props.minLimit) {
+  if (model.value.getIds().length - 1 < props.minLimit) {
     notification.dispatch({
       title: "Info",
       message: `You need to select at least ${props.minLimit} products`,
@@ -96,13 +85,10 @@ function removeSelected(id: string) {
     });
     return;
   }
-  selecteds.value = selecteds.value.filter((p) => p.id !== id);
   model.value.remove(id);
-  hasUnsavedChanges.value = true;
 }
 
-function addToSelecteds(p: Entity<"product">) {
-  if (isFrozen.value) return;
+function addToSelecteds(p?: Entity<"product">) {
   if (!p) {
     throw new Error("Product is undefined");
   }
@@ -123,7 +109,7 @@ function addToSelecteds(p: Entity<"product">) {
   if (p.getEntityName() !== "product") {
     throw new Error("Product is not a product");
   }
-  if (selecteds.value.length >= props.maxLimit) {
+  if (model.value.getIds().length >= props.maxLimit) {
     notification.dispatch({
       title: "error",
       message: `You can only select ${props.maxLimit} products`,
@@ -131,52 +117,13 @@ function addToSelecteds(p: Entity<"product">) {
     return;
   }
   model.value.add(p);
-  selecteds.value.push(p);
-  hasUnsavedChanges.value = true;
   nameToSearch.value = "";
   selectables.value = [];
   isDropdownOpen.value = false;
 }
 
 function handleInputFocus() {
-  if (isFrozen.value) return;
   isDropdownOpen.value = true;
-}
-
-async function commitChanges() {
-  if (isFrozen.value) return;
-  if (selecteds.value.length > props.maxLimit) {
-    notification.dispatch({
-      title: "error",
-      message: `You need to select ${props.maxLimit} products`,
-      variant: "error",
-    });
-    return;
-  }
-  if (selecteds.value.length < props.minLimit) {
-    notification.dispatch({
-      title: "error",
-      message: `You need to select at least ${props.minLimit} products`,
-      variant: "error",
-    });
-    return;
-  }
-  try {
-    // await saveSwEntityCollection("product", model.value);
-    hasUnsavedChanges.value = false;
-    isFrozen.value = true;
-  } catch (e) {
-    notification.dispatch({
-      title: "error",
-      message: "Failed to save products",
-    });
-    console.log(model.value);
-    console.error(e);
-  }
-}
-
-function toggleEditState() {
-  isFrozen.value = false;
 }
 
 function openProductDetail(productId: string) {
@@ -185,22 +132,20 @@ function openProductDetail(productId: string) {
 }
 
 watch(nameToSearch, () => {
-  if (!isFrozen.value) {
-    searchProduct();
-  }
+  searchProduct();
 });
 </script>
 
 <template>
   <div class="product-selection-wrapper">
-    <div class="product-selection" :class="{ frozen: isFrozen }">
+    <div class="product-selection">
       <p>
         Please note that product variants may be unnamed. We recommend using the
         Product Number for searching specific products.
       </p>
       <div class="selected-tags-wrapper">
-        <div class="selected-tags" v-if="selecteds">
-          <div v-for="product in selecteds" :key="product.id" class="tag">
+        <div class="selected-tags" v-if="model.values()">
+          <div v-for="product in model.values()" :key="product.id" class="tag">
             <span class="product-name">
               {{ product.name ? product.name : "__unnamed__" }} -
               {{ product.productNumber }}
@@ -225,7 +170,6 @@ watch(nameToSearch, () => {
                 </svg>
               </button>
               <button
-                v-if="!isFrozen"
                 class="remove-tag"
                 @click.stop="removeSelected(product.id)"
                 title="Remove product"
@@ -258,7 +202,6 @@ watch(nameToSearch, () => {
             placeholder="Search name or product number"
             @focus="handleInputFocus"
             class="search-input"
-            :disabled="isFrozen"
           />
         </div>
 
@@ -279,7 +222,7 @@ watch(nameToSearch, () => {
               v-for="product in selectables"
               :key="product.id"
               class="option"
-              :class="{ selected: selecteds?.find((p) => p.id === product.id) }"
+              :class="{ selected: model.get(product.id) }"
               @click="addToSelecteds(product)"
             >
               <span class="product-name">
@@ -307,23 +250,6 @@ watch(nameToSearch, () => {
             </div>
           </div>
         </div>
-      </div>
-
-      <div class="action-buttons" v-if="selecteds">
-        <span v-if="hasUnsavedChanges" class="unsaved-changes">
-          You have unsaved changes
-        </span>
-        <button
-          v-if="!isFrozen"
-          @click="commitChanges"
-          class="commit-button"
-          :class="{ 'has-changes': hasUnsavedChanges }"
-        >
-          Save Changes
-        </button>
-        <button v-else class="edit-button" @click="toggleEditState">
-          Edit Selection
-        </button>
       </div>
     </div>
   </div>
