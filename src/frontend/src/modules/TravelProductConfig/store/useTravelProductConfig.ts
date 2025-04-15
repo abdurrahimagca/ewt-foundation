@@ -143,14 +143,7 @@ export const useTravelProductConfig = defineStore("travelProductConfig", () => {
       isLoading.value = true;
       isEditing.value = false;
       if (!dataToEdit.value) throw new Error("No entity data found");
-      const entity = toRaw(dataToEdit.value);
-      const changes = new data.Classes.Entity(
-        entity.id,
-        "ce_travel_product_config",
-        entity.getDraft(),
-      );
-
-      await saveSwEntity("ce_travel_product_config", changes);
+      await saveSwEntity("ce_travel_product_config", dataToEdit.value);
       await setResource(dataToEdit.value.id);
 
       notification.dispatch({
@@ -173,28 +166,6 @@ export const useTravelProductConfig = defineStore("travelProductConfig", () => {
     dataToEdit.value = null;
     isEditing.value = false;
   };
-  const reFetchResource = async () => {
-    try {
-      isLoading.value = true;
-      if (!dataToEdit.value) throw new Error("No entity data found");
-      ALL_ASSOCIATIONS_CRITERIA.setIds([dataToEdit.value.id]);
-      const result = await fetchSwEntity(
-        "ce_travel_product_config",
-        ALL_ASSOCIATIONS_CRITERIA,
-      );
-      if (!result) throw new Error("No entity data found");
-      dataToEdit.value = result;
-    } catch (e) {
-      console.error(e);
-      notification.dispatch({
-        title: "Error",
-        message: (e as Error).message,
-        variant: "error",
-      });
-    } finally {
-      isLoading.value = false;
-    }
-  };
 
   return {
     dataToEdit,
@@ -205,7 +176,7 @@ export const useTravelProductConfig = defineStore("travelProductConfig", () => {
     isLoading,
     setResource,
     upsertResource,
-    reFetchResource,
+
     isEditing,
     currentPage,
     cancelEdit,
