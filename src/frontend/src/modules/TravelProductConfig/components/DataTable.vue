@@ -26,7 +26,7 @@ const fetchData = async (page: number) => {
     const criteria = new data.Classes.Criteria();
     criteria.setLimit(itemsPerPage);
     criteria.setPage(page);
-    criteria.addAssociation("productsToApply");
+    criteria.addAssociation("applyProductsStream");
     await store.searchResources(criteria);
   } catch (e) {
     console.error("Error fetching data:", e);
@@ -77,119 +77,133 @@ onMounted(async () => {
   <div class="ewt-container">
     <div class="ewt-content">
       <div class="ewt-table-header">
-        <h2 class="ewt-card-title">Travel Product Configurations</h2>
-        <h3 style="color: red; font-weight: bold">
-          While we strive to provide the best experience, we are currently
-          facing challenges with editing data. To stay aligned with our roadmap,
-          we assume you are aware of these limitations. You can create
-          resources, but we cannot guarantee that updates will work as expected.
-        </h3>
-        <button @click="createResource" class="ewt-button ewt-button--primary">
+        <div>
+          <h2 class="ewt-form-title">Travel Product Configurations</h2>
+          <p class="ewt-badge ewt-badge--warning ewt-mt-2">
+            <i class="fa-solid fa-triangle-exclamation"></i>
+            Note: Updates functionality may be limited during this development
+            phase
+          </p>
+        </div>
+        <button
+          @click="createResource"
+          class="ewt-button ewt-button--primary ewt-button--lg"
+        >
           <i class="fa-solid fa-plus"></i> Create New Resource
         </button>
       </div>
 
-      <table class="ewt-table">
-        <thead>
-          <tr>
-            <th>Product Name</th>
-            <th>Product Number</th>
-            <th>Configuration ID</th>
-            <th>Variant Aware</th>
-            <th>Meta Information</th>
-            <th>Actions</th>
-          </tr>
-        </thead>
-        <tbody>
-          <tr v-for="item in paginatedData" :key="item.id">
-            <td class="ewt-product-display">
-              <span class="ewt-product-name">
-                {{
-                  item.productsToApply?.first()?.name || "No Product Selected"
-                }}
-              </span>
-            </td>
-            <td>
-              {{ item.productsToApply?.first()?.productNumber || "N/A" }}
-            </td>
-            <td>{{ item.id }}</td>
-            <td>
-              <span
-                :class="[
-                  'ewt-badge',
-                  item.variantAware ? 'ewt-badge--success' : 'ewt-badge--info',
-                ]"
-              >
-                {{ item.variantAware ? "Yes" : "No" }}
-              </span>
-            </td>
-            <td class="ewt-meta-info">
-              {{ item.configurationName || "No Config name" }}
-              {{ item.configurationIdentifier || "No Config ID" }}
-            </td>
-            <td class="ewt-actions">
-              <button
-                class="ewt-button ewt-button--view"
-                @click="
-                  async () => {
-                    try {
-                      await cloneSwEntity('ce_travel_product_config', item.id);
-                      notification.dispatch({
-                        title: 'success',
-                        message: 'Resource cloned successfully',
-                        appearance: 'notification',
-                        variant: 'success',
-                      });
-                      await fetchData(1);
-                    } catch (e) {
-                      console.error('Error cloning resource:', e);
-                      notification.dispatch({
-                        title: 'error',
-                        message: 'Failed to clone resource',
-                        appearance: 'notification',
-                        variant: 'error',
-                      });
-                    }
-                  }
-                "
-              >
-                <i class="fa-solid fa-copy"></i> Clone
-              </button>
-              <button
-                class="ewt-button ewt-button--edit"
-                @click="toggleEdit(item.id)"
-              >
-                <i style="color: red" class="fa-solid fa-pen"></i> Edit
-              </button>
-              <button
-                class="ewt-button ewt-button--delete"
-                @click="deleteResource(item.id)"
-              >
-                <i class="fa-solid fa-trash"></i> Delete
-              </button>
-            </td>
-          </tr>
-        </tbody>
-      </table>
+      <!-- Loading State -->
+      <div v-if="!paginatedData.length" class="ewt-loading">
+        <i class="fa-solid fa-spinner fa-spin"></i> Loading configurations...
+      </div>
 
-      <div class="ewt-pagination">
-        <button
-          class="ewt-button"
-          :disabled="currentPage === 1"
-          @click="changePage(currentPage - 1)"
-        >
-          <i class="fa-solid fa-chevron-left"></i> Previous
-        </button>
-        <span class="ewt-pagination-info">
-          Page {{ currentPage }} of {{ totalPages }}
-        </span>
-        <button
-          class="ewt-button"
-          :disabled="currentPage === totalPages"
-          @click="changePage(currentPage + 1)"
-        >
-          Next <i class="fa-solid fa-chevron-right"></i>
-        </button>
+      <!-- Table Content -->
+      <div v-else class="ewt-card">
+        <table class="ewt-table">
+          <thead>
+            <tr>
+              <th>Product Stream</th>
+              <th>Description</th>
+              <th>Configuration ID</th>
+              <th>Variant Aware</th>
+              <th>Meta Information</th>
+              <th class="ewt-px-4">Actions</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr v-for="item in paginatedData" :key="item.id">
+              <td class="ewt-product-display">
+                <span class="ewt-product-name">
+                  {{ item.applyProductsStream?.name || "No Product Selected" }}
+                </span>
+              </td>
+              <td>
+                <span class="ewt-meta-info">
+                  {{ item.applyProductsStream?.description || "N/A" }}
+                </span>
+              </td>
+              <td>
+                <span class="ewt-badge ewt-badge--info">
+                  {{ item.id }}
+                </span>
+              </td>
+              <td class="ewt-meta-info">
+                <div>{{ item.configurationName || "No Config name" }}</div>
+                <div class="ewt-mt-1 ewt-text-secondary">
+                  {{ item.configurationIdentifier || "No Config ID" }}
+                </div>
+              </td>
+              <td>
+                <div class="ewt-actions">
+                  <button
+                    class="ewt-button ewt-button--view ewt-button--sm"
+                    @click="
+                      async () => {
+                        try {
+                          await cloneSwEntity(
+                            'ce_travel_product_config',
+                            item.id,
+                          );
+                          notification.dispatch({
+                            title: 'Success',
+                            message: 'Resource cloned successfully',
+                            appearance: 'notification',
+                            variant: 'success',
+                          });
+                          await fetchData(1);
+                        } catch (e) {
+                          console.error('Error cloning resource:', e);
+                          notification.dispatch({
+                            title: 'Error',
+                            message: 'Failed to clone resource',
+                            appearance: 'notification',
+                            variant: 'error',
+                          });
+                        }
+                      }
+                    "
+                  >
+                    <i class="fa-solid fa-copy"></i>
+                  </button>
+                  <button
+                    class="ewt-button ewt-button--edit ewt-button--sm"
+                    @click="toggleEdit(item.id)"
+                  >
+                    <i class="fa-solid fa-pen"></i>
+                  </button>
+                  <button
+                    class="ewt-button ewt-button--delete ewt-button--sm"
+                    @click="deleteResource(item.id)"
+                  >
+                    <i class="fa-solid fa-trash"></i>
+                  </button>
+                </div>
+              </td>
+            </tr>
+          </tbody>
+        </table>
+
+        <!-- Pagination -->
+        <div class="ewt-pagination">
+          <button
+            class="ewt-button ewt-button--secondary"
+            :disabled="currentPage === 1"
+            @click="changePage(currentPage - 1)"
+          >
+            <i class="fa-solid fa-chevron-left"></i> Previous
+          </button>
+          <span class="ewt-pagination-info">
+            Page {{ currentPage }} of {{ totalPages }}
+          </span>
+          <button
+            class="ewt-button ewt-button--secondary"
+            :disabled="currentPage === totalPages"
+            @click="changePage(currentPage + 1)"
+          >
+            Next <i class="fa-solid fa-chevron-right"></i>
+          </button>
+        </div>
       </div>
     </div>
   </div>

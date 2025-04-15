@@ -1,57 +1,118 @@
 /* EWT Global Styles */
+:root {
+  --ewt-primary: #1a73e8;
+  --ewt-primary-hover: #1557b0;
+  --ewt-danger: #dc3545;
+  --ewt-success: #34a853;
+  --ewt-warning: #fbbc05;
+  --ewt-border: #e0e0e0;
+  --ewt-bg: #f8f9fa;
+  --ewt-text: #202124;
+  --ewt-text-secondary: #5f6368;
+  --ewt-card-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+  --ewt-transition: all 0.2s ease;
+}
+
+/* Base Container */
 .ewt-container {
-  padding: 2rem;
+  width: 100%;
   max-width: 1200px;
   margin: 0 auto;
+  padding: 1rem;
 }
 
-.ewt-header {
-  margin-bottom: 2rem;
-  text-align: center;
+@media (min-width: 768px) {
+  .ewt-container {
+    padding: 2rem;
+  }
 }
 
-.ewt-title {
-  font-size: 2.5rem;
-  color: #2c3e50;
-  margin-bottom: 1rem;
-  font-weight: 600;
-}
-
-.ewt-txt {
-  color: #666;
-  font-size: 1.1rem;
-  line-height: 1.5;
-}
-
-.ewt-txt-error {
-  color: #dc3545;
-  font-size: 0.875rem;
-  margin-top: 0.25rem;
-}
-
-.ewt-tabs {
-  display: flex;
+/* Grid System */
+.ewt-grid {
+  display: grid;
   gap: 1rem;
-  margin-bottom: 2rem;
-  justify-content: center;
-  border-bottom: 2px solid #eee;
-  padding-bottom: 1rem;
+  width: 100%;
 }
 
+.ewt-grid--2 {
+  grid-template-columns: repeat(1, 1fr);
+}
+
+@media (min-width: 768px) {
+  .ewt-grid--2 {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+
+.ewt-grid--3 {
+  grid-template-columns: repeat(3, 1fr);
+}
+
+/* Form Elements */
+.ewt-form-group {
+  margin-bottom: 1.5rem;
+  background-color: white;
+  border-radius: 8px;
+  border: 1px solid var(--ewt-border);
+  padding: 1rem;
+  transition: var(--ewt-transition);
+}
+
+.ewt-form-group:hover {
+  box-shadow: var(--ewt-card-shadow);
+}
+
+.ewt-form-label {
+  display: block;
+  margin-bottom: 0.5rem;
+  font-weight: 500;
+  color: var(--ewt-text);
+  font-size: 0.875rem;
+}
+
+.ewt-input {
+  width: 100%;
+  padding: 0.75rem;
+  border: 1px solid var(--ewt-border);
+  border-radius: 6px;
+  font-size: 0.875rem;
+  transition: var(--ewt-transition);
+  background-color: white;
+}
+
+.ewt-input:hover {
+  border-color: var(--ewt-primary);
+}
+
+.ewt-input:focus {
+  outline: none;
+  border-color: var(--ewt-primary);
+  box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.1);
+}
+
+.ewt-input--date {
+  min-height: 42px;
+  cursor: pointer;
+}
+
+.ewt-input--error {
+  border-color: #dc3545;
+}
+
+/* Buttons */
 .ewt-button {
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  gap: 0.5rem;
-  padding: 0.5rem 1rem;
-  border: 1px solid transparent;
-  border-radius: 4px;
+  padding: 0.625rem 1rem;
+  border-radius: 6px;
   font-size: 0.875rem;
   font-weight: 500;
   cursor: pointer;
-  transition: all 0.2s;
-  line-height: 1.5;
-  white-space: nowrap;
+  transition: var(--ewt-transition);
+  border: 1px solid transparent;
+  gap: 0.5rem;
+  min-height: 38px;
 }
 
 .ewt-button:disabled {
@@ -80,14 +141,6 @@
   margin-left: 0.5rem;
 }
 
-/* Ensure consistent icon sizing */
-.fa-solid {
-  vertical-align: middle;
-  display: inline-flex;
-  align-items: center;
-}
-
-/* Button Variants */
 .ewt-button--primary {
   background: var(--ewt-primary);
   color: white;
@@ -95,16 +148,18 @@
 
 .ewt-button--primary:hover {
   background: var(--ewt-primary-hover);
+  transform: translateY(-1px);
 }
 
 .ewt-button--secondary {
   background: white;
-  border: 1px solid var(--ewt-border);
+  border-color: var(--ewt-border);
   color: var(--ewt-text);
 }
 
 .ewt-button--secondary:hover {
   background: var(--ewt-bg);
+  border-color: var(--ewt-primary);
 }
 
 .ewt-button--danger {
@@ -118,12 +173,35 @@
 }
 
 .ewt-button--edit {
-  background-color: #3498db;
+  background: #2196f3;
   color: white;
+  transition: all 0.2s ease;
 }
 
 .ewt-button--edit:hover {
-  background-color: #2980b9;
+  background: #1976d2;
+  transform: translateY(-1px);
+}
+
+.ewt-button--view {
+  background: #4caf50;
+  color: white;
+  transition: all 0.2s ease;
+}
+
+.ewt-button--view:hover {
+  background: #388e3c;
+  transform: translateY(-1px);
+}
+
+.ewt-button--delete {
+  background: var(--ewt-danger);
+  color: white;
+  transition: all 0.2s ease;
+}
+
+.ewt-button--delete:hover {
+  background: #c82333;
   transform: translateY(-1px);
 }
 
@@ -151,6 +229,15 @@
 }
 
 /* Tab Button Specific */
+.ewt-tabs {
+  display: flex;
+  gap: 1rem;
+  margin-bottom: 2rem;
+  justify-content: center;
+  border-bottom: 2px solid #eee;
+  padding-bottom: 1rem;
+}
+
 .ewt-tabs .ewt-button {
   background: none;
   color: #666;
@@ -176,78 +263,17 @@
   box-shadow: 0 2px 12px rgba(0, 0, 0, 0.1);
 }
 
-.ewt-form-label {
-  display: block;
-  margin-bottom: 0.75rem;
-  color: #1a1a1a;
-  font-weight: 600;
-  font-size: 1.1rem;
-}
-
-.ewt-form-group {
-  margin-bottom: 2rem;
-  padding: 1.25rem;
-  background-color: #f8f9fa;
-  border-radius: 12px;
-  border: 1px solid #e9ecef;
-}
-
-.ewt-input {
-  width: 100%;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid var(--ewt-border);
-  border-radius: 4px;
-  font-size: 0.875rem;
-  transition: border-color 0.2s;
-}
-
-.ewt-input:focus {
-  outline: none;
-  border-color: var(--ewt-primary);
-}
-
-.ewt-input--error {
-  border-color: #dc3545;
-}
-
-.ewt-label {
-  display: block;
-  margin-bottom: 0.5rem;
-  color: #2c3e50;
-  font-weight: 500;
-}
-
-.ewt-grid {
-  display: grid;
-  gap: 1.5rem;
-}
-
-.ewt-grid--2 {
-  grid-template-columns: repeat(2, 1fr);
-}
-
-.ewt-grid--3 {
-  grid-template-columns: repeat(3, 1fr);
-}
-
-.ewt-flex {
-  display: flex;
-  gap: 1rem;
-}
-
-.ewt-flex--center {
-  align-items: center;
-}
-
-.ewt-flex--between {
-  justify-content: space-between;
-}
-
+/* Cards */
 .ewt-card {
   background: white;
-  border-radius: 8px;
+  border-radius: 12px;
   border: 1px solid var(--ewt-border);
   padding: 1.5rem;
+  transition: var(--ewt-transition);
+}
+
+.ewt-card:hover {
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
 }
 
 .ewt-card--secondary {
@@ -269,212 +295,18 @@
   margin: 0;
 }
 
-.ewt-badge {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.25rem 0.5rem;
-  border-radius: 4px;
-  font-size: 0.75rem;
-  font-weight: 500;
+/* Responsive Typography */
+.ewt-title {
+  font-size: clamp(1.5rem, 5vw, 2.5rem);
+  line-height: 1.2;
+  color: var(--ewt-text);
+  margin-bottom: 1rem;
 }
 
-.ewt-badge--success {
-  background-color: #e6f4ea;
-  color: var(--ewt-success);
-}
-
-.ewt-badge--error {
-  background-color: #ffebee;
-  color: #c62828;
-}
-
-.ewt-badge--warning {
-  background-color: #fff3e0;
-  color: #ef6c00;
-}
-
-.ewt-badge--info {
-  background: #e8f0fe;
-  color: var(--ewt-primary);
-}
-
-.ewt-checkbox-group {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  margin-bottom: 0.5rem;
-}
-
-.ewt-checkbox {
-  margin: 0;
-  width: 18px;
-  height: 18px;
-  cursor: pointer;
-}
-
-.ewt-checkbox-label {
-  font-size: 1rem;
-  color: #2c3e50;
-  cursor: pointer;
-}
-
-p {
-  color: #4a5568;
-  font-size: 1.1rem;
-  line-height: 1.6;
-  margin-bottom: 1.5rem;
-}
-
-/* Table Styles */
-.ewt-table-header {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 2rem;
-}
-
-.ewt-table {
-  width: 100%;
-  border-collapse: collapse;
-  background: white;
-  border-radius: 8px;
-  border: 1px solid var(--ewt-border);
-}
-
-.ewt-table th,
-.ewt-table td {
-  padding: 0.75rem 1rem;
-  text-align: left;
-  border-bottom: 1px solid var(--ewt-border);
-  overflow: hidden;
-}
-
-.ewt-table th {
-  background: var(--ewt-bg);
-  font-weight: 500;
-  color: var(--ewt-text-secondary);
-  text-align: left;
-  padding: 0.75rem 1rem;
-  border-bottom: 1px solid var(--ewt-border);
-}
-
-.ewt-table th:nth-child(1) {
-  width: 20%;
-}
-.ewt-table th:nth-child(2) {
-  width: 15%;
-}
-.ewt-table th:nth-child(3) {
-  width: 15%;
-}
-.ewt-table th:nth-child(4) {
-  width: 10%;
-}
-.ewt-table th:nth-child(5) {
-  width: 25%;
-}
-.ewt-table th:nth-child(6) {
-  width: 15%;
-}
-
-.ewt-table tr:hover {
-  background-color: #f8f9fa;
-}
-
-.ewt-meta-info {
-  max-width: 300px;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-}
-
-.ewt-actions {
-  display: flex;
-  gap: 0.5rem;
-  white-space: nowrap;
-  justify-content: flex-start;
-  flex-wrap: wrap;
-}
-
-.ewt-button--primary {
-  background-color: #2c3e50;
-  color: white;
-}
-
-.ewt-button--primary:hover {
-  background-color: #34495e;
-}
-
-.ewt-button--edit {
-  background-color: #3498db;
-  color: white;
-}
-
-.ewt-button--edit:hover {
-  background-color: #2980b9;
-}
-
-.ewt-button--delete {
-  background-color: #e74c3c;
-  color: white;
-}
-
-.ewt-button--delete:hover {
-  background-color: #c0392b;
-}
-
-.ewt-pagination {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  gap: 1rem;
-  margin-top: 2rem;
-  padding: 1rem;
-  background-color: #f8f9fa;
-  border-radius: 8px;
-}
-
-.ewt-pagination-info {
-  color: #666;
-  font-size: 0.9rem;
-  font-weight: 500;
-}
-
-.ewt-product-display {
-  padding: 0.5rem;
-}
-
-.ewt-product-name {
-  color: #2c3e50;
-  font-weight: 500;
-}
-
-/* Form Styles */
-.ewt-form-group {
-  margin-bottom: 2rem;
-  padding: 1.25rem;
-  background-color: #f8f9fa;
-  border-radius: 12px;
-  border: 1px solid #e9ecef;
-  width: 100%;
-  box-sizing: border-box;
-}
-
-.ewt-checkbox-group {
-  display: flex;
-  align-items: center;
-  gap: 12px;
-  padding: 0.5rem 0;
-  flex-wrap: wrap;
-}
-
-.ewt-input {
-  width: 100%;
-  padding: 0.5rem 0.75rem;
-  border: 1px solid var(--ewt-border);
-  border-radius: 4px;
-  font-size: 0.875rem;
-  transition: border-color 0.2s;
+.ewt-section-title {
+  font-size: clamp(1.25rem, 4vw, 1.75rem);
+  color: var(--ewt-text);
+  margin-bottom: 1rem;
 }
 
 .ewt-form-title {
@@ -491,6 +323,313 @@ p {
   font-weight: 500;
   color: var(--ewt-text);
   word-break: break-word;
+}
+
+/* Improved Checkbox Styling */
+.ewt-checkbox-group {
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+  margin: 0.5rem 0;
+}
+
+.ewt-checkbox {
+  appearance: none;
+  width: 1.125rem;
+  height: 1.125rem;
+  border: 2px solid var(--ewt-border);
+  border-radius: 4px;
+  cursor: pointer;
+  position: relative;
+  transition: var(--ewt-transition);
+}
+
+.ewt-checkbox:checked {
+  background-color: var(--ewt-primary);
+  border-color: var(--ewt-primary);
+}
+
+.ewt-checkbox:checked::after {
+  content: "";
+  position: absolute;
+  left: 4px;
+  top: 1px;
+  width: 4px;
+  height: 8px;
+  border: solid white;
+  border-width: 0 2px 2px 0;
+  transform: rotate(45deg);
+}
+
+.ewt-checkbox-label {
+  font-size: 0.875rem;
+  color: var(--ewt-text);
+  cursor: pointer;
+  user-select: none;
+}
+
+/* Table Improvements */
+.ewt-table-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 2rem;
+  flex-wrap: wrap;
+  gap: 1rem;
+}
+
+.ewt-table-header h2 {
+  font-size: 1.5rem;
+  color: #2c3e50;
+  margin: 0;
+}
+
+.ewt-table {
+  width: 100%;
+  border-collapse: separate;
+  border-spacing: 0;
+  margin: 1rem 0;
+  background: white;
+  border-radius: 8px;
+  border: 1px solid var(--ewt-border);
+  box-shadow: 0 2px 8px rgba(0, 0, 0, 0.06);
+}
+
+.ewt-table th {
+  background: var(--ewt-bg);
+  padding: 1rem;
+  text-align: left;
+  font-weight: 600;
+  color: var(--ewt-text);
+  border-bottom: 2px solid var(--ewt-border);
+  white-space: nowrap;
+  text-transform: uppercase;
+  font-size: 0.75rem;
+  letter-spacing: 0.05em;
+}
+
+.ewt-table td {
+  padding: 1rem;
+  border-bottom: 1px solid var(--ewt-border);
+  color: #4a5568;
+  font-size: 0.875rem;
+  transition: var(--ewt-transition);
+}
+
+.ewt-table tr:hover td {
+  background-color: #f8f9fa;
+}
+
+.ewt-table tr:last-child td {
+  border-bottom: none;
+}
+
+@media (max-width: 768px) {
+  .ewt-table {
+    display: block;
+    overflow-x: auto;
+    -webkit-overflow-scrolling: touch;
+  }
+
+  .ewt-table th,
+  .ewt-table td {
+    min-width: 200px;
+  }
+}
+
+/* Loading States */
+.ewt-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 200px;
+  gap: 1rem;
+}
+
+.ewt-loading::after {
+  content: "";
+  width: 2rem;
+  height: 2rem;
+  border: 2px solid var(--ewt-border);
+  border-top-color: var(--ewt-primary);
+  border-radius: 50%;
+  animation: spinner 0.6s linear infinite;
+}
+
+@keyframes spinner {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* Empty States */
+.ewt-empty-state {
+  text-align: center;
+  padding: 3rem 1rem;
+  color: var(--ewt-text-secondary);
+}
+
+.ewt-empty-state svg {
+  width: 4rem;
+  height: 4rem;
+  margin-bottom: 1rem;
+  color: var(--ewt-border);
+}
+
+/* Utility Classes */
+.ewt-flex {
+  display: flex;
+  gap: 1rem;
+}
+
+.ewt-flex--center {
+  align-items: center;
+}
+
+.ewt-flex--between {
+  justify-content: space-between;
+}
+
+.ewt-flex--wrap {
+  flex-wrap: wrap;
+}
+
+@media (max-width: 768px) {
+  .ewt-flex {
+    gap: 0.75rem;
+  }
+
+  .ewt-card {
+    padding: 1rem;
+  }
+
+  .ewt-form-group {
+    padding: 0.75rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .ewt-flex {
+    gap: 0.5rem;
+  }
+
+  .ewt-button {
+    width: 100%;
+  }
+
+  .ewt-card {
+    padding: 0.75rem;
+  }
+}
+
+/* Improved Focus States for Accessibility */
+.ewt-button:focus,
+.ewt-input:focus,
+.ewt-checkbox:focus {
+  outline: none;
+  box-shadow: 0 0 0 3px rgba(26, 115, 232, 0.2);
+}
+
+/* Transitions */
+.ewt-button,
+.ewt-input,
+.ewt-checkbox,
+.ewt-card {
+  transition: all 0.2s ease;
+}
+
+/* Error States */
+.ewt-input.error {
+  border-color: var(--ewt-danger);
+}
+
+.ewt-error-text {
+  color: var(--ewt-danger);
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+/* Success States */
+.ewt-input.success {
+  border-color: var(--ewt-success);
+}
+
+.ewt-success-text {
+  color: var(--ewt-success);
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+/* Additional utility classes */
+.ewt-text-center {
+  text-align: center;
+}
+.ewt-text-right {
+  text-align: right;
+}
+.ewt-text-left {
+  text-align: left;
+}
+
+.ewt-w-full {
+  width: 100%;
+}
+.ewt-h-full {
+  height: 100%;
+}
+
+.ewt-relative {
+  position: relative;
+}
+.ewt-absolute {
+  position: absolute;
+}
+
+/* App Container and Header Styles */
+.ewt-app-container {
+  min-height: 100vh;
+  background-color: var(--ewt-bg);
+  display: flex;
+  flex-direction: column;
+}
+
+.ewt-app-header {
+  background: #fff;
+  padding: 0.75rem 1.5rem;
+  border-bottom: 1px solid var(--ewt-border);
+  position: sticky;
+  top: 0;
+  z-index: 100;
+}
+
+.ewt-app-header h3 {
+  margin: 0;
+  font-size: 1.125rem;
+  font-weight: 500;
+  color: var(--ewt-text);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ewt-header-nav {
+  display: flex;
+  align-items: center;
+  gap: 2rem;
+}
+
+/* Reset and base styles */
+:root {
+  --ewt-primary: #1a73e8;
+  --ewt-primary-hover: #1557b0;
+  --ewt-danger: #dc3545;
+  --ewt-success: #34a853;
+  --ewt-warning: #fbbc05;
+  --ewt-border: #e0e0e0;
+  --ewt-bg: #f8f9fa;
+  --ewt-text: #202124;
+  --ewt-text-secondary: #5f6368;
 }
 
 /* Add missing utility classes */
@@ -604,48 +743,125 @@ p {
   font-size: 1.1rem;
 }
 
-/* App Container and Header Styles */
-.ewt-app-container {
-  min-height: 100vh;
-  background-color: var(--ewt-bg);
+p {
+  color: #4a5568;
+  font-size: 1.1rem;
+  line-height: 1.6;
+  margin-bottom: 1.5rem;
+}
+
+.ewt-meta-info {
+  font-size: 0.875rem;
+  color: #4a5568;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  line-height: 1.4;
+}
+
+.ewt-actions {
   display: flex;
-  flex-direction: column;
+  gap: 0.75rem;
+  align-items: center;
+  justify-content: flex-start;
 }
 
-.ewt-app-header {
-  background: #fff;
-  padding: 0.75rem 1.5rem;
-  border-bottom: 1px solid var(--ewt-border);
-  position: sticky;
-  top: 0;
-  z-index: 100;
-}
-
-.ewt-app-header h3 {
-  margin: 0;
-  font-size: 1.125rem;
+.ewt-actions .ewt-button {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.75rem;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  border-radius: 4px;
   font-weight: 500;
-  color: var(--ewt-text);
-  display: flex;
-  align-items: center;
-  gap: 0.5rem;
 }
 
-.ewt-header-nav {
+.ewt-pagination {
   display: flex;
+  justify-content: center;
   align-items: center;
-  gap: 2rem;
+  gap: 1rem;
+  margin-top: 2rem;
+  padding: 1rem;
+  background-color: white;
+  border-radius: 8px;
+  box-shadow: 0 2px 4px rgba(0, 0, 0, 0.05);
 }
 
-/* Reset and base styles */
-:root {
-  --ewt-primary: #1a73e8;
-  --ewt-primary-hover: #1557b0;
-  --ewt-danger: #dc3545;
-  --ewt-success: #34a853;
-  --ewt-warning: #fbbc05;
-  --ewt-border: #e0e0e0;
-  --ewt-bg: #f8f9fa;
-  --ewt-text: #202124;
-  --ewt-text-secondary: #5f6368;
+.ewt-pagination .ewt-button {
+  min-width: 100px;
+  justify-content: center;
+}
+
+.ewt-pagination-info {
+  color: #4a5568;
+  font-size: 0.875rem;
+  font-weight: 500;
+  padding: 0.5rem 1rem;
+  background: #f8f9fa;
+  border-radius: 4px;
+}
+
+.ewt-product-display {
+  padding: 0.5rem;
+}
+
+.ewt-product-name {
+  color: #2c3e50;
+  font-weight: 500;
+}
+
+/* Ensure consistent icon sizing */
+.fa-solid {
+  vertical-align: middle;
+  display: inline-flex;
+  align-items: center;
+}
+
+/* Error States */
+.ewt-input.error {
+  border-color: var(--ewt-danger);
+}
+
+.ewt-error-text {
+  color: var(--ewt-danger);
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+}
+
+/* Success States */
+.ewt-input.success {
+  border-color: var(--ewt-success);
+}
+
+.ewt-success-text {
+  color: var(--ewt-success);
+  font-size: 0.75rem;
+  margin-top: 0.25rem;
+
+  /* Additional utility classes */
+  .ewt-text-center {
+    text-align: center;
+  }
+  .ewt-text-right {
+    text-align: right;
+  }
+  .ewt-text-left {
+    text-align: left;
+  }
+
+  .ewt-w-full {
+    width: 100%;
+  }
+  .ewt-h-full {
+    height: 100%;
+  }
+
+  .ewt-relative {
+    position: relative;
+  }
+  .ewt-absolute {
+    position: absolute;
+  }
 }

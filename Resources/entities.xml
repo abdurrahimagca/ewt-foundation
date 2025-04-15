@@ -64,14 +64,15 @@
  
     <entity name="ce_travel_product_config">
         <fields>
-            <many-to-many name="products_to_apply" reference="product" store-api-aware="true" />
+            <one-to-one name="apply_products_stream" reference="product_stream" store-api-aware="true" on-delete="set-null" />
             <one-to-one name="hotel_bundle" store-api-aware="true" reference="ce_hotel_bundle" on-delete="cascade"/>
             <one-to-one name="child_discount" store-api-aware="true" reference="ce_custom_child_discount" on-delete="cascade"/>
             <one-to-many name="generic_bundles" reference="ce_generic_bundle" store-api-aware="true" on-delete="cascade" />
-            <bool name="variant_aware" store-api-aware="true" />
             <text name="configuration_name" store-api-aware="true" />
             <text name="configuration_identifier" store-api-aware="true" />
             <bool name="is_date_configurable" store-api-aware="true" />
+            <bool name="allow_extra_days" store-api-aware="true" />
+            <one-to-one name="extra_days_configurator" reference="ce_extra_day_configurator" store-api-aware="true" on-delete="cascade" />
             <one-to-one name="date_configurator" reference="ce_date_configurator" store-api-aware="true" on-delete="cascade" />
         </fields>
     </entity>
@@ -86,7 +87,7 @@
 
     <entity name="ce_room_bundle">
         <fields>
-            <many-to-many name="room_products" store-api-aware="true" reference="product"/>
+            <one-to-one name="room_products_stream" reference="product_stream" store-api-aware="true" on-delete="set-null" />
             <one-to-one name="room_sale_rule" store-api-aware="true" reference="ce_room_sale_rule" on-delete="cascade"/>
         </fields>
     </entity>
@@ -112,7 +113,7 @@
             <int name="apply_if_adults" store-api-aware="true"/>
             <int name="apply_if_children" store-api-aware="true"/>
             <int name="apply_if_infants" store-api-aware="true" />
-            <many-to-many name="supplement_products" store-api-aware="true" reference="product" />
+            <one-to-one name="supplement_products_stream" reference="product_stream" store-api-aware="true" on-delete="set-null" />
         </fields>
     </entity>
 
@@ -123,33 +124,38 @@
         </fields>
     </entity>
     <entity name="ce_generic_bundle">
-    <fields>
-        <int name="available_on_min_parent_quantity" default="1" store-api-aware="true" />
-        <int name="available_on_max_parent_quantity" store-api-aware="true" />   
-        <int name="available_on_min_travellers" default="1" store-api-aware="true" />
-        <int name="available_on_max_travellers" store-api-aware="true" />
-        <text name="propaganda_text" store-api-aware="true" translatable="true" />
-        <json name="availability_operator" store-api-aware="true" /> 
-        <bool name="is_quantity_effects_duration" store-api-aware="true" />
-        <bool name="match_parent_quantity" store-api-aware="true" />
-        <bool name="match_travellers" store-api-aware="true" />
-        <bool name="is_required" store-api-aware="true" />
-        <bool name="allow_multiple_selection" store-api-aware="true" />
-        <many-to-many name="parent_product_options" reference="product" store-api-aware="true"  />
-        <many-to-many name="generic_product_options" reference="product" store-api-aware="true"  />
-    </fields>
-</entity>
+        <fields>
+            <int name="available_on_min_parent_quantity" default="1" store-api-aware="true" />
+            <int name="available_on_max_parent_quantity" store-api-aware="true" />   
+            <int name="available_on_min_travellers" default="1" store-api-aware="true" />
+            <int name="available_on_max_travellers" store-api-aware="true" />
+            <text name="propaganda_text" store-api-aware="true" translatable="true" />
+            <int name="duration_effect_per_quantity" store-api-aware="true" />
+            <bool name="match_parent_quantity" store-api-aware="true" />
+            <bool name="match_travellers" store-api-aware="true" />
+            <bool name="is_required" store-api-aware="true" />
+            <bool name="allow_multiple_selection" store-api-aware="true" />
+            <one-to-one name="parent_stream" reference="product_stream" store-api-aware="true" on-delete="set-null" /> 
+            <one-to-one name="bundle_stream" reference="product_stream" store-api-aware="true" on-delete="set-null" />
+        </fields>
+    </entity>
 
-<entity name="ce_date_configurator">
-    <fields>
-    <date name="accept_from" store-api-aware="true" />
-    <date name="accept_to" store-api-aware="true" />
-    <int name="max_days" store-api-aware="true" />
-    <int name="min_days" store-api-aware="true" /> 
-</fields>
+    <entity name="ce_date_configurator">
+        <fields>
+            <date name="accept_from" store-api-aware="true" />
+            <date name="accept_to" store-api-aware="true" />
+            <int name="max_days" store-api-aware="true" />
+            <int name="min_days" store-api-aware="true" /> 
+        </fields>
+    </entity>
 
-
-</entity>
+    <entity name="ce_extra_day_configurator">
+        <fields>
+            <int name="max_extra_pre_days" store-api-aware="true" />
+            <int name="max_extra_post_days" store-api-aware="true" />
+            <int name="max_travellers_accepted" store-api-aware="true" />
+        </fields>
+    </entity>
 
 
 </entities>

@@ -7,8 +7,6 @@ import { ref, computed } from "vue";
 import { useTravelProductConfig } from "./store/useTravelProductConfig";
 import { storeToRefs } from "pinia";
 import DataTable from "./components/DataTable.vue";
-import DateConfigurator from "./tabs/DateConfigurator.vue";
-import ChildDiscount from "./components/ChildDiscount.vue";
 const showRawData = ref(false);
 const store = useTravelProductConfig();
 const isEditMode = storeToRefs(store).isEditing;
@@ -31,18 +29,6 @@ const tabs = [
     component: GenericBundle,
     label: "Generic Bundle",
     icon: "fa-solid fa-box",
-  },
-  {
-    name: "dateConfigurator",
-    component: DateConfigurator,
-    label: "Date Configurator",
-    icon: "fa-solid fa-calendar",
-  },
-  {
-    name: "childDiscount",
-    component: ChildDiscount,
-    label: "Child Discount",
-    icon: "fa-solid fa-child",
   },
 ];
 
@@ -118,9 +104,17 @@ const handleCancel = () => {
       </nav>
 
       <main class="ewt-content">
+        <p class="ewt-badge ewt-badge--warning ewt-mt-2">
+          <i class="fa-solid fa-triangle-exclamation"></i>
+          Note: We plan to add a validation step before saving changes in the
+          future. For now, please ensure that all required fields are filled out
+          correctly.
+        </p>
         <component :is="activeComponent" />
         <div v-if="showRawData">
-          <pre>{{ JSON.stringify(storeToRefs(store).dataToEdit.value, null, 2) }}</pre>
+          <pre>{{
+            JSON.stringify(storeToRefs(store).dataToEdit.value, null, 2)
+          }}</pre>
         </div>
         <div v-else>
           <p>Raw data is hidden</p>

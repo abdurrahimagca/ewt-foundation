@@ -1,18 +1,25 @@
 <script setup lang="ts">
 import { storeToRefs } from "pinia";
 import { useTravelProductConfig } from "../store/useTravelProductConfig";
-import ParentOperator from "../../shared/components/ParentOperator.vue";
-import { computed, ref, toRaw } from "vue";
-import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
-import EntityCollection from "@shopware-ag/meteor-admin-sdk/es/_internals/data/EntityCollection";
+import { computed, ref } from "vue";
 import { useSw } from "@/modules/shared/composables/useSw";
 import { notification } from "@shopware-ag/meteor-admin-sdk"; // Import data
-import ProductCollectionSelector from "@/modules/shared/components/ProductCollectionSelector.vue";
-const { createSwEntity, saveSwEntity } = useSw();
+import ProductStreamSelector from "@/modules/shared/components/ProductStreamSelector.vue";
+const { createSwEntity, deleteSwEntity } = useSw();
 const store = useTravelProductConfig();
 const swDatas = computed(
   () => storeToRefs(store).dataToEdit.value?.genericBundles,
 );
+
+const expandedBundles = ref<Set<string>>(new Set());
+
+const toggleExpand = (id: string) => {
+  if (expandedBundles.value.has(id)) {
+    expandedBundles.value.delete(id);
+  } else {
+    expandedBundles.value.add(id);
+  }
+};
 
 const handleNewGenericBundleResource = async () => {
   try {
@@ -23,9 +30,7 @@ const handleNewGenericBundleResource = async () => {
     if (!newGenericBundle) {
       throw new Error("Failed to create new generic bundle");
     }
-
     newGenericBundle.availableOnMinTravellers = 1;
-
     swDatas.value.add(newGenericBundle);
   } catch (e) {
     console.error("Error creating new resource:", e);
@@ -37,9 +42,8 @@ const handleNewGenericBundleResource = async () => {
 };
 const handleDeleteResource = async (id: string) => {
   try {
-    if (!swDatas.value?.remove(id)) {
-      throw new Error("Failed to remove generic bundle");
-    }
+    await deleteSwEntity("ce_generic_bundle", id);
+    swDatas.value?.remove(id);
   } catch (e) {
     console.error("Error removing generic bundle:", e);
     notification.dispatch({
@@ -47,28 +51,6 @@ const handleDeleteResource = async (id: string) => {
       message: "Failed to remove generic bundle",
     });
   }
-};
-
-const transformProductForLogicStatement = (
-  p: EntityCollection<"product"> | undefined | null,
-) => {
-  if (!p) {
-    return [];
-  }
-  return Object.values(p)
-    .filter(
-      (product): product is Entity<"product"> =>
-        product !== null &&
-        typeof product === "object" &&
-        "id" in product &&
-        "productNumber" in product &&
-        "name" in product,
-    )
-    .map((product) => ({
-      id: product.id || "",
-      productNumber: product.productNumber || "",
-      name: product.name || "",
-    }));
 };
 </script>
 <template>
@@ -88,46 +70,57 @@ const transformProductForLogicStatement = (
     :key="swData.id"
     class="generic-bundle-container"
   >
-    <div class="generic-bundle-header ewt-flex ewt-flex--between">
-      <h4 class="ewt-title ewt-mb-0">Bundle Configuration #{{ index + 1 }}</h4>
-      <button
-        @click="handleDeleteResource(swData.id)"
-        class="ewt-button ewt-button--danger"
-      >
-        Remove Bundle
-      </button>
+    <div
+      class="generic-bundle-header ewt-flex ewt-flex--between"
+      @click="toggleExpand(swData.id)"
+    >
+      <div class="ewt-flex ewt-flex--center">
+        <i
+          :class="[
+            'fa-solid',
+            expandedBundles.has(swData.id)
+              ? 'fa-chevron-down'
+              : 'fa-chevron-right',
+          ]"
+        ></i>
+        <h4 class="ewt-card-title">Bundle Configuration #{{ index + 1 }}</h4>
+      </div>
+      <div class="ewt-flex ewt-flex--center">
+        <button
+          @click.stop="handleDeleteResource(swData.id)"
+          class="ewt-button ewt-button--danger"
+        >
+          Remove Bundle
+        </button>
+      </div>
     </div>
-    
-    <div class="generic-bundle-content">
+
+    <div v-show="expandedBundles.has(swData.id)" class="generic-bundle-content">
       <div class="ewt-card ewt-mb-3">
-        <div v-if="swData.parentProductOptions">
-          <ProductCollectionSelector
-            v-model="swData.parentProductOptions"
-            :label="'Parent Product Options'"
-            :max-limit="20"
-            :min-limit="0"
-          />
-        </div>
+        <label class="ewt-form-label">Parent Stream</label>
+        <ProductStreamSelector
+          @update:model-value="
+            (s) => {
+              if (s) {
+                swData.parentStreamId = s.id;
+              }
+            }
+          "
+          v-model="swData.parentStream"
+        />
       </div>
 
       <div class="ewt-card ewt-mb-3">
-        <div v-if="swData.genericProductOptions">
-          <ProductCollectionSelector
-            v-model="swData.genericProductOptions"
-            :label="'Generic Product Options'"
-            :max-limit="20"
-            :min-limit="0"
-          />
-        </div>
-      </div>
-      <label class="ewt-form-label">Propaganda Text</label>
-      <p>This is not translateable for now</p>
-      <div class="ewt-form-group">
-        <input
-          type="text"
-          v-model="swData.propagandaText"
-          placeholder="Propaganda Text"
-          class="ewt-input"
+        <label class="ewt-form-label">Bundle Stream</label>
+        <ProductStreamSelector
+          @update:model-value="
+            (s) => {
+              if (s) {
+                swData.bundleStreamId = s.id;
+              }
+            }
+          "
+          v-model="swData.bundleStream"
         />
       </div>
 
@@ -202,6 +195,14 @@ const transformProductForLogicStatement = (
             <label class="ewt-checkbox-label">Is Required</label>
           </div>
         </div>
+        <div class="ewt-form-group">
+          <label class="ewt-form-label">Duration Effect Per Quantity</label>
+          <input
+            v-model="swData.durationEffectDayPerQuantity"
+            type="number"
+            class="ewt-input"
+          />
+        </div>
 
         <div class="ewt-form-group">
           <div class="ewt-checkbox-group">
@@ -213,18 +214,6 @@ const transformProductForLogicStatement = (
             <label class="ewt-checkbox-label">Allow Multiple Selection</label>
           </div>
         </div>
-      </div>
-
-      <label class="ewt-form-label">Availability Operator</label>
-      <h2 style="color: red">EXPREMENTIAL DO NOT USE NOW</h2>
-      <div class="ewt-checkbox-group">
-        <ParentOperator
-          :products="
-            transformProductForLogicStatement(
-              swData?.parentProductOptions || null,
-            )
-          "
-        />
       </div>
     </div>
   </div>
@@ -241,19 +230,50 @@ const transformProductForLogicStatement = (
 
 .generic-bundle-header {
   margin-bottom: 1.5rem;
-  padding-bottom: 1rem;
+  padding: 1rem;
   border-bottom: 1px solid #e9ecef;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+  border-radius: 8px;
+}
+
+.generic-bundle-header:hover {
+  background-color: #e9ecef;
+}
+
+.generic-bundle-header i {
+  margin-right: 1rem;
+  font-size: 1.2rem;
+  color: var(--ewt-text-secondary);
+  transition: transform 0.2s ease;
 }
 
 .generic-bundle-content {
   display: flex;
   flex-direction: column;
   gap: 1.5rem;
+  padding: 1rem;
+  animation: slideDown 0.2s ease-out;
+}
+
+@keyframes slideDown {
+  from {
+    opacity: 0;
+    transform: translateY(-10px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
 
 .button-group {
   display: flex;
   gap: 1rem;
   margin-top: 1rem;
+}
+
+.ewt-flex--center {
+  align-items: center;
 }
 </style>

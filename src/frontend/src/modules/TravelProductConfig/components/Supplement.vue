@@ -1,13 +1,11 @@
 <script setup lang="ts">
-import { useSw } from "@/modules/shared/composables/useSw";
-const { createSwEntity } = useSw();
 const props = defineProps<{
   id: string;
 }>();
 import { useTravelProductConfig } from "../store/useTravelProductConfig";
 import { computed } from "vue";
 import { storeToRefs } from "pinia";
-import ProductCollectionSelector from "@/modules/shared/components/ProductCollectionSelector.vue";
+import ProductStreamSelector from "@/modules/shared/components/ProductStreamSelector.vue";
 const store = useTravelProductConfig();
 const swData = computed(() => {
   return storeToRefs(store).dataToEdit.value?.hotelBundle?.roomOptions?.get(
@@ -42,14 +40,18 @@ const swData = computed(() => {
       </div>
     </div>
 
-    <div v-if="swData.supplementProducts" class="ewt-form-group">
-      <label class="ewt-form-label">Supplement Products</label>
-      <p class="ewt-txt ewt-mb-3">These products will be added to cart</p>
-      <ProductCollectionSelector
-        v-model="swData.supplementProducts"
-        :maxLimit="Infinity"
-        :minLimit="0"
-      />
-    </div>
+    <label class="ewt-form-label">Supplement Products</label>
+    <p class="ewt-txt ewt-mb-3">These products will be added to cart</p>
+    <ProductStreamSelector
+      v-model="swData.supplementProductsStream"
+      @update:modelValue="
+        (s) => {
+          if (s && swData) {
+            swData.supplementProductsStream = s;
+            swData.supplementProductsStreamId = s.id;
+          }
+        }
+      "
+    />
   </div>
 </template>
