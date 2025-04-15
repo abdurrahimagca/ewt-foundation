@@ -3,7 +3,7 @@ import { data, notification } from "@shopware-ag/meteor-admin-sdk";
 import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
 import EntityCollection from "@shopware-ag/meteor-admin-sdk/es/_internals/data/EntityCollection";
 import { defineStore } from "pinia";
-import { ref, toRaw } from "vue";
+import { ref } from "vue";
 import {
   ALL_ASSOCIATIONS_CRITERIA,
   DEFAULT_SUMMARY_CRITERIA,
@@ -143,7 +143,10 @@ export const useTravelProductConfig = defineStore("travelProductConfig", () => {
       isLoading.value = true;
       isEditing.value = false;
       if (!dataToEdit.value) throw new Error("No entity data found");
-      await saveSwEntity("ce_travel_product_config", dataToEdit.value);
+      const entity = dataToEdit.value;
+
+      await saveSwEntity("ce_travel_product_config", entity);
+
       await setResource(dataToEdit.value.id);
 
       notification.dispatch({

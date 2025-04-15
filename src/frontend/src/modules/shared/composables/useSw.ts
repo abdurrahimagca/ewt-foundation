@@ -34,15 +34,29 @@ export function useSw() {
   async function createSwEntity<T extends keyof EntitySchema.Entities>(
     key: T,
   ): Promise<Entity<T> | null> {
-    const entity = data.repository(key).create();
-
-    return entity;
+    try {
+      const entity = await data.repository(key).create();
+      return entity;
+    } catch (error) {
+      console.error("Error creating entity:", error);
+      return null;
+    }
   }
   async function saveSwEntityCollection<T extends keyof EntitySchema.Entities>(
     key: T,
     entityCollection: EntityCollection<T>,
   ): Promise<void> {
     await data.repository(key).saveAll(entityCollection);
+  }
+  async function cloneSwEntity<T extends keyof EntitySchema.Entities>(
+    key: T,
+    id: string,
+  ): Promise<void> {
+    try {
+      await data.repository(key).clone(id);
+    } catch (error) {
+      console.error("Error cloning entity:", error);
+    }
   }
 
   return {
@@ -51,6 +65,7 @@ export function useSw() {
     saveSwEntity,
     deleteSwEntity,
     createSwEntity,
+    cloneSwEntity,
     saveSwEntityCollection,
   };
 }

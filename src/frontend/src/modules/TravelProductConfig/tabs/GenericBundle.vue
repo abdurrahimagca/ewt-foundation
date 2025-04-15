@@ -2,7 +2,7 @@
 import { storeToRefs } from "pinia";
 import { useTravelProductConfig } from "../store/useTravelProductConfig";
 import ParentOperator from "../../shared/components/ParentOperator.vue";
-import { computed, toRaw } from "vue";
+import { computed, ref, toRaw } from "vue";
 import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
 import EntityCollection from "@shopware-ag/meteor-admin-sdk/es/_internals/data/EntityCollection";
 import { useSw } from "@/modules/shared/composables/useSw";
@@ -25,10 +25,8 @@ const handleNewGenericBundleResource = async () => {
     }
 
     newGenericBundle.availableOnMinTravellers = 1;
-    newGenericBundle.ceTravelProductConfigGenericBundlesId =
-      store.dataToEdit.id;
-    await saveSwEntity("ce_generic_bundle", newGenericBundle);
-    await store.reFetchResource();
+
+    swDatas.value.add(newGenericBundle);
   } catch (e) {
     console.error("Error creating new resource:", e);
     notification.dispatch({
@@ -47,21 +45,6 @@ const handleDeleteResource = async (id: string) => {
     notification.dispatch({
       title: "error",
       message: "Failed to remove generic bundle",
-    });
-  }
-};
-const handleSaveBundle = async (bundle: Entity<"ce_generic_bundle">) => {
-  const d = toRaw(bundle);
-  try {
-    await saveSwEntity("ce_generic_bundle", d);
-  } catch (e) {
-    console.error("Error saving bundle:", e);
-    console.log(d);
-    console.log(typeof d);
-    console.log(JSON.stringify(d, null, 2));
-    notification.dispatch({
-      title: "error",
-      message: "Failed to save bundle",
     });
   }
 };
@@ -114,9 +97,7 @@ const transformProductForLogicStatement = (
         Remove Bundle
       </button>
     </div>
-    <div>
-      <button @click="handleSaveBundle(swData)">Save Bundle</button>
-    </div>
+    
     <div class="generic-bundle-content">
       <div class="ewt-card ewt-mb-3">
         <div v-if="swData.parentProductOptions">
@@ -124,7 +105,7 @@ const transformProductForLogicStatement = (
             v-model="swData.parentProductOptions"
             :label="'Parent Product Options'"
             :max-limit="20"
-            :min-limit="1"
+            :min-limit="0"
           />
         </div>
       </div>
@@ -135,7 +116,7 @@ const transformProductForLogicStatement = (
             v-model="swData.genericProductOptions"
             :label="'Generic Product Options'"
             :max-limit="20"
-            :min-limit="1"
+            :min-limit="0"
           />
         </div>
       </div>

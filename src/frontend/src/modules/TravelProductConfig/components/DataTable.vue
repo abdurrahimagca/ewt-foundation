@@ -2,10 +2,11 @@
 import { data, notification } from "@shopware-ag/meteor-admin-sdk";
 import { onMounted, computed } from "vue";
 import { useTravelProductConfig } from "../store/useTravelProductConfig";
+import { useSw } from "@/modules/shared/composables/useSw";
 
 const store = useTravelProductConfig();
 const itemsPerPage = 10;
-
+const { cloneSwEntity } = useSw();
 const paginatedData = computed(() => store.dataToOverview || []);
 const currentPage = computed(() => store.currentPage || 1);
 const totalPages = computed(() =>
@@ -77,6 +78,12 @@ onMounted(async () => {
     <div class="ewt-content">
       <div class="ewt-table-header">
         <h2 class="ewt-card-title">Travel Product Configurations</h2>
+        <h3 style="color: red; font-weight: bold">
+          While we strive to provide the best experience, we are currently
+          facing challenges with editing data. To stay aligned with our roadmap,
+          we assume you are aware of these limitations. You can create
+          resources, but we cannot guarantee that updates will work as expected.
+        </h3>
         <button @click="createResource" class="ewt-button ewt-button--primary">
           <i class="fa-solid fa-plus"></i> Create New Resource
         </button>
@@ -98,16 +105,12 @@ onMounted(async () => {
             <td class="ewt-product-display">
               <span class="ewt-product-name">
                 {{
-                  item.productsToApply?.first()?.name ||
-                  "No Product Selected"
+                  item.productsToApply?.first()?.name || "No Product Selected"
                 }}
               </span>
             </td>
             <td>
-              {{
-                item.productsToApply?.first()?.productNumber ||
-                "N/A"
-              }}
+              {{ item.productsToApply?.first()?.productNumber || "N/A" }}
             </td>
             <td>{{ item.id }}</td>
             <td>
@@ -126,10 +129,37 @@ onMounted(async () => {
             </td>
             <td class="ewt-actions">
               <button
+                class="ewt-button ewt-button--view"
+                @click="
+                  async () => {
+                    try {
+                      await cloneSwEntity('ce_travel_product_config', item.id);
+                      notification.dispatch({
+                        title: 'success',
+                        message: 'Resource cloned successfully',
+                        appearance: 'notification',
+                        variant: 'success',
+                      });
+                      await fetchData(1);
+                    } catch (e) {
+                      console.error('Error cloning resource:', e);
+                      notification.dispatch({
+                        title: 'error',
+                        message: 'Failed to clone resource',
+                        appearance: 'notification',
+                        variant: 'error',
+                      });
+                    }
+                  }
+                "
+              >
+                <i class="fa-solid fa-copy"></i> Clone
+              </button>
+              <button
                 class="ewt-button ewt-button--edit"
                 @click="toggleEdit(item.id)"
               >
-                <i class="fa-solid fa-pen"></i> Edit
+                <i style="color: red" class="fa-solid fa-pen"></i> Edit
               </button>
               <button
                 class="ewt-button ewt-button--delete"

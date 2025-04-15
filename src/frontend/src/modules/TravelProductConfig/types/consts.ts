@@ -12,8 +12,8 @@ const ASSOCIATIONS = [
   "hotelBundle.roomOptions.roomSaleRule",
   "hotelBundle.roomOptions.roomSaleRule.supplementRule",
   "hotelBundle.roomOptions.roomSaleRule.supplementRule.supplementProducts",
-  
-  "genericBundles.parentProductOptions",
+
+ "genericBundles.parentProductOptions",
   "genericBundles.genericProductOptions",
 ];
 
@@ -24,7 +24,16 @@ ASSOCIATIONS.forEach((association) => {
   ALL_ASSOCIATIONS_CRITERIA.addAssociation(association);
 });
 ALL_ASSOCIATIONS_CRITERIA.addIncludes({
-  product: ["name", "productNumber", "available", "id", "versionId"],
+  product: [
+    "name",
+    "productNumber",
+    "available",
+    "id",
+    "versionId",
+    "stock",
+    "price",
+    "taxId",
+  ],
 });
 
 export const DEFAULT_SUMMARY_CRITERIA = new data.Classes.Criteria();

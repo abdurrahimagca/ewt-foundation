@@ -31,7 +31,16 @@ async function searchProduct() {
       ]),
     );
     criteria.addIncludes({
-      product: ["name", "productNumber", "available", "id", "versionId"],
+     product: [
+    "name",
+    "productNumber",
+    "available",
+    "id",
+    "versionId",
+    "stock",
+    "price",
+    "taxId",
+  ],
     });
 
     const repoSearchResult = await repo.search(criteria);

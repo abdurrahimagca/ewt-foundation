@@ -20,6 +20,7 @@ declare namespace EntitySchema {
 
   interface product {
     id: string;
+    versionId: string;
     name: string | null;
     productNumber: string | null;
     taxId: string | null;
