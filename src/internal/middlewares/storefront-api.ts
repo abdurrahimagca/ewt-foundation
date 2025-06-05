@@ -1,5 +1,6 @@
 import { AppServer } from "@shopware-ag/app-server-sdk";
 import { Context, Next } from "hono";
+import { verify } from "hono/jwt";
 
 export const apiShopTransformMw = async (c: Context, next: Next) => {
   try {
@@ -14,18 +15,22 @@ export const apiShopTransformMw = async (c: Context, next: Next) => {
         400,
       );
     }
-    //console.log("shopId", shopId);
-    //console.log("shopwareAppToken", shopwareAppToken);
-
     const app = c.get("app") as AppServer;
-    // console.log("app", app);
 
     const shop = await app.repository.getShopById(shopId);
-    //console.log("shop", shop);
+    const secret = shop?.getShopSecret();
+    if (!secret) {
+      return c.json({ error: "Shop secret is not set" }, 401, {});
+    }
+    const tkn = await verify(shopwareAppToken, secret, "HS256");
     if (!shop) {
       return c.json({ error: "Shop not found" }, 404);
     }
     c.set("shop", shop);
+    if (!tkn.customerId) {
+      return c.json({ error: "Customer ID is required" }, 401);
+    }
+    c.set("customerId", tkn.customerId as string);
     await next();
   } catch (error) {
     return c.json(

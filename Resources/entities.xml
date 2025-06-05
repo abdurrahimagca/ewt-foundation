@@ -3,61 +3,59 @@
 
     <entity name="ce_travel_order_info">
         <fields>
-            <text name="identifier_code" store-api-aware="true" />
-            <json name="generic_info" store-api-aware="true" />
-            <one-to-many name="travellers" store-api-aware="true" reference="ce_traveller" on-delete="set-null"/>
-            <one-to-one name="flight_info" store-api-aware="true" reference="ce_flight_info" on-delete="set-null"/> 
-            <one-to-one store-api-aware="true" name="order" reference="order" on-delete="set-null"/>
-            <one-to-one name="bundle_info" store-api-aware="true" reference="ce_travel_order_bundle_info" on-delete="set-null"/>
+            
+            <one-to-one store-api-aware="true" name="order" reference="order" on-delete="set-null"/>  
+            <one-to-many name="travellers" store-api-aware="true" reference="ce_traveller" on-delete="cascade"/>
+            <one-to-one name="emergency_contact_info" store-api-aware="true" reference="ce_emergency_contact_information" on-delete="cascade"/>
+            <one-to-many name="flight_info" store-api-aware="true" reference="ce_flight_info" on-delete="cascade"/> 
+            <one-to-many name="room_product_detailed_info" store-api-aware="true" reference="ce_room_product_detailed_info" on-delete="cascade"/>
+            <json name="metadata" store-api-aware="true" />
         </fields>
     </entity>
 
-    <entity name="ce_traveller">
+   <entity name="ce_traveller">
         <fields>
-            <text name="name" store-api-aware="true" />
-            <text name="surname" store-api-aware="true" />
-            <date name="birthdate" store-api-aware="true" />
-            <email name="email" store-api-aware="true" />
-            <text name="phone" store-api-aware="true" />
-            <text name="passport_number" store-api-aware="true" />
+            <text name="traveller_type" store-api-aware="true" />
+            <text name="traveller_name" store-api-aware="true" />
+            <text name="traveller_surname" store-api-aware="true" />
+            <email name="traveller_email" store-api-aware="true" />
+            <text name="traveller_phone" store-api-aware="true" />
+            <text name="traveller_passport_number" store-api-aware="true" />
+            <text name="traveller_nationality" store-api-aware="true" />
+            <json name="traveller_diet_info" store-api-aware="true" />
+            <text name="traveller_diet_info_manual_input" store-api-aware="true" />
+            <date name="traveller_birth_date" store-api-aware="true" />
         </fields>
     </entity>
-
-    <entity name="ce_flight_info">
+    <entity name="ce_emergency_contact_information">
+    <fields>
+        <text name="contact_name" store-api-aware="true" />
+        <text name="contact_surname" store-api-aware="true" />
+        <text name="contact_phone" store-api-aware="true" />
+        <email name="contact_email" store-api-aware="true" />
+    </fields>
+    </entity>
+   <entity name="ce_flight_info">
         <fields>
-            <date name="arrival_date" store-api-aware="true" />
-            <date name="return_date" store-api-aware="true" />
-            <text name="arrival_airport" store-api-aware="true" />
-            <text name="departure_airport" store-api-aware="true" />
-            <text name="airline" store-api-aware="true" />
             <text name="flight_number" store-api-aware="true" />
+            <date name="flight_departure_date" store-api-aware="true" />
+            <date name="flight_arrival_date" store-api-aware="true" />
+            <text name="flight_departure_airport" store-api-aware="true" />
+            <text name="flight_arrival_airport" store-api-aware="true" />
+            <json name="metadata" store-api-aware="true" />
+        </fields>
+    </entity>
+    <entity name="ce_room_product_detailed_info">
+        <fields>
+            <one-to-one name="room_product" reference="product" store-api-aware="true" on-delete="set-null" />
+           <int name="number_of_adults" store-api-aware="true" />
+           <int name="number_of_children" store-api-aware="true" />
+           <int name="number_of_infants" store-api-aware="true" />
         </fields>
     </entity>
 
-    <entity name="ce_travel_order_bundle_info">
-        <fields>
-            <one-to-many name="rooms" reference="ce_travel_order_bundle_info_room_selection" store-api-aware="true" on-delete="set-null" />
-            <one-to-many name="additional_products" reference="ce_additional_generic_product_info" store-api-aware="true" on-delete="set-null" />
-        </fields>
-    </entity>
 
-    <entity name="ce_travel_order_bundle_info_room_selection">
-        <fields>
-            <text name="room_name" store-api-aware="true" />
-            <int name="number_of_adults" store-api-aware="true" />
-            <int name="number_of_children" store-api-aware="true" />     
-            <int name="room_quantity" store-api-aware="true" />
-        </fields>
-    </entity>
-
-    <entity name="ce_additional_generic_product_info">
-        <fields>
-                <text name="product_name" store-api-aware="true" />
-                <json name="additional_info" store-api-aware="true" />
-                <float name="product_price" store-api-aware="true" />
-                <int name="product_quantity" store-api-aware="true" />
-        </fields>
-    </entity>
+    
 
     <!-- PRODUCT CONF   -->
 
