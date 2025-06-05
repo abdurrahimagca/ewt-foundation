@@ -5,7 +5,7 @@ import {
   CeTravelOrderInfoInsertInformation,
   CeTravelOrderInfoEntity,
   CeTravelOrderInfoUpdateInformation,
-} from "@/internal/types/new_ce_travel_order_info.js";
+} from "../types/new_ce_travel_order_info.js";
 import OrderService from "./order.js";
 
 class CeTravelOrderInfoService {

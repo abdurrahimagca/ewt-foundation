@@ -4,7 +4,7 @@ import {
 } from "@shopware-ag/app-server-sdk/helper/admin-api";
 import { HttpClient } from "@shopware-ag/app-server-sdk";
 import { Criteria } from "@shopware-ag/app-server-sdk/helper/criteria";
-import { CeTravelOrderInfoEntity } from "@/internal/types/new_ce_travel_order_info.js";
+import { CeTravelOrderInfoEntity } from "../types/new_ce_travel_order_info.js";
 import {
   CeTravelOrderInfoInsertInformation,
   CeTravelOrderInfoUpdateInformation,

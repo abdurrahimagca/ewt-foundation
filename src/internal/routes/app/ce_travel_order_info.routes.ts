@@ -5,13 +5,13 @@ import {
   ceTravelOrderInfoInsertInformationSchema,
   ceTravelOrderInfoUpdateInformationSchema,
   searchTravelOrderInfoSchema,
-} from "@/internal/types/new_ce_travel_order_info.js";
+} from "../../types/new_ce_travel_order_info.js";
 import CeTravelOrderInfoService from "../../services/ce_travel_order_info.service.js";
-import { shopwareId } from "@/internal/types/ce_travel_product_bundle.js";
+import { shopwareId } from "../../types/ce_travel_product_bundle.js";
 import {
   ApiResponse,
   ApiErrorResponse,
-} from "@/internal/types/api-response.js";
+} from "../../types/api-response.js";
 
 const TRAVEL_ORDER_INFO = new Hono();
 

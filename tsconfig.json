@@ -16,11 +16,8 @@
     "noEmit": false,
     "removeComments": true,
     "declaration": false,
-    "baseUrl": "./",
-    "paths": {
-      "@/*": ["src/*"],
-      "@/internal/*": ["src/internal/*"],
-    },
+    "baseUrl": ".",
+
     "types": ["node"]
   },
   "include": ["src", "index.ts"],
