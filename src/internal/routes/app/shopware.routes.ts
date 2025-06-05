@@ -22,6 +22,7 @@ declare module "hono" {
     app: AppServer;
     shop: ShopInterface;
     context: Context;
+    customerId: string;
   }
 }
 configureAppServer(SHOPWARE_ROUTE, {

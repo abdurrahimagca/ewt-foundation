@@ -26,7 +26,7 @@ jobs:
       - name: Validate Secrets
         run: |
           if [ -z "${{ secrets.DOT_ENV }}" ]; then echo "DOT_ENV is not set!" >&2; exit 1; fi
-          if [ -z "${{ secrets.GH_TOKEN }}" ]; then echo "GH_TOKEN is not set!" >&2; exit 1; fi
+          if [ -z "${{ secrets.GITHUB_TOKEN }}" ]; then echo "GITHUB_TOKEN is not set!" >&2; exit 1; fi
           if [ -z "${{ secrets.SSH_KEY }}" ]; then echo "SSH_KEY is not set!" >&2; exit 1; fi
           if [ -z "${{ secrets.SSH_IP }}" ]; then echo "SSH_IP is not set!" >&2; exit 1; fi
 
@@ -43,7 +43,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GH_TOKEN }}
+          password: ${{ secrets.GITHUB_TOKEN }}
 
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v5
@@ -75,7 +75,7 @@ jobs:
 
       - name: Deploy to Server
         env:
-          GH_TOKEN: ${{ secrets.GH_TOKEN }}
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           SSH_USER: ${{ secrets.SSH_USER }}
           SSH_IP: ${{ secrets.SSH_IP }}
         run: |
@@ -96,7 +96,7 @@ jobs:
             docker-compose -f compose.yml ps
 
             echo ">>> Logging into GitHub Container Registry"
-            echo "${GH_TOKEN}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            echo "${GITHUB_TOKEN}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
             echo ">>> Pulling the latest Docker image"
             docker-compose -f compose.yml pull
