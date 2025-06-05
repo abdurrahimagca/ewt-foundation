@@ -15,6 +15,10 @@ jobs:
     name: Build and Push Docker Image
     runs-on: ubuntu-latest
     environment: production
+    permissions:
+      contents: read
+      packages: write
+      actions: read
     env:
       GITHUB_ACTOR: ${{ github.actor }}
 
@@ -46,6 +50,7 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ secrets.GITHUB_TOKEN }}
+          logout: true
 
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v5
@@ -56,6 +61,7 @@ jobs:
           tags: ghcr.io/${{ github.repository }}:latest
           cache-from: type=gha
           cache-to: type=gha,mode=max
+          no-cache-filters: true
 
   deploy:
     name: Deploy to Production
