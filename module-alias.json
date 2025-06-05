@@ -1,0 +1,6 @@
+{
+  "_moduleAliases": {
+    "@": "dist/src",
+    "@/internal": "dist/src/internal"
+  }
+}
