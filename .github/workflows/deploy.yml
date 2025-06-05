@@ -49,7 +49,7 @@ jobs:
         with:
           registry: ghcr.io
           username: ${{ github.actor }}
-          password: ${{ secrets.GITHUB_TOKEN }}
+          password: ${{ github.token }}
           logout: true
 
       - name: Build and Push Docker Image
@@ -83,7 +83,7 @@ jobs:
 
       - name: Deploy to Server
         env:
-          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          GITHUB_TOKEN: ${{ github.token }}
           SSH_USER: ${{ secrets.SSH_USER }}
           SSH_IP: ${{ secrets.SSH_IP }}
         run: |
@@ -104,7 +104,7 @@ jobs:
             docker-compose -f compose.yml ps
 
             echo ">>> Logging into GitHub Container Registry"
-            echo "${GITHUB_TOKEN}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            echo "${github.token}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
             echo ">>> Pulling the latest Docker image"
             docker-compose -f compose.yml pull
