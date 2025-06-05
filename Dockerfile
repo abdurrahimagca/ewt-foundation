@@ -40,7 +40,6 @@ RUN npm ci --legacy-peer-deps --frozen-lockfile --no-cache && \
 COPY --chown=appuser:appgroup ./src ./src
 COPY --chown=appuser:appgroup index.ts ./
 COPY --chown=appuser:appgroup tsconfig.json ./
-COPY --chown=appuser:appgroup module-alias.json ./
 COPY --chown=appuser:appgroup .env* ./
 
 # Build frontend and backend
@@ -74,7 +73,6 @@ RUN chown -R appuser:appgroup /app
 # Copy only the necessary files from builder stage
 COPY --from=builder --chown=appuser:appgroup /app/dist ./dist
 COPY --from=builder --chown=appuser:appgroup /app/package*.json ./
-COPY --from=builder --chown=appuser:appgroup /app/module-alias.json ./
 
 # Set npm cache directory to avoid permission issues
 ENV NPM_CONFIG_CACHE=/home/appuser/.npm
