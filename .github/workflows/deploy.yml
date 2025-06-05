@@ -11,10 +11,6 @@ permissions:
   actions: read
 
 jobs:
-  permissions:
-    contents: read
-    packages: write
-    actions: read
   build:
     name: Build and Push Docker Image
     runs-on: ubuntu-latest
