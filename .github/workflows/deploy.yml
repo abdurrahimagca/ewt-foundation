@@ -11,6 +11,10 @@ permissions:
   actions: read
 
 jobs:
+  permissions:
+    contents: read
+    packages: write
+    actions: read
   build:
     name: Build and Push Docker Image
     runs-on: ubuntu-latest
@@ -19,8 +23,6 @@ jobs:
       contents: read
       packages: write
       actions: read
-    env:
-      GITHUB_ACTOR: ${{ github.actor }}
 
     steps:
       - name: Checkout code
@@ -50,7 +52,6 @@ jobs:
           registry: ghcr.io
           username: ${{ github.actor }}
           password: ${{ github.token }}
-          logout: true
 
       - name: Build and Push Docker Image
         uses: docker/build-push-action@v5
@@ -58,7 +59,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ghcr.io/${{ github.repository }}:latest
+          tags: ghcr.io/${{ github.repository }}:latest-${{ github.sha }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           no-cache-filters: true
@@ -104,7 +105,7 @@ jobs:
             docker-compose -f compose.yml ps
 
             echo ">>> Logging into GitHub Container Registry"
-            echo "${github.token}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
+            echo "${{ github.token }}" | docker login ghcr.io -u ${{ github.actor }} --password-stdin
 
             echo ">>> Pulling the latest Docker image"
             docker-compose -f compose.yml pull
