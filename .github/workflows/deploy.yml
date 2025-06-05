@@ -54,7 +54,7 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ghcr.io/${{ github.repository }}:latest:prod
+          tags: ghcr.io/${{ github.repository }}
           cache-from: type=gha
           cache-to: type=gha,mode=max
           no-cache-filters: true
