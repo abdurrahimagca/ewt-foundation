@@ -18,7 +18,8 @@
     "declaration": false,
     "baseUrl": "./",
     "paths": {
-      "@/*": ["src/*"]
+      "@/*": ["src/*"],
+      "@/internal/*": ["src/internal/*"],
     },
     "types": ["node"]
   },
