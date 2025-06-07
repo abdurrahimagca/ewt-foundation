@@ -21,6 +21,10 @@ export default defineConfig({
     outDir: "../../dist/frontend",
     assetsDir: "assets",
     emptyOutDir: true,
+    minify: true,
+    cssCodeSplit: true,
+    cssMinify: true,
+    
     rollupOptions: {
       output: {
         assetFileNames: "assets/[name]-[hash][extname]",

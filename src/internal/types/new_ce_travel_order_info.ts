@@ -1,6 +1,7 @@
 import { z } from "zod";
 import { Order } from "./order.type.js";
 import { Criteria } from "@shopware-ag/app-server-sdk/helper/criteria";
+// ISO 8601 Date Format (YYYY-MM-DD)
 
 // Shopware ID Format (32-character hex)
 export const shopwareId = z

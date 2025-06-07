@@ -1,7 +1,8 @@
 declare namespace EntitySchema {
   interface Entities {
     product: product;
-    ce_travellers: ce_traveller;
+    order: order;
+    ce_traveller: ce_traveller;
     ce_travel_order_info: ce_travel_order_info;
     ce_flight_info: ce_flight_info;
     ce_travel_order_bundle_info: ce_travel_order_bundle_info;
@@ -18,6 +19,15 @@ declare namespace EntitySchema {
     ce_date_configurator: ce_date_configurator;
     product_stream: product_stream;
     ce_extra_day_configurator: ce_extra_day_configurator;
+    ce_emergency_contact_information: ce_emergency_contact_information;
+    ce_room_product_detailed_info: ce_room_product_detailed_info;
+  }
+
+  interface order {
+    id: string;
+    orderNumber: string;
+    orderDate: string;
+    
   }
 
   interface product {
@@ -46,33 +56,37 @@ declare namespace EntitySchema {
 
   interface ce_traveller {
     id: string;
-    name: string;
-    surname: string;
-    birthdate: string;
-    email: string;
-    phone?: string;
-    passportNumber?: string;
+    travellerType: string;
+    travellerName: string;
+    travellerSurname: string;
+    travellerEmail: string;
+    travellerPhone?: string;
+    travellerPassportNumber?: string;
+    travellerNationality?: string;
+    travellerDietInfo?: Record<string, unknown>;
+    travellerDietInfoManualInput?: string;
+    travellerBirthDate: string;
   }
 
   interface ce_travel_order_info {
     id: string;
-    identifierCode?: string;
-    genericInfo: Record<string, unknown>;
     orderId: string;
-    orderNumber?: string;
-    bundleInfo?: Entity<"ce_travel_order_bundle_info">;
-    travellers: EntityCollection<"ce_travellers">;
-    flightInfo?: Entity<"ce_flight_info">;
+    order?: Entity<"order">;
+    metadata?: Record<string, unknown>;
+    travellers: EntityCollection<"ce_traveller">;
+    emergencyContactInfo: Entity<"ce_emergency_contact_information">;
+    flightInfo?: EntityCollection<"ce_flight_info">;
+    roomProductDetailedInfo: EntityCollection<"ce_room_product_detailed_info">;
   }
 
   interface ce_flight_info {
     id: string;
-    arrivalDate: string;
-    returnDate: string;
-    arrivalAirport: string;
-    departureAirport: string;
-    airline?: string;
     flightNumber: string;
+    flightDepartureDate: string;
+    flightArrivalDate: string;
+    flightDepartureAirport: string;
+    flightArrivalAirport: string;
+    metadata?: Record<string, unknown>;
   }
 
   interface ce_travel_order_bundle_info {
@@ -194,5 +208,22 @@ declare namespace EntitySchema {
     maxExtraPostDays: number | null;
     maxTotalExtraDays: number | null;
     maxTravellersAccepted: number | null;
+  }
+
+  interface ce_emergency_contact_information {
+    id: string;
+    contactName: string;
+    contactSurname: string;
+    contactPhone: string;
+    contactEmail: string;
+  }
+
+  interface ce_room_product_detailed_info {
+    id: string;
+    roomProductId?: string;
+    roomProduct?: Entity<"product">;
+    numberOfAdults: number;
+    numberOfChildren: number;
+    numberOfInfants: number;
   }
 }
