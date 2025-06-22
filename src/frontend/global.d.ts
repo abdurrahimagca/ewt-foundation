@@ -21,6 +21,9 @@ declare namespace EntitySchema {
     ce_extra_day_configurator: ce_extra_day_configurator;
     ce_emergency_contact_information: ce_emergency_contact_information;
     ce_room_product_detailed_info: ce_room_product_detailed_info;
+    ce_travel_product_date_config: ce_travel_product_date_config;
+    ce_date_range: ce_date_range;
+    ce_static_date_opt: ce_static_date_opt;
   }
 
   interface order {
@@ -225,5 +228,26 @@ declare namespace EntitySchema {
     numberOfAdults: number;
     numberOfChildren: number;
     numberOfInfants: number;
+  }
+  interface ce_travel_product_date_config{
+    id: string;
+    productId?: string;
+    product?: Entity<"product"> | null;
+    isDateRange?: boolean | null;
+    isStaticDate?: boolean | null;
+    dateRanges?: EntityCollection<"ce_date_range"> | null;
+    staticDate?: Entity<"ce_static_date_opt"> | null;
+  }
+  interface ce_date_range{
+    id: string;
+    dateRangeData?: Record<string, unknown> | null;
+    maxDurationInDays?: number | null;
+    minDurationInDays?: number | null;
+  }
+  interface ce_static_date_opt{
+    id: string;
+    startDate?: string | null;
+    endDate?: string | null;
+    durationInDays?: number | null;
   }
 }

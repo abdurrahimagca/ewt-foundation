@@ -1,9 +1,7 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <entities xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/shopware/trunk/src/Core/System/CustomEntity/Xml/entity-1.0.xsd">
-
     <entity name="ce_travel_order_info">
-        <fields>
-            
+        <fields> 
             <one-to-one store-api-aware="true" name="order" reference="order" on-delete="set-null"/>  
             <one-to-many name="travellers" store-api-aware="true" reference="ce_traveller" on-delete="cascade"/>
             <one-to-one name="emergency_contact_info" store-api-aware="true" reference="ce_emergency_contact_information" on-delete="cascade"/>
@@ -12,8 +10,7 @@
             <json name="metadata" store-api-aware="true" />
         </fields>
     </entity>
-
-   <entity name="ce_traveller">
+    <entity name="ce_traveller">
         <fields>
             <text name="traveller_type" store-api-aware="true" />
             <text name="traveller_name" store-api-aware="true" />
@@ -53,28 +50,18 @@
            <int name="number_of_infants" store-api-aware="true" />
         </fields>
     </entity>
-
-
-    
-
-    <!-- PRODUCT CONF   -->
-
- 
+    <!-- PRODUCT CONF   --> 
     <entity name="ce_travel_product_config">
         <fields>
             <one-to-one name="apply_products_stream" reference="product_stream" store-api-aware="true" on-delete="set-null" />
             <one-to-one name="hotel_bundle" store-api-aware="true" reference="ce_hotel_bundle" on-delete="cascade"/>
             <one-to-one name="child_discount" store-api-aware="true" reference="ce_custom_child_discount" on-delete="cascade"/>
             <one-to-many name="generic_bundles" reference="ce_generic_bundle" store-api-aware="true" on-delete="cascade" />
+            <one-to-one name="traveller_type_config" store-api-aware="true" reference="ce_traveller_type_config" on-delete="cascade"/>
             <text name="configuration_name" store-api-aware="true" />
             <text name="configuration_identifier" store-api-aware="true" />
-            <bool name="is_date_configurable" store-api-aware="true" />
-            <bool name="allow_extra_days" store-api-aware="true" />
-            <one-to-one name="extra_days_configurator" reference="ce_extra_day_configurator" store-api-aware="true" on-delete="cascade" />
-            <one-to-one name="date_configurator" reference="ce_date_configurator" store-api-aware="true" on-delete="cascade" />
         </fields>
     </entity>
-
     <entity name="ce_hotel_bundle">
         <fields>
             <int name="min_room_selection" store-api-aware="true"/>
@@ -82,14 +69,12 @@
             <one-to-many name="room_options" store-api-aware="true" reference="ce_room_bundle" on-delete="set-null"/>
         </fields>
     </entity>
-
     <entity name="ce_room_bundle">
         <fields>
             <one-to-one name="room_products_stream" reference="product_stream" store-api-aware="true" on-delete="set-null" />
             <one-to-one name="room_sale_rule" store-api-aware="true" reference="ce_room_sale_rule" on-delete="cascade"/>
         </fields>
     </entity>
-
     <entity name="ce_room_sale_rule">
         <fields>
             <int name="min_adults" store-api-aware="true"/>
@@ -105,7 +90,6 @@
             <one-to-one name="supplement_rule" store-api-aware="true" reference="ce_room_supplement_rule" on-delete="cascade"/>
         </fields>
     </entity>
-
     <entity name="ce_room_supplement_rule">
         <fields>
             <int name="apply_if_adults" store-api-aware="true"/>
@@ -114,47 +98,53 @@
             <one-to-one name="supplement_products_stream" reference="product_stream" store-api-aware="true" on-delete="set-null" />
         </fields>
     </entity>
-
-    <entity name="ce_custom_child_discount">
-        <fields>   
-            <float name="child_discount_percentage" store-api-aware="true"/>
-            <float name="infants_discount_percentage" store-api-aware="true" />
-        </fields>
-    </entity>
     <entity name="ce_generic_bundle">
         <fields>
             <int name="available_on_min_parent_quantity" default="1" store-api-aware="true" />
             <int name="available_on_max_parent_quantity" store-api-aware="true" />   
             <int name="available_on_min_travellers" default="1" store-api-aware="true" />
             <int name="available_on_max_travellers" store-api-aware="true" />
-            <text name="propaganda_text" store-api-aware="true" translatable="true" />
             <int name="duration_effect_per_quantity" store-api-aware="true" />
             <bool name="match_parent_quantity" store-api-aware="true" />
             <bool name="match_travellers" store-api-aware="true" />
-            <bool name="is_required" store-api-aware="true" />
-            <bool name="allow_multiple_selection" store-api-aware="true" />
             <one-to-one name="parent_stream" reference="product_stream" store-api-aware="true" on-delete="set-null" /> 
             <one-to-one name="bundle_stream" reference="product_stream" store-api-aware="true" on-delete="set-null" />
         </fields>
     </entity>
-
-    <entity name="ce_date_configurator">
+    <entity name="ce_traveller_type_config">
         <fields>
-            <date name="accept_from" store-api-aware="true" />
-            <date name="accept_to" store-api-aware="true" />
-            <int name="max_days" store-api-aware="true" />
-            <int name="min_days" store-api-aware="true" /> 
+            <int name="child_start_age" store-api-aware="true" />
+            <int name="child_end_age" store-api-aware="true" />
+            <int name="infant_start_age" store-api-aware="true" />
+            <int name="infant_end_age" store-api-aware="true" />
+            <int name="adult_start_age" store-api-aware="true" />
+            <int name="adult_end_age" store-api-aware="true" />
+            <one-to-one name="infant_product" reference="product" store-api-aware="true" on-delete="set-null"/>
+            <one-to-one name="child_product" reference="product" store-api-aware="true" on-delete="set-null"/>
+        </fields>
+    </entity>    
+    <!-- date configurator -->
+    <entity name="ce_travel_product_date_config">
+        <fields>
+            <one-to-one name="product" reference="product" store-api-aware="true" on-delete="set-null"/>
+            <bool name="is_date_range" store-api-aware="true" />
+            <bool name="is_static_date" store-api-aware="true" />
+            <one-to-many name="date_ranges" reference="ce_date_range" store-api-aware="true" on-delete="cascade"/>
+            <one-to-one name="static_date" reference="ce_static_date_opt" store-api-aware="true" on-delete="cascade"/>
         </fields>
     </entity>
-
-    <entity name="ce_extra_day_configurator">
+    <entity name="ce_date_range">
         <fields>
-            <int name="max_total_extra_days" store-api-aware="true" />
-            <int name="max_extra_pre_days" store-api-aware="true" />
-            <int name="max_extra_post_days" store-api-aware="true" />
-            <int name="max_travellers_accepted" store-api-aware="true" />
+            <json name="date_range_data" store-api-aware="true" />
+            <int name="max_duration_in_days" store-api-aware="true" />
+            <int name="min_duration_in_days" store-api-aware="true" />
         </fields>
     </entity>
-
-
+    <entity name="ce_static_date_opt">
+        <fields>
+            <date name="start_date" store-api-aware="true" />
+            <date name="end_date" store-api-aware="true" />
+            <int name="duration_in_days" store-api-aware="true" />
+        </fields>
+    </entity>
 </entities>

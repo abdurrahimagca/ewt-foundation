@@ -8,7 +8,6 @@ onMounted(() => {
       label: "Travel Order Details",
       componentSectionId: "ce-order-view",
     });
-
     ui.componentSection.add({
       component: "card",
       positionId: "ce-order-view",
@@ -17,12 +16,6 @@ onMounted(() => {
         locationId: "ce-traveller-view-tab-card",
       },
     });
-
-    ui.tabs("sw-product-detail").addTabItem({
-      label: "Product Bundles",
-      componentSectionId: "ce-product-view",
-    });
-
     ui.menu.addMenuItem({
       label: "Travel Product Config",
       displaySearchBar: true,
@@ -31,12 +24,16 @@ onMounted(() => {
       parent: "sw-catalogue",
     });
 
+    ui.tabs("sw-product-detail").addTabItem({
+      label: "Tour Date Config",
+      componentSectionId: "ce-tour-date-view",
+    });
     ui.componentSection.add({
       component: "card",
-      positionId: "ce-product-view",
+      positionId: "ce-tour-date-view",
       props: {
-        title: "Bundles",
-        locationId: "ce-product-view-tab-card",
+        title: "Tour Date Config",
+        locationId: "ce-tour-date-view-tab-card",
       },
     });
   }

@@ -7,12 +7,30 @@ const showTravelOrder = ref(false);
 const showLocation = ref(false);
 const showProductView = ref(false);
 const showTravelProductConfig = ref(false);
+const showTourDateConfig = ref(false);
 import Main from "./modules/TravelProductConfig/Main.vue";
+import TourDateConfig from "./modules/TravelProductDateConfig/components/DateConf.vue";
 
 onMounted(() => {
+  console.log("All locations check:");
+  console.log(
+    "ce-traveller-view-tab-card:",
+    location.is("ce-traveller-view-tab-card"),
+  );
+  console.log("MAIN_HIDDEN:", location.is(location.MAIN_HIDDEN));
+  console.log(
+    "ewtf-travel-product-config:",
+    location.is("ewtf-travel-product-config"),
+  );
+  console.log(
+    "ce-tour-date-view-tab-card:",
+    location.is("ce-tour-date-view-tab-card"),
+  );
+
   showTravelOrder.value = location.is("ce-traveller-view-tab-card");
   showLocation.value = location.is(location.MAIN_HIDDEN);
   showTravelProductConfig.value = location.is("ewtf-travel-product-config");
+  showTourDateConfig.value = location.is("ce-tour-date-view-tab-card");
 
   if (showLocation.value) {
     location.startAutoResizer();
@@ -37,6 +55,7 @@ onMounted(() => {
       <Location v-if="showLocation" />
       <TravelOrderInfo v-if="showTravelOrder" />
       <Main v-if="showTravelProductConfig" />
+      <TourDateConfig v-if="showTourDateConfig" />
     </div>
   </div>
 </template>
