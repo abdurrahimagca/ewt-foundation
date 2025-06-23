@@ -88,31 +88,6 @@ async function handleCreateSupplementRuleResource() {
         </div>
       </div>
 
-      <!-- Children Age Range -->
-      <div class="ewt-form-group">
-        <label class="ewt-form-label">Children Age Range</label>
-        <div class="ewt-flex">
-          <div class="ewt-form-group" style="flex: 1">
-            <label class="ewt-form-label">Start Age</label>
-            <input
-              v-model="swData.childrenStartAge"
-              type="number"
-              class="ewt-input"
-              placeholder="Start age"
-            />
-          </div>
-          <div class="ewt-form-group" style="flex: 1">
-            <label class="ewt-form-label">End Age</label>
-            <input
-              v-model="swData.childrenEndAge"
-              type="number"
-              class="ewt-input"
-              placeholder="End age"
-            />
-          </div>
-        </div>
-      </div>
-
       <!-- Infants -->
       <div class="ewt-form-group">
         <label class="ewt-form-label">Infants</label>
@@ -147,17 +122,6 @@ async function handleCreateSupplementRuleResource() {
           class="ewt-input"
           placeholder="Max total persons"
         />
-      </div>
-
-      <div class="ewt-form-group">
-        <div class="ewt-checkbox-group">
-          <input
-            v-model="swData.allowPets"
-            type="checkbox"
-            class="ewt-checkbox"
-          />
-          <label class="ewt-checkbox-label">Allow Pets</label>
-        </div>
       </div>
     </div>
     <div v-if="swData.supplementRule">

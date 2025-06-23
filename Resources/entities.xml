@@ -55,7 +55,6 @@
         <fields>
             <one-to-one name="apply_products_stream" reference="product_stream" store-api-aware="true" on-delete="set-null" />
             <one-to-one name="hotel_bundle" store-api-aware="true" reference="ce_hotel_bundle" on-delete="cascade"/>
-            <one-to-one name="child_discount" store-api-aware="true" reference="ce_custom_child_discount" on-delete="cascade"/>
             <one-to-many name="generic_bundles" reference="ce_generic_bundle" store-api-aware="true" on-delete="cascade" />
             <one-to-one name="traveller_type_config" store-api-aware="true" reference="ce_traveller_type_config" on-delete="cascade"/>
             <text name="configuration_name" store-api-aware="true" />
@@ -81,12 +80,9 @@
             <int name="max_adults" store-api-aware="true"/>
             <int name="min_children" store-api-aware="true"/>
             <int name="max_children" store-api-aware="true"/>
-            <int name="children_start_age" store-api-aware="true"/>
-            <int name="children_end_age" store-api-aware="true"/>
             <int name="min_infants" store-api-aware="true"/>
             <int name="max_infants" store-api-aware="true"/>
             <int name="max_total_persons" store-api-aware="true"/>
-            <bool name="allow_pets" store-api-aware="true"/>
             <one-to-one name="supplement_rule" store-api-aware="true" reference="ce_room_supplement_rule" on-delete="cascade"/>
         </fields>
     </entity>
@@ -104,7 +100,6 @@
             <int name="available_on_max_parent_quantity" store-api-aware="true" />   
             <int name="available_on_min_travellers" default="1" store-api-aware="true" />
             <int name="available_on_max_travellers" store-api-aware="true" />
-            <int name="duration_effect_per_quantity" store-api-aware="true" />
             <bool name="match_parent_quantity" store-api-aware="true" />
             <bool name="match_travellers" store-api-aware="true" />
             <one-to-one name="parent_stream" reference="product_stream" store-api-aware="true" on-delete="set-null" /> 
@@ -119,8 +114,8 @@
             <int name="infant_end_age" store-api-aware="true" />
             <int name="adult_start_age" store-api-aware="true" />
             <int name="adult_end_age" store-api-aware="true" />
-            <one-to-one name="infant_product" reference="product" store-api-aware="true" on-delete="set-null"/>
-            <one-to-one name="child_product" reference="product" store-api-aware="true" on-delete="set-null"/>
+            <one-to-one name="infant_product_stream" reference="product_stream" store-api-aware="true" on-delete="set-null"/>
+            <one-to-one name="child_product_stream" reference="product_stream" store-api-aware="true" on-delete="set-null"/>
         </fields>
     </entity>    
     <!-- date configurator -->
@@ -129,7 +124,7 @@
             <one-to-one name="product" reference="product" store-api-aware="true" on-delete="set-null"/>
             <bool name="is_date_range" store-api-aware="true" />
             <bool name="is_static_date" store-api-aware="true" />
-            <one-to-many name="date_ranges" reference="ce_date_range" store-api-aware="true" on-delete="cascade"/>
+            <one-to-one name="date_range" reference="ce_date_range" store-api-aware="true" on-delete="cascade"/>
             <one-to-one name="static_date" reference="ce_static_date_opt" store-api-aware="true" on-delete="cascade"/>
         </fields>
     </entity>

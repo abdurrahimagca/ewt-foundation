@@ -3,10 +3,10 @@ import { data } from "@shopware-ag/meteor-admin-sdk";
 const ASSOCIATIONS = [
   "applyProductsStream",
   "hotelBundle",
-  "childDiscount",
   "genericBundles",
-  "extraDaysConfigurator",
-  "dateConfigurator",
+  "travellerTypeConfig",
+  "travellerTypeConfig.infantProductStream",
+  "travellerTypeConfig.childProductStream",
   "hotelBundle.roomOptions",
   "hotelBundle.roomOptions.roomProductsStream",
   "hotelBundle.roomOptions.roomSaleRule",

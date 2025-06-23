@@ -1,139 +1,191 @@
 <script lang="ts" setup>
-import { useSw } from "@/modules/shared/composables/useSw";
 import { data } from "@shopware-ag/meteor-admin-sdk";
-import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
-import { ref, onMounted, watch } from "vue";
+import { onMounted } from "vue";
+import { storeToRefs } from "pinia";
 import { location } from "@shopware-ag/meteor-admin-sdk";
-const productId = ref<string | undefined>(undefined);
-const dateConfig = ref<Entity<"ce_travel_product_date_config"> | null>(null);
-const isLoading = ref(false);
-const error = ref<string | null>(null);
-const sw = useSw();
-const { fetchSwEntity } = sw;
+import DateRange from "./DateRange.vue";
+import StaticDateOpt from "./StaticDateOpt.vue";
+import { useDateConfig } from "../store/useDateConfig";
+
+const dateConfigStore = useDateConfig();
+const { data: dateConfigData, isLoading, error } = storeToRefs(dateConfigStore);
+
 onMounted(async () => {
   location.startAutoResizer();
-  const result: any = await data.get({
-    //todo: validate if this correct id
-    id: "sw-product-detail__product",
-    selectors: ["id"],
-  });
-
-  if (result && result.id) {
-    productId.value = result.id;
-  }
-  location.stopAutoResizer();
-});
-
-watch(productId, async (newValue) => {
-  if (newValue) {
-    try {
-      const criteria = new data.Classes.Criteria();
-      criteria.addFilter({
-        type: "equals",
-        field: "productId",
-        value: newValue,
-      });
-      dateConfig.value = await fetchSwEntity(
-        "ce_travel_product_date_config",
-        criteria,
-      );
-    } catch (e) {
-      error.value = "Failed to fetch date config";
-    } finally {
-      isLoading.value = false;
-    }
-  }
-});
-watch(dateConfig, async (newValue) => {
-  if (newValue?.isDateRange && newValue?.isStaticDate) {
-    error.value = "Cannot have both date range and static date";
-  }
-});
-
-const handleSave = async () => {
-  if (dateConfig.value) {
-    try {
-      await sw.saveSwEntity("ce_travel_product_date_config", dateConfig.value);
-    } catch (e) {
-      error.value = "Failed to save date config";
-    }
-  }
-};
-
-const createDateConfig = async () => {
-  const newDateConfig = await sw.createSwEntity(
-    "ce_travel_product_date_config",
-  );
-  if (!newDateConfig) {
-    error.value = "Failed to create date config";
-    return;
-  }
-  dateConfig.value = newDateConfig;
-};
-
-const createDateRanges = async () => {
-  if (dateConfig.value) {
-    const data = await sw.createSwEntity("ce_date_range");
-    if (!data) {
-      error.value = "Failed to create date range";
+  try {
+    const result: any = await data.get({
+      id: "sw-product-detail__product",
+      selectors: ["id"],
+    });
+    if (!result || !result.id) {
+      dateConfigStore.error = "Product ID is required";
       return;
     }
-    dateConfig.value.dateRanges?.add(data);
+    await dateConfigStore.init(result.id);
+  } catch (error) {
+    console.error(error);
+  } finally {
+    location.stopAutoResizer();
   }
-};
-
-const createStaticDate = async () => {
-  if (dateConfig.value) {
-    const data = await sw.createSwEntity("ce_static_date_opt");
-    if (!data) {
-      error.value = "Failed to create static date";
-      return;
-    }
-    dateConfig.value.staticDate = data;
-  }
-};
+});
 </script>
+
 <template>
-  <div>
-    <h1>Date Config</h1>
-    <div v-if="isLoading">
-      <p>Loading...</p>
+  <div class="ewt-container">
+    <header class="ewt-header">
+      <div class="ewt-flex ewt-flex--between ewt-flex--center">
+        <h1 class="ewt-title">
+          <i class="fa-solid fa-calendar-days"></i>
+          Date Configuration
+        </h1>
+        <div class="ewt-button-group" v-if="dateConfigData">
+          <button
+            class="ewt-button ewt-button--primary"
+            @click="dateConfigStore.saveResource"
+            :disabled="isLoading"
+          >
+            <i class="fa-solid fa-save"></i>
+            Save Configuration
+          </button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Loading State -->
+    <div v-if="isLoading" class="ewt-loading">
+      <div class="ewt-loading-spinner"></div>
+      <p>Loading date configuration...</p>
+      <small class="ewt-loading-hint">This may take a few moments</small>
     </div>
-    <div v-if="!dateConfig && !isLoading && !error">
-      <p>No date config found</p>
-      <button @click="createDateConfig">Create Date Config</button>
+
+    <!-- Error State -->
+    <div v-if="error" class="ewt-card ewt-card--danger">
+      <div class="ewt-flex ewt-flex--center">
+        <i class="fa-solid fa-triangle-exclamation"></i>
+        <span class="ewt-error-text">{{ error }}</span>
+      </div>
     </div>
-    <div v-if="error">
-      <p>{{ error }}</p>
-    </div>
-    <div v-if="dateConfig">
-      <input
-        :disabled="!!dateConfig.isStaticDate"
-        type="checkbox"
-        v-model="dateConfig.isDateRange"
-      />
-      <DateRange
-        v-if="dateConfig.isDateRange"
-        :dateRange="dateConfig.dateRanges"
-      />
+
+    <div v-if="dateConfigData">
       <button
-        v-if="dateConfig.isDateRange && !dateConfig.dateRanges"
-        @click="createDateRanges"
-      ></button>
-      <input
-        :disabled="!!dateConfig.isDateRange"
-        type="checkbox"
-        v-model="dateConfig.isStaticDate"
-      />
-      <button
-        v-if="dateConfig.isStaticDate && !dateConfig.staticDate"
-        @click="createStaticDate"
-      ></button>
-      <StaticDateOpt
-        v-if="dateConfig.isStaticDate"
-        :staticDate="dateConfig.staticDate"
-      />
-      <button @click="handleSave">Save</button>
+        class="ewt-button ewt-button--primary"
+        @click="dateConfigStore.deleteResource"
+      >
+        <i class="fa-solid fa-trash"></i>
+        Delete Date Configuration
+      </button>
+    </div>
+
+    <!-- Empty State -->
+    <div v-if="!dateConfigData && !isLoading && !error" class="ewt-empty-state">
+      <div class="ewt-card">
+        <div
+          class="ewt-flex ewt-flex--center"
+          style="flex-direction: column; gap: 1rem"
+        >
+          <i
+            class="fa-solid fa-calendar-xmark"
+            style="font-size: 3rem; color: var(--ewt-text-secondary)"
+          ></i>
+          <h3>No Date Configuration Found</h3>
+          <p class="ewt-text-center">
+            Create a date configuration to manage travel product availability
+            and scheduling.
+          </p>
+          <button
+            class="ewt-button ewt-button--primary"
+            @click="dateConfigStore.createNewResource('dateRange')"
+          >
+            <i class="fa-solid fa-plus"></i>
+            Create Date Configuration Date Range
+          </button>
+          <button
+            class="ewt-button ewt-button--primary"
+            @click="dateConfigStore.createNewResource('staticDate')"
+          >
+            <i class="fa-solid fa-plus"></i>
+            Create Date Configuration Static Date
+          </button>
+        </div>
+      </div>
+    </div>
+
+    <div
+      v-if="dateConfigData?.dateRange && dateConfigData?.isDateRange"
+      class="ewt-content"
+    >
+      <DateRange :dateRange="dateConfigData.dateRange" />
+    </div>
+    <div
+      v-if="dateConfigData?.staticDate && dateConfigData?.isStaticDate"
+      class="ewt-content"
+    >
+      <StaticDateOpt :staticDate="dateConfigData.staticDate" />
     </div>
   </div>
 </template>
+
+<style scoped>
+.ewt-loading {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 300px;
+}
+
+.ewt-loading-spinner {
+  width: 40px;
+  height: 40px;
+  margin-bottom: 1rem;
+  border: 3px solid var(--ewt-border);
+  border-top: 3px solid var(--ewt-primary);
+  border-radius: 50%;
+  animation: spin 1s linear infinite;
+}
+
+.ewt-loading-hint {
+  color: var(--ewt-text-secondary);
+  margin-top: 0.5rem;
+}
+
+@keyframes spin {
+  0% {
+    transform: rotate(0deg);
+  }
+  100% {
+    transform: rotate(360deg);
+  }
+}
+
+.ewt-header {
+  margin-bottom: 2rem;
+}
+
+.ewt-header .ewt-title {
+  margin: 0;
+  font-size: 1.75rem;
+  display: flex;
+  align-items: center;
+  gap: 0.75rem;
+}
+
+.ewt-card--danger {
+  background-color: #fef2f2;
+  border-color: var(--ewt-danger);
+  color: var(--ewt-danger);
+}
+
+.ewt-empty-state h3,
+.ewt-empty-state h4 {
+  color: var(--ewt-text);
+  margin: 0.5rem 0;
+}
+
+.ewt-meta-info {
+  margin-top: 0.5rem;
+  font-size: 0.875rem;
+  color: var(--ewt-text-secondary);
+  line-height: 1.4;
+}
+</style>

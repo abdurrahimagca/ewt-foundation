@@ -184,36 +184,6 @@ const handleDeleteResource = async (id: string) => {
             <label class="ewt-checkbox-label">Match Travellers</label>
           </div>
         </div>
-
-        <div class="ewt-form-group">
-          <div class="ewt-checkbox-group">
-            <input
-              v-model="swData.isRequired"
-              type="checkbox"
-              class="ewt-checkbox"
-            />
-            <label class="ewt-checkbox-label">Is Required</label>
-          </div>
-        </div>
-        <div class="ewt-form-group">
-          <label class="ewt-form-label">Duration Effect Per Quantity</label>
-          <input
-            v-model="swData.durationEffectDayPerQuantity"
-            type="number"
-            class="ewt-input"
-          />
-        </div>
-
-        <div class="ewt-form-group">
-          <div class="ewt-checkbox-group">
-            <input
-              v-model="swData.allowMultipleSelection"
-              type="checkbox"
-              class="ewt-checkbox"
-            />
-            <label class="ewt-checkbox-label">Allow Multiple Selection</label>
-          </div>
-        </div>
       </div>
     </div>
   </div>

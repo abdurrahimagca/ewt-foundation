@@ -13,17 +13,14 @@ declare namespace EntitySchema {
     ce_room_bundle: ce_room_bundle;
     ce_room_sale_rule: ce_room_sale_rule;
     ce_room_supplement_rule: ce_room_supplement_rule;
-    ce_custom_child_discount: ce_custom_child_discount;
     ce_generic_bundle: ce_generic_bundle;
-    ce_generic_bundle_product: ce_generic_bundle_product;
-    ce_date_configurator: ce_date_configurator;
     product_stream: product_stream;
-    ce_extra_day_configurator: ce_extra_day_configurator;
     ce_emergency_contact_information: ce_emergency_contact_information;
     ce_room_product_detailed_info: ce_room_product_detailed_info;
     ce_travel_product_date_config: ce_travel_product_date_config;
     ce_date_range: ce_date_range;
     ce_static_date_opt: ce_static_date_opt;
+    ce_traveller_type_config: ce_traveller_type_config;
   }
 
   interface order {
@@ -121,17 +118,25 @@ declare namespace EntitySchema {
     applyProductsStream: Entity<"product_stream"> | null;
     hotelBundleId: string | null;
     hotelBundle: Entity<"ce_hotel_bundle"> | null;
-    childDiscountId: string | null;
-    childDiscount: Entity<"ce_custom_child_discount"> | null;
     genericBundles: EntityCollection<"ce_generic_bundle"> | null;
     configurationName: string | null;
     configurationIdentifier: string | null;
-    isDateConfigurable: boolean | null;
-    allowExtraDays: boolean | null;
-    dateConfiguratorId: string | null;
-    dateConfigurator: Entity<"ce_date_configurator"> | null;
-    extraDaysConfiguratorId: string | null;
-    extraDaysConfigurator: Entity<"ce_extra_day_configurator"> | null;
+    travellerTypeConfigId: string | null;
+    travellerTypeConfig: Entity<"ce_traveller_type_config"> | null;
+  }
+  interface ce_traveller_type_config{
+    id: string;
+
+    childStartAge: number | null;
+    childEndAge: number | null;
+    infantStartAge: number | null;
+    infantEndAge: number | null;
+    adultStartAge: number | null;
+    adultEndAge: number | null;
+    infantProductStreamId: string | null;
+    infantProductStream: Entity<"product_stream"> | null;
+    childProductStreamId: string | null;
+    childProductStream: Entity<"product_stream"> | null;
   }
 
   interface ce_hotel_bundle {
@@ -155,12 +160,11 @@ declare namespace EntitySchema {
     maxAdults: number | null;
     minChildren: number | null;
     maxChildren: number | null;
-    childrenStartAge: number | null;
-    childrenEndAge: number | null;
+  
     minInfants: number | null;
     maxInfants: number | null;
     maxTotalPersons: number | null;
-    allowPets: boolean | null;
+
     supplementRuleId: string | null;
     supplementRule: Entity<"ce_room_supplement_rule"> | null;
   }
@@ -174,43 +178,20 @@ declare namespace EntitySchema {
     supplementProductsStream: Entity<"product_stream"> | null;
   }
 
-  interface ce_custom_child_discount {
-    id: string;
-    childDiscountPercentage: number | null;
-    infantsDiscountPercentage: number | null;
-  }
-
   interface ce_generic_bundle {
     id: string;
     ceTravelProductConfigGenericBundle: Entity<"ce_travel_product_config"> | null;
     ceTravelProductConfigGenericBundlesId: string | null;
     availableOnMinParentQuantity: number | null;
     availableOnMaxParentQuantity: number | null;
-    durationEffectDayPerQuantity: number | null;
     availableOnMinTravellers: number | null;
     availableOnMaxTravellers: number | null;
     matchParentQuantity: boolean | null;
     matchTravellers: boolean | null;
-    isRequired: boolean | null;
-    allowMultipleSelection: boolean | null;
     parentStream: Entity<"product_stream"> | null;
     parentStreamId: string | null;
     bundleStream: Entity<"product_stream"> | null;
     bundleStreamId: string | null;
-  }
-  interface ce_date_configurator {
-    id: string;
-    acceptFrom: string;
-    acceptTo: string;
-    maxDays: number;
-    minDays: number;
-  }
-  interface ce_extra_day_configurator {
-    id: string;
-    maxExtraPreDays: number | null;
-    maxExtraPostDays: number | null;
-    maxTotalExtraDays: number | null;
-    maxTravellersAccepted: number | null;
   }
 
   interface ce_emergency_contact_information {
@@ -235,7 +216,7 @@ declare namespace EntitySchema {
     product?: Entity<"product"> | null;
     isDateRange?: boolean | null;
     isStaticDate?: boolean | null;
-    dateRanges?: EntityCollection<"ce_date_range"> | null;
+    dateRange?: Entity<"ce_date_range"> | null;
     staticDate?: Entity<"ce_static_date_opt"> | null;
   }
   interface ce_date_range{
