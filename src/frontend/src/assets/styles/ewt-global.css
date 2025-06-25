@@ -110,15 +110,16 @@
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  padding: 0.75rem 1.25rem;
+  padding: 0.5rem 1rem;
   border-radius: var(--ewt-button-radius);
-  font-size: 0.875rem;
+  font-size: 0.8rem;
   font-weight: 500;
   cursor: pointer;
   transition: var(--ewt-transition);
   border: 1px solid transparent;
-  gap: 0.5rem;
-  min-height: 2.5rem;
+  gap: 0.375rem;
+  min-height: 2.25rem;
+  white-space: nowrap;
 }
 
 .ewt-button:disabled {
@@ -217,20 +218,23 @@
 
 /* Button Sizes */
 .ewt-button--sm {
-  padding: 0.5rem 0.75rem;
-  font-size: 0.85rem;
+  padding: 0.375rem 0.625rem;
+  font-size: 0.75rem;
+  min-height: 1.875rem;
 }
 
 .ewt-button--lg {
-  padding: 1rem 1.5rem;
-  font-size: 1.1rem;
+  padding: 0.75rem 1.25rem;
+  font-size: 0.9rem;
+  min-height: 2.75rem;
 }
 
 /* Button Group */
 .ewt-button-group {
   display: flex;
-  gap: 0.5rem;
+  gap: 0.75rem;
   align-items: center;
+  flex-wrap: wrap;
 }
 
 .ewt-button-group--vertical {
@@ -251,8 +255,10 @@
 .ewt-tabs .ewt-button {
   background: none;
   color: #666;
-  border-radius: 8px 8px 0 0;
+  border-radius: 6px 6px 0 0;
   border-bottom: 2px solid transparent;
+  padding: 0.625rem 1rem;
+  font-size: 0.85rem;
 }
 
 .ewt-tabs .ewt-button--active {
@@ -312,23 +318,26 @@
 
 /* Responsive Typography */
 .ewt-title {
-  font-size: clamp(1.5rem, 5vw, 2.5rem);
-  line-height: 1.2;
+  font-size: clamp(1.25rem, 4vw, 1.75rem);
+  line-height: 1.3;
   color: var(--ewt-text);
   margin-bottom: 1rem;
+  font-weight: 600;
 }
 
 .ewt-section-title {
-  font-size: clamp(1.25rem, 4vw, 1.75rem);
+  font-size: clamp(1.125rem, 3vw, 1.25rem);
   color: var(--ewt-text);
-  margin-bottom: 1rem;
+  margin-bottom: 0.75rem;
+  font-weight: 600;
 }
 
 .ewt-form-title {
-  font-size: 1.8rem;
+  font-size: 1.35rem;
   color: #2c3e50;
-  margin-bottom: 1.5rem;
+  margin-bottom: 1rem;
   word-break: break-word;
+  font-weight: 600;
 }
 
 .ewt-form-label {
@@ -394,9 +403,10 @@
 }
 
 .ewt-table-header h2 {
-  font-size: 1.5rem;
-  color: #2c3e50;
+  font-size: 1.35rem;
+  color: var(--ewt-text);
   margin: 0;
+  font-weight: 600;
 }
 
 .ewt-table {
@@ -578,6 +588,30 @@
   margin-top: 0.15rem;
 }
 
+/* Badge styles */
+.ewt-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.375rem;
+  padding: 0.375rem 0.75rem;
+  border-radius: 0.375rem;
+  font-size: 0.75rem;
+  font-weight: 500;
+  line-height: 1;
+}
+
+.ewt-badge--warning {
+  background-color: #fef3c7;
+  color: #92400e;
+  border: 1px solid #fcd34d;
+}
+
+.ewt-badge--info {
+  background-color: #dbeafe;
+  color: #1e40af;
+  border: 1px solid #93c5fd;
+}
+
 /* Additional utility classes */
 .ewt-text-center {
   text-align: center;
@@ -587,6 +621,10 @@
 }
 .ewt-text-left {
   text-align: left;
+}
+
+.ewt-text-secondary {
+  color: var(--ewt-text-secondary);
 }
 
 .ewt-w-full {
@@ -636,17 +674,17 @@
   gap: 2rem;
 }
 
-/* Reset and base styles */
+/* Updated color variables for consistency */
 :root {
-  --ewt-primary: #1a73e8;
-  --ewt-primary-hover: #1557b0;
-  --ewt-danger: #dc3545;
-  --ewt-success: #34a853;
-  --ewt-warning: #fbbc05;
-  --ewt-border: #e0e0e0;
-  --ewt-bg: #f8f9fa;
-  --ewt-text: #202124;
-  --ewt-text-secondary: #5f6368;
+  --ewt-primary: #2563eb;
+  --ewt-primary-hover: #1d4ed8;
+  --ewt-danger: #ef4444;
+  --ewt-success: #22c55e;
+  --ewt-warning: #f59e0b;
+  --ewt-border: #e5e7eb;
+  --ewt-bg: #f9fafb;
+  --ewt-text: #111827;
+  --ewt-text-secondary: #6b7280;
 }
 
 /* Add missing utility classes */
@@ -750,14 +788,16 @@
   box-shadow: 0 0 0 3px rgba(44, 62, 80, 0.1);
 }
 
-/* Loading state */
+/* Loading state consistency */
 .ewt-loading {
   display: flex;
+  flex-direction: column;
   justify-content: center;
   align-items: center;
   min-height: 200px;
-  color: #666;
-  font-size: 1.1rem;
+  color: var(--ewt-text-secondary);
+  font-size: 0.9rem;
+  gap: 0.75rem;
 }
 
 p {
@@ -856,31 +896,6 @@ p {
   color: var(--ewt-success);
   font-size: 0.75rem;
   margin-top: 0.25rem;
-
-  /* Additional utility classes */
-  .ewt-text-center {
-    text-align: center;
-  }
-  .ewt-text-right {
-    text-align: right;
-  }
-  .ewt-text-left {
-    text-align: left;
-  }
-
-  .ewt-w-full {
-    width: 100%;
-  }
-  .ewt-h-full {
-    height: 100%;
-  }
-
-  .ewt-relative {
-    position: relative;
-  }
-  .ewt-absolute {
-    position: absolute;
-  }
 }
 
 /* Collapsible Sections */
@@ -963,11 +978,13 @@ p {
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
 }
 
-/* Compact Button Styles */
-.ewt-button {
-  padding: 0.5rem 0.75rem;
-  font-size: 0.8rem;
-  min-height: 32px;
+/* Button spacing improvements */
+.ewt-button i {
+  flex-shrink: 0;
+}
+
+.ewt-button span {
+  line-height: 1;
 }
 
 /* Error and Success States */

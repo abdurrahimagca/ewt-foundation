@@ -210,6 +210,8 @@ declare namespace EntitySchema {
     numberOfChildren: number;
     numberOfInfants: number;
   }
+
+  //**end of product date conf */
   interface ce_travel_product_date_config{
     id: string;
     productId?: string;

@@ -172,7 +172,8 @@ const handleCancel = () => {
 
 .ewt-header .ewt-title {
   margin: 0;
-  font-size: 1.75rem;
+  font-size: 1.5rem;
+  font-weight: 600;
 }
 
 .ewt-tabs {
