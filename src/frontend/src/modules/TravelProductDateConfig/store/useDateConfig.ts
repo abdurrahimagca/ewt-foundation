@@ -116,8 +116,8 @@ export const useDateConfig = defineStore("dateConfig", () => {
         if (parsedDateRange.success) {
           data.value.dateRange.dateRangeData = parsedDateRange.data;
         } else {
-          error.value = "Invalid date range data";
-          throw new Error("Invalid date range data");
+          error.value = parsedDateRange.error.message;
+          throw new Error(parsedDateRange.error.message);
         }
       }
       await saveSwEntity("ce_travel_product_date_config", data.value);
