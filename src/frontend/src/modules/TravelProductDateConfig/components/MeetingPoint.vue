@@ -4,7 +4,6 @@ import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity"
 import { MeetingPointType } from "../types/meetingPoint";
 import "leaflet/dist/leaflet.css";
 import { LMap, LTileLayer, LMarker } from "@vue-leaflet/vue-leaflet";
-import { location } from "@shopware-ag/meteor-admin-sdk";
 
 const props = defineProps<{
   meetingPoint: Entity<"ce_meeting_point">;
