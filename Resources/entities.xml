@@ -2,12 +2,20 @@
 <entities xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/shopware/trunk/src/Core/System/CustomEntity/Xml/entity-1.0.xsd">
     <entity name="ce_travel_order_info">
         <fields> 
+            <text name="order_tour_product_type" store-api-aware="true" />
             <one-to-one store-api-aware="true" name="order" reference="order" on-delete="set-null"/>  
             <one-to-many name="travellers" store-api-aware="true" reference="ce_traveller" on-delete="cascade"/>
             <one-to-one name="emergency_contact_info" store-api-aware="true" reference="ce_emergency_contact_information" on-delete="cascade"/>
             <one-to-many name="flight_info" store-api-aware="true" reference="ce_flight_info" on-delete="cascade"/> 
             <one-to-many name="room_product_detailed_info" store-api-aware="true" reference="ce_room_product_detailed_info" on-delete="cascade"/>
+            <one-to-one name="custom_date_information" store-api-aware="true" reference="ce_custom_date_information" on-delete="cascade"/>
             <json name="metadata" store-api-aware="true" />
+        </fields>
+    </entity>
+    <entity name="ce_custom_date_information">
+        <fields>
+            <json name="custom_date_information" store-api-aware="true" />
+            <json name="pick_up_information" store-api-aware="true" />
         </fields>
     </entity>
     <entity name="ce_traveller">
@@ -131,8 +139,25 @@
     <entity name="ce_date_range">
         <fields>
             <json name="date_range_data" store-api-aware="true" />
-            <int name="max_duration_in_days" store-api-aware="true" />
-            <int name="min_duration_in_days" store-api-aware="true" />
+            <int name="duration_in_days" store-api-aware="true" />
+            <one-to-one name="meeting_point" reference="ce_meeting_point" store-api-aware="true" on-delete="cascade"/>
+        </fields>
+    </entity>
+    <entity name="ce_meeting_point">
+        <fields>
+            <text name="meeting_point_name" store-api-aware="true" />
+            <text name="meeting_point_address" store-api-aware="true" />
+            <text name="meeting_point_city" store-api-aware="true" />
+            <text name="meeting_point_country" store-api-aware="true" />
+            <text name="meeting_point_street" store-api-aware="true" />
+            <text name="meeting_point_house_number" store-api-aware="true" />
+            <text name="meeting_point_floor" store-api-aware="true" />
+            <text name="meeting_point_zip" store-api-aware="true" />
+            <text name="meeting_point_phone" store-api-aware="true" />
+            <text name="meeting_point_email" store-api-aware="true" />
+            <text name="meeting_point_iframe" store-api-aware="true" />
+            <json name="meeting_point_instructions" store-api-aware="true" />
+
         </fields>
     </entity>
     <entity name="ce_static_date_opt">

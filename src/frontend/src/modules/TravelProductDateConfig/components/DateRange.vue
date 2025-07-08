@@ -1,31 +1,30 @@
 <script lang="ts" setup>
 import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
 import { computed } from "vue";
+import { useSw } from "@/modules/shared/composables/useSw";
 import { DateRangeType } from "../types/dateType";
 import DateRangeInput from "./DateRangeInput.vue";
+import MeetingPoint from "./MeetingPoint.vue";
 
 const props = defineProps<{
   dateRange: Entity<"ce_date_range"> | null;
 }>();
 
-const maxDurationInDays = computed({
-  get: () => props.dateRange?.dateRangeData?.maxDurationInDays ?? 0,
+const emit = defineEmits<{
+  (e: "update:dateRange", value: Entity<"ce_date_range"> | null): void;
+}>();
+
+const { createSwEntity } = useSw();
+
+const durationInDays = computed({
+  get: () => props.dateRange?.dateRangeData?.durationInDays ?? 0,
   set: (value: number) => {
     if (props.dateRange?.dateRangeData) {
-      props.dateRange.dateRangeData.maxDurationInDays = value;
+      props.dateRange.dateRangeData.durationInDays = value;
+      emit("update:dateRange", props.dateRange);
     }
   },
 });
-
-const minDurationInDays = computed({
-  get: () => props.dateRange?.dateRangeData?.minDurationInDays ?? 0,
-  set: (value: number) => {
-    if (props.dateRange?.dateRangeData) {
-      props.dateRange.dateRangeData.minDurationInDays = value;
-    }
-  },
-});
-
 const updateRange = (value: DateRangeType["dateRange"]) => {
   if (!props.dateRange) {
     return;
@@ -35,11 +34,31 @@ const updateRange = (value: DateRangeType["dateRange"]) => {
   if (!props.dateRange.dateRangeData) {
     props.dateRange.dateRangeData = {
       dateRange: value,
-      maxDurationInDays: 0,
-      minDurationInDays: 0,
+      durationInDays: 0,
     };
   } else {
     props.dateRange.dateRangeData.dateRange = value;
+  }
+
+  emit("update:dateRange", props.dateRange);
+};
+
+const addMeetingPoint = async () => {
+  if (!props.dateRange) {
+    return;
+  }
+  const meetingPoint = await createSwEntity("ce_meeting_point");
+  if (!meetingPoint) {
+    throw new Error("Failed to create meeting point");
+  }
+  props.dateRange.meetingPoint = meetingPoint;
+  emit("update:dateRange", props.dateRange);
+};
+
+const onMeetingPointUpdate = (meetingPoint: Entity<"ce_meeting_point">) => {
+  if (props.dateRange) {
+    props.dateRange.meetingPoint = meetingPoint;
+    emit("update:dateRange", props.dateRange);
   }
 };
 </script>
@@ -86,33 +105,17 @@ const updateRange = (value: DateRangeType["dateRange"]) => {
             <div class="ewt-form-col">
               <label class="ewt-form-label">
                 <i class="fa-solid fa-clock"></i>
-                Minimum Duration (Days)
+                Duration (Days)
               </label>
               <input
                 type="number"
                 class="ewt-input"
-                v-model="minDurationInDays"
-                min="1"
-                placeholder="e.g., 3"
-              />
-              <div class="ewt-input-hint">
-                Minimum number of days required for booking
-              </div>
-            </div>
-            <div class="ewt-form-col">
-              <label class="ewt-form-label">
-                <i class="fa-solid fa-clock"></i>
-                Maximum Duration (Days)
-              </label>
-              <input
-                type="number"
-                class="ewt-input"
-                v-model="maxDurationInDays"
+                v-model="durationInDays"
                 min="1"
                 placeholder="e.g., 30"
               />
               <div class="ewt-input-hint">
-                Maximum number of days allowed for booking
+                Number of days allowed for booking
               </div>
             </div>
           </div>
@@ -133,6 +136,27 @@ const updateRange = (value: DateRangeType["dateRange"]) => {
             @update:range="updateRange"
           />
         </div>
+      </div>
+      <div class="ewt-card">
+        <div class="ewt-card-header">
+          <h4 class="ewt-card-title">
+            <i class="fa-solid fa-map-pin"></i>
+            Meeting Point
+          </h4>
+        </div>
+        <button
+          v-if="!dateRange?.meetingPoint"
+          class="ewt-button ewt-button--primary"
+          @click="addMeetingPoint"
+        >
+          <i class="fa-solid fa-plus"></i>
+          Add Meeting Point
+        </button>
+        <MeetingPoint
+          v-if="dateRange?.meetingPoint"
+          :meetingPoint="dateRange.meetingPoint"
+          @update:meetingPoint="onMeetingPointUpdate"
+        />
       </div>
     </div>
   </div>

@@ -7,6 +7,7 @@ import FlightInfo from "./FlightInfo.vue";
 import Travellers from "./Travellers.vue";
 import RoomProductInfos from "./RoomProductInfos.vue";
 import EmergencyContact from "./EmergencyContact.vue";
+import CustomDateInformation from "./CustomDateInformation.vue";
 
 const orderId = ref<string | undefined>(undefined);
 const orderInfo = ref<Entity<"ce_travel_order_info"> | null>(null);
@@ -107,6 +108,19 @@ const handleSave = async () => {
       <div v-else-if="error" class="ewt-error-text ewt-mb-3">{{ error }}</div>
 
       <div v-else-if="orderInfo" class="ewt-grid ewt-gap-4">
+        <div>
+          <p>
+            {{ JSON.stringify(orderInfo.orderTourProductType) }}
+            {{ JSON.stringify(orderInfo.customDateInformation) }}
+          </p>
+        </div>
+        <div v-if="orderInfo.orderTourProductType === 'custom_date'">
+          <CustomDateInformation
+            v-if="orderInfo.customDateInformation"
+            :customDateInformation="orderInfo.customDateInformation"
+          />
+        </div>
+
         <div
           class="ewt-collapsible"
           :class="{ 'ewt-collapsible--expanded': sections.flight }"

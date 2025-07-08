@@ -4,6 +4,7 @@ declare namespace EntitySchema {
     order: order;
     ce_traveller: ce_traveller;
     ce_travel_order_info: ce_travel_order_info;
+    ce_custom_date_information: ce_custom_date_information;
     ce_flight_info: ce_flight_info;
     ce_travel_order_bundle_info: ce_travel_order_bundle_info;
     ce_travel_order_bundle_info_room_selection: ce_travel_order_bundle_info_room_selection;
@@ -21,6 +22,7 @@ declare namespace EntitySchema {
     ce_date_range: ce_date_range;
     ce_static_date_opt: ce_static_date_opt;
     ce_traveller_type_config: ce_traveller_type_config;
+    ce_meeting_point: ce_meeting_point;
   }
 
   interface order {
@@ -68,12 +70,20 @@ declare namespace EntitySchema {
     travellerBirthDate: string;
   }
 
+  interface ce_custom_date_information {
+    id: string;
+    customDateInformation?: Record<string, unknown> | null;
+    pickUpInformation?: Record<string, unknown> | null;
+  }
+
   interface ce_travel_order_info {
     id: string;
+    orderTourProductType: string;
     orderId: string;
     order?: Entity<"order">;
     metadata?: Record<string, unknown>;
     travellers: EntityCollection<"ce_traveller">;
+    customDateInformation?: Entity<"ce_custom_date_information"> | null;
     emergencyContactInfo: Entity<"ce_emergency_contact_information">;
     flightInfo?: EntityCollection<"ce_flight_info">;
     roomProductDetailedInfo: EntityCollection<"ce_room_product_detailed_info">;
@@ -224,13 +234,29 @@ declare namespace EntitySchema {
   interface ce_date_range{
     id: string;
     dateRangeData?: Record<string, unknown> | null;
-    maxDurationInDays?: number | null;
-    minDurationInDays?: number | null;
+    durationInDays?: number | null;
+    meetingPoint?: Entity<"ce_meeting_point"> | null;
   }
   interface ce_static_date_opt{
     id: string;
     startDate?: string | null;
     endDate?: string | null;
     durationInDays?: number | null;
+  }
+  interface ce_meeting_point{
+      id: string;
+      meetingPointName?: string | null;
+      meetingPointAddress?: string | null;
+      meetingPointCity?: string | null;
+      meetingPointCountry?: string | null;
+      meetingPointZip?: string | null;
+      meetingPointPhone?: string | null;
+      meetingPointEmail?: string | null;
+      meetingPointStreet?: string | null;
+      meetingPointHouseNumber?: string | null;
+      meetingPointFloor?: string | null;
+      meetingPointIframe?: string | null;
+      meetingPointInstructions?: Record<string, unknown> | null;
+
   }
 }

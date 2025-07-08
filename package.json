@@ -21,14 +21,17 @@
     "@shopware-ag/app-server-sdk": "^1.1.16",
     "@shopware-ag/entity-schema-types": "^5.0.0",
     "@shopware-ag/meteor-admin-sdk": "^5.8.0",
+    "@vue-leaflet/vue-leaflet": "^0.10.1",
     "archiver": "^7.0.1",
     "better-sqlite3": "^11.2.1",
     "dotenv": "^16.4.7",
-    "hono": "^4.4.7", 
+    "hono": "^4.4.7",
+    "leaflet": "^1.9.4",
     "mime": "^4.0.6",
     "pinia": "^3.0.1",
     "prettier": "^3.5.2",
     "vue": "^3.x.x",
+    "vue3-google-map": "^0.23.0",
     "zod": "^3.24.2"
   },
   "devDependencies": {

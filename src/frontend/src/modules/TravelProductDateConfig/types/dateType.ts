@@ -6,8 +6,7 @@ export const dateRangeSchema = z.object({
       endTo: z.string(),
     }),
   ),
-  maxDurationInDays: z.number(),
-  minDurationInDays: z.number(),
+  durationInDays: z.number().min(1),
 });
 
 export type DateRangeType = z.infer<typeof dateRangeSchema>;
