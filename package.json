@@ -21,6 +21,7 @@
     "@shopware-ag/app-server-sdk": "^1.1.16",
     "@shopware-ag/entity-schema-types": "^5.0.0",
     "@shopware-ag/meteor-admin-sdk": "^5.8.0",
+    "@strapi/client": "^1.4.0",
     "@vue-leaflet/vue-leaflet": "^0.10.1",
     "archiver": "^7.0.1",
     "better-sqlite3": "^11.2.1",

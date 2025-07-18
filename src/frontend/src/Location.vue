@@ -16,6 +16,7 @@ onMounted(() => {
         locationId: "ce-traveller-view-tab-card",
       },
     });
+
     ui.menu.addMenuItem({
       label: "Travel Product Config",
       displaySearchBar: true,
@@ -34,6 +35,18 @@ onMounted(() => {
       props: {
         title: "Tour Date Config",
         locationId: "ce-tour-date-view-tab-card",
+      },
+    });
+    ui.tabs("sw-product-detail").addTabItem({
+      label: "CMS Connection",
+      componentSectionId: "ce-cms-connection-view",
+    });
+    ui.componentSection.add({
+      component: "card",
+      positionId: "ce-cms-connection-view",
+      props: {
+        title: "CMS Connection",
+        locationId: "ce-cms-connection-view-tab-card",
       },
     });
   }

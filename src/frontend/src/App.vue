@@ -8,8 +8,10 @@ const showLocation = ref(false);
 const showProductView = ref(false);
 const showTravelProductConfig = ref(false);
 const showTourDateConfig = ref(false);
+const showCmsConnection = ref(false);
 import Main from "./modules/TravelProductConfig/Main.vue";
 import TourDateConfig from "./modules/TravelProductDateConfig/components/DateConf.vue";
+import CmsConnection from "./modules/TravelProductCmsConnection/components/StrapiConnection.vue";
 
 onMounted(() => {
   console.log("All locations check:");
@@ -31,6 +33,7 @@ onMounted(() => {
   showLocation.value = location.is(location.MAIN_HIDDEN);
   showTravelProductConfig.value = location.is("ewtf-travel-product-config");
   showTourDateConfig.value = location.is("ce-tour-date-view-tab-card");
+  showCmsConnection.value = location.is("ce-cms-connection-view-tab-card");
 
   if (showLocation.value) {
     location.startAutoResizer();
@@ -56,6 +59,7 @@ onMounted(() => {
       <TravelOrderInfo v-if="showTravelOrder" />
       <Main v-if="showTravelProductConfig" />
       <TourDateConfig v-if="showTourDateConfig" />
+      <CmsConnection v-if="showCmsConnection" />
     </div>
   </div>
 </template>

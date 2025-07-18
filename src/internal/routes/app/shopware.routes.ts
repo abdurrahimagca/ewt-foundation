@@ -3,7 +3,6 @@ import { Hono } from "hono";
 import {
   AppServer,
   Context,
-  SimpleShop,
   type ShopInterface,
 } from "@shopware-ag/app-server-sdk";
 import { configureAppServer } from "@shopware-ag/app-server-sdk/integration/hono";
@@ -44,6 +43,11 @@ SHOPWARE_ROUTE.post("/app/ping", async () => {
 import TRAVEL_ORDER_INFO from "./ce_travel_order_info.routes.js";
 SHOPWARE_ROUTE.route("/ce", TRAVEL_ORDER_INFO);
 //**END OF CE ROUTES */
+
+//**STRAPI ROUTES */
+import STRAPI from "./strapi.routes.js";
+SHOPWARE_ROUTE.route("/strapi", STRAPI);
+//**END OF STRAPI ROUTES */
 
 export default SHOPWARE_ROUTE;
 ///*****END OF SHOPWARE APP */

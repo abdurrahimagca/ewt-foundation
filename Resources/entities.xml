@@ -157,7 +157,6 @@
             <text name="meeting_point_email" store-api-aware="true" />
             <text name="meeting_point_iframe" store-api-aware="true" />
             <json name="meeting_point_instructions" store-api-aware="true" />
-
         </fields>
     </entity>
     <entity name="ce_static_date_opt">
