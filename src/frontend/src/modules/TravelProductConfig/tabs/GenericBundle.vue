@@ -203,19 +203,18 @@ const handleDeleteResource = async (id: string) => {
   padding: 1rem;
   border-bottom: 1px solid #e9ecef;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: none;
   border-radius: 8px;
 }
 
 .generic-bundle-header:hover {
-  background-color: #e9ecef;
 }
 
 .generic-bundle-header i {
   margin-right: 1rem;
   font-size: 1.2rem;
   color: var(--ewt-text-secondary);
-  transition: transform 0.2s ease;
+  transition: none;
 }
 
 .generic-bundle-content {
@@ -223,19 +222,10 @@ const handleDeleteResource = async (id: string) => {
   flex-direction: column;
   gap: 1.5rem;
   padding: 1rem;
-  animation: slideDown 0.2s ease-out;
+  animation: none;
 }
 
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+/* animations removed by request */
 
 .button-group {
   display: flex;

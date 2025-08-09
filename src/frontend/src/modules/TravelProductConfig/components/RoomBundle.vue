@@ -146,19 +146,18 @@ const addSaleRuleToRoomOption = async (room: Entity<"ce_room_bundle">) => {
   padding: 1rem;
   border-bottom: 1px solid #e9ecef;
   cursor: pointer;
-  transition: background-color 0.2s ease;
+  transition: none;
   border-radius: 8px;
 }
 
 .room-bundle-header:hover {
-  background-color: #e9ecef;
 }
 
 .room-bundle-header i {
   margin-right: 1rem;
   font-size: 1.2rem;
   color: var(--ewt-text-secondary);
-  transition: transform 0.2s ease;
+  transition: none;
 }
 
 .room-bundle-content {
@@ -166,19 +165,10 @@ const addSaleRuleToRoomOption = async (room: Entity<"ce_room_bundle">) => {
   flex-direction: column;
   gap: 1.5rem;
   padding: 1rem;
-  animation: slideDown 0.2s ease-out;
+  animation: none;
 }
 
-@keyframes slideDown {
-  from {
-    opacity: 0;
-    transform: translateY(-10px);
-  }
-  to {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
+/* animations removed by request */
 
 .ewt-button i {
   margin-right: 0.5rem;
