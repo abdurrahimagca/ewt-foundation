@@ -44,12 +44,12 @@
 
 @media (min-width: 768px) {
   .ewt-grid--2 {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 
 .ewt-grid--3 {
-  grid-template-columns: repeat(3, 1fr);
+  grid-template-columns: repeat(3, minmax(0, 1fr));
 }
 
 /* Form Elements */
@@ -83,6 +83,8 @@
   transition: var(--ewt-transition);
   background-color: white;
   color: var(--ewt-text);
+  max-width: 100%;
+  box-sizing: border-box;
 }
 
 .ewt-input:hover {
@@ -691,6 +693,9 @@
 .ewt-mt-1 {
   margin-top: 0.25rem;
 }
+.ewt-mt-0 {
+  margin-top: 0;
+}
 .ewt-mt-2 {
   margin-top: 0.5rem;
 }
@@ -706,6 +711,9 @@
 
 .ewt-mb-1 {
   margin-bottom: 0.25rem;
+}
+.ewt-mb-0 {
+  margin-bottom: 0;
 }
 .ewt-mb-2 {
   margin-bottom: 0.5rem;
@@ -1054,4 +1062,68 @@ p {
   .ewt-form-col {
     width: 100%;
   }
+}
+
+/* Fieldset and compact form helpers */
+.ewt-grid,
+.ewt-flex,
+.ewt-content,
+.ewt-form-group,
+.ewt-fieldset {
+  min-width: 0;
+}
+
+.ewt-grid > *,
+.ewt-flex > * {
+  min-width: 0;
+}
+
+.ewt-content,
+.ewt-card,
+.ewt-form-group,
+.ewt-fieldset {
+  overflow-wrap: anywhere;
+}
+
+.ewt-fieldset {
+  padding: 1rem;
+  background: #ffffff;
+  border: 1px dashed var(--ewt-border);
+  border-radius: 8px;
+  margin-bottom: 1rem;
+}
+
+.ewt-fieldset-title {
+  margin: 0 0 0.75rem 0;
+  font-size: 0.95rem;
+  font-weight: 600;
+  color: var(--ewt-text);
+  display: flex;
+  align-items: center;
+  gap: 0.5rem;
+}
+
+.ewt-form-row.compact {
+  gap: 0.75rem;
+  margin-bottom: 0.5rem;
+}
+
+.ewt-form-col.shrink {
+  max-width: 220px;
+}
+
+.ewt-input--sm {
+  padding: 0.5rem 0.75rem;
+  font-size: 0.85rem;
+  min-height: 2rem;
+}
+
+.ewt-input--number {
+  text-align: right;
+}
+
+.ewt-form-group--subtle {
+  background: #fcfcfd;
+  border-color: #f1f5f9;
+  padding: 1rem;
 }

@@ -61,7 +61,7 @@ const handleCreateHotelBundle = async () => {
   <div v-if="swData" class="ewt-form-group">
     <h2 class="ewt-heading ewt-heading--h2">Hotel Bundle</h2>
     <div class="ewt-grid ewt-grid--2">
-      <div class="ewt-form-group">
+      <div class="ewt-fieldset">
         <label class="ewt-form-label">Min Room Selection</label>
         <input
           v-model="swData.minRoomSelection"
@@ -69,7 +69,7 @@ const handleCreateHotelBundle = async () => {
           class="ewt-input"
         />
       </div>
-      <div class="ewt-form-group">
+      <div class="ewt-fieldset">
         <label class="ewt-form-label">Max Room Selection</label>
         <input
           v-model="swData.maxRoomSelection"
@@ -77,7 +77,7 @@ const handleCreateHotelBundle = async () => {
           class="ewt-input"
         />
       </div>
-      <div class="ewt-form-group">
+      <div class="ewt-fieldset">
         <label class="ewt-form-label">Max Additional Pre Night</label>
         <input
           v-model="swData.maxAdditionalPreNight"
@@ -85,7 +85,7 @@ const handleCreateHotelBundle = async () => {
           class="ewt-input"
         />
       </div>
-      <div class="ewt-form-group">
+      <div class="ewt-fieldset">
         <label class="ewt-form-label">Max Additional Post Night</label>
         <input
           v-model="swData.maxAdditionalPostNight"
