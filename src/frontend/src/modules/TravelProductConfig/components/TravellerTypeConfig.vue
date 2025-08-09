@@ -2,7 +2,7 @@
 import { useTravelProductConfig } from "../store/useTravelProductConfig";
 import { storeToRefs } from "pinia";
 import { computed } from "vue";
-import ProductStreamSelector from "@/modules/shared/components/ProductStreamSelector.vue";
+import ProductSelector from "@/modules/shared/components/ProductSelector.vue";
 
 const store = useTravelProductConfig();
 const swData = computed(
@@ -58,27 +58,27 @@ const swData = computed(
           placeholder="Infant End Age"
         />
         <label class="ewt-form-label">Infant Product Stream</label>
-        <ProductStreamSelector
-          v-model="swData.infantProductStream"
-          :product-stream-id="swData.infantProductStreamId"
+        <ProductSelector
+          v-model="swData.infantProduct"
+          :product-id="swData.infantProductId"
           @update:modelValue="
             (s) => {
               if (s && swData) {
-                swData.infantProductStream = s;
-                swData.infantProductStreamId = s.id;
+                swData.infantProduct = s;
+                swData.infantProductId = s.id;
               }
             }
           "
         />
         <label class="ewt-form-label">Child Product Stream</label>
-        <ProductStreamSelector
-          v-model="swData.childProductStream"
-          :product-stream-id="swData.childProductStreamId"
+        <ProductSelector
+          v-model="swData.childProduct"
+          :product-stream-id="swData.childProductId"
           @update:modelValue="
             (s) => {
               if (s && swData) {
-                swData.childProductStream = s;
-                swData.childProductStreamId = s.id;
+                swData.childProduct = s;
+                swData.childProductId = s.id;
               }
             }
           "

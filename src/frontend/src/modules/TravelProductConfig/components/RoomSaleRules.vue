@@ -1,8 +1,6 @@
 <script setup lang="ts">
-import Supplement from "./Supplement.vue";
-import { useSw } from "@/modules/shared/composables/useSw";
+import ProductSelector from "@/modules/shared/components/ProductSelector.vue";
 
-const { createSwEntity } = useSw();
 const props = defineProps<{
   id: string;
 }>();
@@ -14,24 +12,7 @@ const swData = computed(() => {
 import { useTravelProductConfig } from "../store/useTravelProductConfig";
 import { computed } from "vue";
 import { storeToRefs } from "pinia";
-import { notification } from "@shopware-ag/meteor-admin-sdk";
 const store = useTravelProductConfig();
-async function handleCreateSupplementRuleResource() {
-  try {
-    if (!swData.value) throw new Error("SwData is null");
-    const newSupplementRule = await createSwEntity("ce_room_supplement_rule");
-    if (newSupplementRule === null) {
-      throw new Error("Could not create new supplement rule");
-    }
-    swData.value.supplementRule = newSupplementRule;
-  } catch (e) {
-    console.log(e);
-    notification.dispatch({
-      title: "Error",
-      message: "Couldnt create Resoruce",
-    });
-  }
-}
 </script>
 <template>
   <div v-if="swData" class="ewt-form-group">
@@ -124,18 +105,17 @@ async function handleCreateSupplementRuleResource() {
         />
       </div>
     </div>
-    <div v-if="swData.supplementRule">
-      <Supplement :id="props.id" />
-    </div>
-    <div v-else>
-      <button
-        class="ewt-button ewt-button--primary"
-        @click="handleCreateSupplementRuleResource"
-      >
-        <span class="ewt-button--secondary"
-          >Initialize Supplement Rule Resource</span
-        >
-      </button>
-    </div>
+    <label class="ewt-form-label">Supplement Product</label>
+    <ProductSelector
+      v-model="swData.supplementProduct"
+      @update:modelValue="
+        (s) => {
+          if (s && swData) {
+            swData.supplementProduct = s;
+            swData.supplementProductId = s.id;
+          }
+        }
+      "
+    />
   </div>
 </template>

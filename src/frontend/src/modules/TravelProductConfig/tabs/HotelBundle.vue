@@ -7,7 +7,7 @@ import { storeToRefs } from "pinia";
 import { computed } from "vue";
 import RoomBundle from "../components/RoomBundle.vue";
 import { useSw } from "@/modules/shared/composables/useSw";
-const {createSwEntity } = useSw();
+const { createSwEntity } = useSw();
 const swData = computed(() => {
   return storeToRefs(store).dataToEdit.value?.hotelBundle;
 });
@@ -73,6 +73,22 @@ const handleCreateHotelBundle = async () => {
         <label class="ewt-form-label">Max Room Selection</label>
         <input
           v-model="swData.maxRoomSelection"
+          type="number"
+          class="ewt-input"
+        />
+      </div>
+      <div class="ewt-form-group">
+        <label class="ewt-form-label">Max Additional Pre Night</label>
+        <input
+          v-model="swData.maxAdditionalPreNight"
+          type="number"
+          class="ewt-input"
+        />
+      </div>
+      <div class="ewt-form-group">
+        <label class="ewt-form-label">Max Additional Post Night</label>
+        <input
+          v-model="swData.maxAdditionalPostNight"
           type="number"
           class="ewt-input"
         />

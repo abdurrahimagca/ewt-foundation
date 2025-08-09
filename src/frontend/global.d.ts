@@ -13,7 +13,6 @@ declare namespace EntitySchema {
     ce_hotel_bundle: ce_hotel_bundle;
     ce_room_bundle: ce_room_bundle;
     ce_room_sale_rule: ce_room_sale_rule;
-    ce_room_supplement_rule: ce_room_supplement_rule;
     ce_generic_bundle: ce_generic_bundle;
     product_stream: product_stream;
     ce_emergency_contact_information: ce_emergency_contact_information;
@@ -143,25 +142,33 @@ declare namespace EntitySchema {
     infantEndAge: number | null;
     adultStartAge: number | null;
     adultEndAge: number | null;
-    infantProductStreamId: string | null;
-    infantProductStream: Entity<"product_stream"> | null;
-    childProductStreamId: string | null;
-    childProductStream: Entity<"product_stream"> | null;
+    infantProductId: string | null;
+    infantProduct: Entity<"product"> | null;
+    childProductId: string | null;
+    childProduct: Entity<"product"> | null;
   }
 
   interface ce_hotel_bundle {
     id: string;
     minRoomSelection: number | null;
     maxRoomSelection: number | null;
+    maxAdditionalPreNight: number | null;
+    minAdditionalPreNight: number | null;
+    maxAdditionalPostNight: number | null;
+    minAdditionalPostNight: number | null;
     roomOptions: EntityCollection<"ce_room_bundle"> | null;
   }
 
   interface ce_room_bundle {
     id: string;
-    roomProductsStreamId: string | null;
-    roomProductsStream: Entity<"product_stream"> | null;
+    roomProductId: string | null;
+    roomProduct: Entity<"product"> | null;
     roomSaleRuleId: string | null;
     roomSaleRule: Entity<"ce_room_sale_rule"> | null;
+    additionalPreNightProductId: string | null;
+    additionalPreNightProduct: Entity<"product"> | null;
+    additionalPostNightProductId: string | null;
+    additionalPostNightProduct: Entity<"product"> | null;
   }
 
   interface ce_room_sale_rule {
@@ -175,18 +182,11 @@ declare namespace EntitySchema {
     maxInfants: number | null;
     maxTotalPersons: number | null;
 
-    supplementRuleId: string | null;
-    supplementRule: Entity<"ce_room_supplement_rule"> | null;
+    supplementProductId: string | null;
+    supplementProduct: Entity<"product"> | null;
   }
 
-  interface ce_room_supplement_rule {
-    id: string;
-    applyIfAdults: number | null;
-    applyIfChildren: number | null;
-    applyIfInfants: number | null;
-    supplementProductsStreamId: string | null;
-    supplementProductsStream: Entity<"product_stream"> | null;
-  }
+
 
   interface ce_generic_bundle {
     id: string;

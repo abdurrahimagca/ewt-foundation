@@ -6,7 +6,7 @@ import { notification } from "@shopware-ag/meteor-admin-sdk";
 import RoomSaleRules from "./RoomSaleRules.vue";
 import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
 import { useSw } from "@/modules/shared/composables/useSw";
-import ProductStreamSelector from "@/modules/shared/components/ProductStreamSelector.vue";
+import ProductSelector from "@/modules/shared/components/ProductSelector.vue";
 
 const { createSwEntity, deleteSwEntity } = useSw();
 const store = useTravelProductConfig();
@@ -79,14 +79,38 @@ const addSaleRuleToRoomOption = async (room: Entity<"ce_room_bundle">) => {
 
     <div v-show="expandedRooms.has(swData.id)" class="room-bundle-content">
       <div class="ewt-card ewt-mb-3">
-        <label class="ewt-form-label">Room Products Stream</label>
-        <ProductStreamSelector
-          v-model="swData.roomProductsStream"
+        <label class="ewt-form-label">Room Product</label>
+        <ProductSelector
+          v-model="swData.roomProduct"
           @update:modelValue="
             (s) => {
               if (s && swData) {
-                swData.roomProductsStream = s;
-                swData.roomProductsStreamId = s.id;
+                swData.roomProduct = s;
+                swData.roomProductId = s.id;
+              }
+            }
+          "
+        />
+        <label class="ewt-form-label">Additional Pre Night Product</label>
+        <ProductSelector
+          v-model="swData.additionalPreNightProduct"
+          @update:modelValue="
+            (s) => {
+              if (s && swData) {
+                swData.additionalPreNightProduct = s;
+                swData.additionalPreNightProductId = s.id;
+              }
+            }
+          "
+        />
+        <label class="ewt-form-label">Additional Post Night Product</label>
+        <ProductSelector
+          v-model="swData.additionalPostNightProduct"
+          @update:modelValue="
+            (s) => {
+              if (s && swData) {
+                swData.additionalPostNightProduct = s;
+                swData.additionalPostNightProductId = s.id;
               }
             }
           "
