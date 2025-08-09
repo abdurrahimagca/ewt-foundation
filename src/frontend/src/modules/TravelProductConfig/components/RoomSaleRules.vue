@@ -105,17 +105,27 @@ const store = useTravelProductConfig();
         />
       </div>
     </div>
-    <label class="ewt-form-label">Supplement Product</label>
-    <ProductSelector
-      v-model="swData.supplementProduct"
-      @update:modelValue="
-        (s) => {
-          if (s && swData) {
-            swData.supplementProduct = s;
-            swData.supplementProductId = s.id;
-          }
-        }
-      "
-    />
+    <div class="ewt-form-group">
+      <label class="ewt-form-label">Minimum Total Persons</label>
+      <input
+        v-model="swData.minTotalPersons"
+        type="number"
+        class="ewt-input"
+        placeholder="Min total persons"
+      />
+    </div>
   </div>
+  <label class="ewt-form-label">Supplement Product</label>
+
+  <ProductSelector
+    v-model="swData?.supplementProduct"
+    @update:modelValue="
+      (s) => {
+        if (s && swData) {
+          swData.supplementProduct = s;
+          swData.supplementProductId = s.id;
+        }
+      }
+    "
+  />
 </template>

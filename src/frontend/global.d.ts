@@ -181,7 +181,7 @@ declare namespace EntitySchema {
     minInfants: number | null;
     maxInfants: number | null;
     maxTotalPersons: number | null;
-
+    minTotalPersons: number | null;
     supplementProductId: string | null;
     supplementProduct: Entity<"product"> | null;
   }

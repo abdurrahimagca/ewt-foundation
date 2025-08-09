@@ -5,7 +5,7 @@ import { defineProps, ref, watch, defineEmits } from "vue";
 import { useSw } from "@/modules/shared/composables/useSw";
 
 defineProps<{
-  modelValue: Entity<"product"> | null;
+  modelValue: Entity<"product"> | null | undefined;
 }>();
 const { fetchSwEntityCollection } = useSw();
 
