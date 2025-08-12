@@ -75,6 +75,8 @@
             <int name="max_room_selection" store-api-aware="true"/>
             <int name="max_additional_pre_night" store-api-aware="true"/>
             <int name="max_additional_post_night" store-api-aware="true"/>
+            <one-to-one name="additional_pre_night_product" reference="product" store-api-aware="true" on-delete="set-null"/>
+            <one-to-one name="additional_post_night_product" reference="product" store-api-aware="true" on-delete="set-null"/> 
             <one-to-many name="room_options" store-api-aware="true" reference="ce_room_bundle" on-delete="set-null"/>
         </fields>
     </entity>
@@ -82,8 +84,6 @@
         <fields>
             <one-to-one name="room_product" reference="product" store-api-aware="true" on-delete="set-null" />
             <one-to-one name="room_sale_rule" store-api-aware="true" reference="ce_room_sale_rule" on-delete="cascade"/>
-            <one-to-one name="additional_pre_night_product" reference="product" store-api-aware="true" on-delete="set-null"/>
-            <one-to-one name="additional_post_night_product" reference="product" store-api-aware="true" on-delete="set-null"/>
         </fields>
     </entity>
     <!-- ROOM SALE RULE -->

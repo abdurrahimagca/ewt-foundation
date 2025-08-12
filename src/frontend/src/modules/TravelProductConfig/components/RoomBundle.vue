@@ -7,7 +7,6 @@ import RoomSaleRules from "./RoomSaleRules.vue";
 import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
 import { useSw } from "@/modules/shared/composables/useSw";
 import ProductSelector from "@/modules/shared/components/ProductSelector.vue";
-
 const { createSwEntity, deleteSwEntity } = useSw();
 const store = useTravelProductConfig();
 const swDatas = computed(() => {
@@ -91,30 +90,7 @@ const addSaleRuleToRoomOption = async (room: Entity<"ce_room_bundle">) => {
             }
           "
         />
-        <label class="ewt-form-label">Additional Pre Night Product</label>
-        <ProductSelector
-          v-model="swData.additionalPreNightProduct"
-          @update:modelValue="
-            (s) => {
-              if (s && swData) {
-                swData.additionalPreNightProduct = s;
-                swData.additionalPreNightProductId = s.id;
-              }
-            }
-          "
-        />
-        <label class="ewt-form-label">Additional Post Night Product</label>
-        <ProductSelector
-          v-model="swData.additionalPostNightProduct"
-          @update:modelValue="
-            (s) => {
-              if (s && swData) {
-                swData.additionalPostNightProduct = s;
-                swData.additionalPostNightProductId = s.id;
-              }
-            }
-          "
-        />
+       
       </div>
 
       <RoomSaleRules v-if="swData.roomSaleRule" :id="swData.id" />
@@ -150,8 +126,6 @@ const addSaleRuleToRoomOption = async (room: Entity<"ce_room_bundle">) => {
   border-radius: 8px;
 }
 
-.room-bundle-header:hover {
-}
 
 .room-bundle-header i {
   margin-right: 1rem;

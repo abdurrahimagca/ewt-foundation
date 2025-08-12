@@ -7,6 +7,7 @@ import { storeToRefs } from "pinia";
 import { computed } from "vue";
 import RoomBundle from "../components/RoomBundle.vue";
 import { useSw } from "@/modules/shared/composables/useSw";
+import ProductSelector from "@/modules/shared/components/ProductSelector.vue";
 const { createSwEntity } = useSw();
 const swData = computed(() => {
   return storeToRefs(store).dataToEdit.value?.hotelBundle;
@@ -24,7 +25,6 @@ const handleCreateRoomBundleResource = async () => {
     if (!store.dataToEdit.hotelBundle?.roomOptions) {
       throw new Error("roomOptions is not defined");
     }
-
     store.dataToEdit.hotelBundle.roomOptions.add(newEntity);
   } catch (error) {
     notification.dispatch({
@@ -93,6 +93,32 @@ const handleCreateHotelBundle = async () => {
           class="ewt-input"
         />
       </div>
+    </div>
+    <div class="">
+    <label class="ewt-form-label">Additional Pre Night Product</label>
+    <ProductSelector
+      v-model="swData.additionalPreNightProduct"
+      @update:modelValue="
+        (s) => {
+          if (s && swData) {
+            swData.additionalPreNightProduct = s;
+            swData.additionalPreNightProductId = s.id;
+          }
+        }
+      "
+    />
+    <label class="ewt-form-label">Additional Post Night Product</label>
+    <ProductSelector
+      v-model="swData.additionalPostNightProduct"
+      @update:modelValue="
+        (s) => {
+          if (s && swData) {
+            swData.additionalPostNightProduct = s;
+            swData.additionalPostNightProductId = s.id;
+          }
+        }
+        "
+      />
     </div>
     <div class="ewt-mt-4">
       <RoomBundle />

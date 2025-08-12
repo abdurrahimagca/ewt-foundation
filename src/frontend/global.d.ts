@@ -156,6 +156,10 @@ declare namespace EntitySchema {
     minAdditionalPreNight: number | null;
     maxAdditionalPostNight: number | null;
     minAdditionalPostNight: number | null;
+    additionalPreNightProductId: string | null;
+    additionalPreNightProduct: Entity<"product"> | null;
+    additionalPostNightProductId: string | null;
+    additionalPostNightProduct: Entity<"product"> | null;
     roomOptions: EntityCollection<"ce_room_bundle"> | null;
   }
 
@@ -165,10 +169,6 @@ declare namespace EntitySchema {
     roomProduct: Entity<"product"> | null;
     roomSaleRuleId: string | null;
     roomSaleRule: Entity<"ce_room_sale_rule"> | null;
-    additionalPreNightProductId: string | null;
-    additionalPreNightProduct: Entity<"product"> | null;
-    additionalPostNightProductId: string | null;
-    additionalPostNightProduct: Entity<"product"> | null;
   }
 
   interface ce_room_sale_rule {
