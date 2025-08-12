@@ -90,9 +90,10 @@ declare namespace EntitySchema {
 
   interface ce_flight_info {
     id: string;
+    flightCarrier: string | null;
     flightNumber: string;
-    flightDepartureDate: string;
-    flightArrivalDate: string;
+    flightDepartureDate: string | null;
+    flightArrivalDate: string | null;
     flightDepartureAirport: string;
     flightArrivalAirport: string;
     metadata?: Record<string, unknown>;

@@ -67,6 +67,21 @@ const formatDateForDisplay = (date: string | null) => {
           <div v-if="formErrors.flightNumber" class="ewt-error-text">
             {{ formErrors.flightNumber }}
           </div>
+          <div class="ewt-form-row">
+            <div class="ewt-form-col">
+              <label class="ewt-form-label">Flight Carrier</label>
+              <input
+                type="text"
+                class="ewt-input"
+                v-model="flight.flightCarrier"
+                :class="{ 'ewt-input--error': formErrors.flightCarrier }"
+                @input="handleUpdate"
+              />
+              <div v-if="formErrors.flightCarrier" class="ewt-error-text">
+                {{ formErrors.flightCarrier }}
+              </div>
+            </div>
+          </div>
         </div>
       </div>
 

@@ -207,8 +207,7 @@ const handleDeleteResource = async (id: string) => {
   border-radius: 8px;
 }
 
-.generic-bundle-header:hover {
-}
+
 
 .generic-bundle-header i {
   margin-right: 1rem;
