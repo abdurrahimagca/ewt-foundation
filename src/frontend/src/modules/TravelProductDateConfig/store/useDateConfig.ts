@@ -74,7 +74,6 @@ export const useDateConfig = defineStore("dateConfig", () => {
     });
     criteria.addAssociation("dateRange");
     criteria.addAssociation("staticDate");
-    criteria.addAssociation("dateRange.meetingPoint");
     const result = await fetchSwEntityCollection(
       "ce_travel_product_date_config",
       criteria,

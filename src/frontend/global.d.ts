@@ -21,14 +21,15 @@ declare namespace EntitySchema {
     ce_date_range: ce_date_range;
     ce_static_date_opt: ce_static_date_opt;
     ce_traveller_type_config: ce_traveller_type_config;
-    ce_meeting_point: ce_meeting_point;
+    ce_meeting_point_option: ce_meeting_point_option;
+    ce_order_meeting_point_info: ce_order_meeting_point_info;
+    ce_no_accommodation_config: ce_no_accommodation_config;
   }
 
   interface order {
     id: string;
     orderNumber: string;
     orderDate: string;
-    
   }
 
   interface product {
@@ -62,6 +63,7 @@ declare namespace EntitySchema {
     travellerSurname: string;
     travellerEmail: string;
     travellerPhone?: string;
+    travellerGender?: string;
     travellerPassportNumber?: string;
     travellerNationality?: string;
     travellerDietInfo?: Record<string, unknown>;
@@ -86,6 +88,7 @@ declare namespace EntitySchema {
     emergencyContactInfo: Entity<"ce_emergency_contact_information">;
     flightInfo?: EntityCollection<"ce_flight_info">;
     roomProductDetailedInfo: EntityCollection<"ce_room_product_detailed_info">;
+    orderMeetingPointInfo?: Entity<"ce_order_meeting_point_info"> | null;
   }
 
   interface ce_flight_info {
@@ -133,8 +136,11 @@ declare namespace EntitySchema {
     configurationIdentifier: string | null;
     travellerTypeConfigId: string | null;
     travellerTypeConfig: Entity<"ce_traveller_type_config"> | null;
+    meetingPointOptions: EntityCollection<"ce_meeting_point_option"> | null;
+    noAccommodationConfigId: string | null;
+    noAccommodationConfig: Entity<"ce_no_accommodation_config"> | null;
   }
-  interface ce_traveller_type_config{
+  interface ce_traveller_type_config {
     id: string;
 
     childStartAge: number | null;
@@ -178,7 +184,7 @@ declare namespace EntitySchema {
     maxAdults: number | null;
     minChildren: number | null;
     maxChildren: number | null;
-  
+
     minInfants: number | null;
     maxInfants: number | null;
     maxTotalPersons: number | null;
@@ -186,8 +192,6 @@ declare namespace EntitySchema {
     supplementProductId: string | null;
     supplementProduct: Entity<"product"> | null;
   }
-
-
 
   interface ce_generic_bundle {
     id: string;
@@ -223,7 +227,7 @@ declare namespace EntitySchema {
   }
 
   //**end of product date conf */
-  interface ce_travel_product_date_config{
+  interface ce_travel_product_date_config {
     id: string;
     productId?: string;
     product?: Entity<"product"> | null;
@@ -232,32 +236,41 @@ declare namespace EntitySchema {
     dateRange?: Entity<"ce_date_range"> | null;
     staticDate?: Entity<"ce_static_date_opt"> | null;
   }
-  interface ce_date_range{
+  interface ce_date_range {
     id: string;
     dateRangeData?: Record<string, unknown> | null;
     durationInDays?: number | null;
-    meetingPoint?: Entity<"ce_meeting_point"> | null;
+    padding?: number | null;
   }
-  interface ce_static_date_opt{
+  interface ce_static_date_opt {
     id: string;
     startDate?: string | null;
     endDate?: string | null;
     durationInDays?: number | null;
   }
-  interface ce_meeting_point{
-      id: string;
-      meetingPointName?: string | null;
-      meetingPointAddress?: string | null;
-      meetingPointCity?: string | null;
-      meetingPointCountry?: string | null;
-      meetingPointZip?: string | null;
-      meetingPointPhone?: string | null;
-      meetingPointEmail?: string | null;
-      meetingPointStreet?: string | null;
-      meetingPointHouseNumber?: string | null;
-      meetingPointFloor?: string | null;
-      meetingPointIframe?: string | null;
-      meetingPointInstructions?: Record<string, unknown> | null;
-
+  interface ce_meeting_point_option {
+    id: string;
+    ceTravelProductConfigMeetingPointOptionsId?: string | null;
+    ceTravelProductConfigMeetingPointOptions?: Entity<"ce_travel_product_config"> | null;
+    meetingPointOptionData?: Record<string, unknown> | null;
+    onSelectAddProductId?: string | null;
+    onSelectAddProduct?: Entity<"product"> | null;
   }
+  interface ce_order_meeting_point_info {
+    id: string;
+    meetingPointOptionId?: string | null;
+    meetingPointOption?: Entity<"ce_meeting_point_option"> | null;
+    meetingPointOptionManualInput?: string | null;
+  }
+}
+interface ce_no_accommodation_config {
+  id: string;
+  minAdults?: number | null;
+  maxAdults?: number | null;
+  minChildren?: number | null;
+  maxChildren?: number | null;
+  minInfants?: number | null;
+  maxInfants?: number | null;
+  maxTotalPersons?: number | null;
+  minTotalPersons?: number | null;
 }

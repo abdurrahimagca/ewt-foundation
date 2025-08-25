@@ -1,7 +1,6 @@
 <script lang="ts" setup>
-import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
 import EntityCollection from "@shopware-ag/meteor-admin-sdk/es/_internals/data/EntityCollection";
-import { ref, computed } from "vue";
+import { ref } from "vue";
 
 const props = defineProps<{
   flightInfo: EntityCollection<"ce_flight_info"> | null;

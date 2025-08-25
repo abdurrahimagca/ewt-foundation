@@ -60,6 +60,7 @@ watch(orderId, async (newValue) => {
       criteria.addAssociation("flightInfo");
       criteria.addAssociation("roomProductDetailedInfo.roomProduct");
       criteria.addAssociation("emergencyContactInfo");
+      criteria.addAssociation("orderMeetingPointInfo");
       orderInfo.value = await fetchSwEntity("ce_travel_order_info", criteria);
     } catch (e) {
       error.value = "Failed to load order info";

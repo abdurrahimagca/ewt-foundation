@@ -9,7 +9,14 @@
             <one-to-many name="flight_info" store-api-aware="true" reference="ce_flight_info" on-delete="cascade"/> 
             <one-to-many name="room_product_detailed_info" store-api-aware="true" reference="ce_room_product_detailed_info" on-delete="cascade"/>
             <one-to-one name="custom_date_information" store-api-aware="true" reference="ce_custom_date_information" on-delete="cascade"/>
+            <one-to-one name="order_meeting_point_info" store-api-aware="true" reference="ce_order_meeting_point_info" on-delete="cascade"/>
             <json name="metadata" store-api-aware="true" />
+        </fields>
+    </entity>
+    <entity name="ce_order_meeting_point_info">
+        <fields>
+            <text name="meeting_point_option_manual_input" store-api-aware="true" />
+            <one-to-one name="meeting_point_option" store-api-aware="true" reference="ce_meeting_point_option" on-delete="cascade"/>
         </fields>
     </entity>
     <entity name="ce_custom_date_information">
@@ -20,6 +27,7 @@
     </entity>
     <entity name="ce_traveller">
         <fields>
+            <text name="traveller_gender" store-api-aware="true" />
             <text name="traveller_type" store-api-aware="true" />
             <text name="traveller_name" store-api-aware="true" />
             <text name="traveller_surname" store-api-aware="true" />
@@ -59,6 +67,7 @@
            <int name="number_of_infants" store-api-aware="true" />
         </fields>
     </entity>
+   
     <!-- PRODUCT CONF   --> 
     <entity name="ce_travel_product_config">
         <fields>
@@ -68,9 +77,23 @@
             <one-to-one name="traveller_type_config" store-api-aware="true" reference="ce_traveller_type_config" on-delete="cascade"/>
             <text name="configuration_name" store-api-aware="true" />
             <text name="configuration_identifier" store-api-aware="true" />
+          <one-to-one name="no_accommodation_config" reference="ce_no_accommodation_config" store-api-aware="true" on-delete="set-null" />
+            <one-to-many name="meeting_point_options" reference="ce_meeting_point_option" store-api-aware="true" on-delete="cascade" />
         </fields>
     </entity>
-    <entity name="ce_hotel_bundle">
+    <entity name="ce_no_accommodation_config">
+            <fields>
+                <int name="min_adults" store-api-aware="true"/>
+                <int name="max_adults" store-api-aware="true"/>
+                <int name="min_children" store-api-aware="true"/>
+                <int name="max_children" store-api-aware="true"/>
+                <int name="min_infants" store-api-aware="true"/>
+                <int name="max_infants" store-api-aware="true"/>
+                <int name="max_total_persons" store-api-aware="true"/>
+                <int name="min_total_persons" store-api-aware="true"/>
+            </fields>
+    </entity>
+   <entity name="ce_hotel_bundle">
         <fields>
             <int name="min_room_selection" store-api-aware="true"/>
             <int name="max_room_selection" store-api-aware="true"/>
@@ -126,6 +149,12 @@
             <one-to-one name="child_product" reference="product" store-api-aware="true" on-delete="set-null"/>
         </fields>
     </entity>    
+        <entity name="ce_meeting_point_option">
+        <fields>
+            <json name="meeting_point_option_data" store-api-aware="true" />
+            <one-to-one name="on_select_add_product" reference="product" store-api-aware="true" on-delete="set-null" />
+        </fields>
+    </entity>
     <!-- date configurator -->
     <entity name="ce_travel_product_date_config">
         <fields>
@@ -139,24 +168,8 @@
     <entity name="ce_date_range">
         <fields>
             <json name="date_range_data" store-api-aware="true" />
+            <int name="padding" store-api-aware="true" />
             <int name="duration_in_days" store-api-aware="true" />
-            <one-to-one name="meeting_point" reference="ce_meeting_point" store-api-aware="true" on-delete="cascade"/>
-        </fields>
-    </entity>
-    <entity name="ce_meeting_point">
-        <fields>
-            <text name="meeting_point_name" store-api-aware="true" />
-            <text name="meeting_point_address" store-api-aware="true" />
-            <text name="meeting_point_city" store-api-aware="true" />
-            <text name="meeting_point_country" store-api-aware="true" />
-            <text name="meeting_point_street" store-api-aware="true" />
-            <text name="meeting_point_house_number" store-api-aware="true" />
-            <text name="meeting_point_floor" store-api-aware="true" />
-            <text name="meeting_point_zip" store-api-aware="true" />
-            <text name="meeting_point_phone" store-api-aware="true" />
-            <text name="meeting_point_email" store-api-aware="true" />
-            <text name="meeting_point_iframe" store-api-aware="true" />
-            <json name="meeting_point_instructions" store-api-aware="true" />
         </fields>
     </entity>
     <entity name="ce_static_date_opt">
@@ -166,4 +179,5 @@
             <int name="duration_in_days" store-api-aware="true" />
         </fields>
     </entity>
+
 </entities>

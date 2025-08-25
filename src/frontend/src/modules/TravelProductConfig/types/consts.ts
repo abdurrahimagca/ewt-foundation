@@ -15,6 +15,9 @@ const ASSOCIATIONS = [
   "hotelBundle.roomOptions.roomSaleRule.supplementProduct",
   "genericBundles.parentStream",
   "genericBundles.bundleStream",
+  "meetingPointOptions",
+  "meetingPointOptions.onSelectAddProduct",
+  "noAccommodationConfig",
 ];
 
 const DEFAULT_SUMMARY_ASSOCIATIONS = ["applyProductsStream"];

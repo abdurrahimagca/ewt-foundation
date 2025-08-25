@@ -5,12 +5,17 @@ import { computed } from "vue";
 import ProductStreamSelector from "@/modules/shared/components/ProductStreamSelector.vue";
 import TravellerTypeConfig from "../components/TravellerTypeConfig.vue";
 import { useSw } from "@/modules/shared/composables/useSw";
+import MeetingConf from "@/modules/MeetingPointConf/components/MeetingConf.vue";
+import EntityCollection from "@shopware-ag/meteor-admin-sdk/es/_internals/data/EntityCollection";
+import NoAccommodationConfig from "../components/NoAccommodationConfig.vue";
 
-const { createSwEntity } = useSw();
+const { createSwEntity, deleteSwEntity } = useSw();
 const store = useTravelProductConfig();
 const swData = computed(() => storeToRefs(store).dataToEdit.value);
 const createNewTravellerTypeConfig = async () => {
-  const newTravellerTypeConfig = await createSwEntity("ce_traveller_type_config");
+  const newTravellerTypeConfig = await createSwEntity(
+    "ce_traveller_type_config",
+  );
   if (newTravellerTypeConfig === null) {
     throw new Error("Could not create new traveller type config");
   }
@@ -19,7 +24,39 @@ const createNewTravellerTypeConfig = async () => {
   }
   swData.value.travellerTypeConfig = newTravellerTypeConfig;
   swData.value.travellerTypeConfigId = newTravellerTypeConfig.id;
-  
+};
+
+const createNewMeetingPointOption = async () => {
+  const newMeetingPointOption = await createSwEntity("ce_meeting_point_option");
+  if (newMeetingPointOption === null) {
+    throw new Error("Could not create new meeting point option");
+  }
+  if (!swData.value) {
+    throw new Error("Data to edit is null");
+  }
+  swData.value.meetingPointOptions?.push(newMeetingPointOption);
+};
+
+const deleteMeetingPointOption = async (id: string) => {
+  if (!swData.value) {
+    throw new Error("Data to edit is null");
+  }
+  swData.value.meetingPointOptions = swData.value.meetingPointOptions?.filter(
+    (option) => option.id !== id,
+  ) as EntityCollection<"ce_meeting_point_option">;
+  await deleteSwEntity("ce_meeting_point_option", id);
+};
+
+const createNewNoAccommodationConfig = async () => {
+  const newNoAccommodationConfig = await createSwEntity("ce_no_accommodation_config");
+  if (newNoAccommodationConfig === null) {
+    throw new Error("Could not create new no accommodation config");
+  }
+  if (!swData.value) {
+    throw new Error("Data to edit is null");
+  }
+  swData.value.noAccommodationConfig = newNoAccommodationConfig;
+  swData.value.noAccommodationConfigId = newNoAccommodationConfig.id;
 };
 </script>
 
@@ -37,6 +74,18 @@ const createNewTravellerTypeConfig = async () => {
             placeholder="Enter configuration name"
             class="ewt-input"
           />
+        </div>
+        <div v-if="swData.noAccommodationConfig" class="ewt-form-group">
+          <label class="ewt-form-label">No Accommodation Config</label>
+          <NoAccommodationConfig />
+        </div>
+        <div v-if="!swData.noAccommodationConfig" class="ewt-form-group">
+          <button
+            class="ewt-button ewt-button--primary"
+            @click="createNewNoAccommodationConfig"
+          >
+            Create No Accommodation Config
+          </button>
         </div>
 
         <div class="ewt-form-group">
@@ -68,6 +117,30 @@ const createNewTravellerTypeConfig = async () => {
         Create Traveller Type Config
       </button>
     </section>
+    <section class="">
+      
+      <div class="">
+        <div
+          v-for="meetingPointOption in swData.meetingPointOptions"
+          :key="meetingPointOption.id"
+          class="ewt-card ewt-mb-4"
+        >
+          <MeetingConf :meetingPointOption="meetingPointOption" />
+          <button
+            class="ewt-button ewt-button--primary ewt-mt-3"
+            @click="deleteMeetingPointOption(meetingPointOption.id)"
+          >
+            Delete Meeting Point Option
+          </button>
+        </div>
+        <button
+          class="ewt-button ewt-button--primary"
+          @click="createNewMeetingPointOption"
+        >
+          Create Meeting Point Option
+        </button>
+      </div>
+    </section>
   </div>
 </template>
 
@@ -86,6 +159,11 @@ const createNewTravellerTypeConfig = async () => {
   color: var(--ewt-text);
   margin-bottom: 1rem;
   font-weight: 600;
+}
+
+.ewt-meeting-options-container {
+  width: 100%;
+  min-width: 0;
 }
 
 .ewt-info-text {

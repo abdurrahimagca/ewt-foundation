@@ -189,6 +189,13 @@ const formatDateForDisplay = (date: string | null) => {
 
       <div class="ewt-form-row">
         <div class="ewt-form-col">
+          <label class="ewt-form-label">Gender</label>
+          <input
+            type="text"
+            class="ewt-input"
+            v-model="traveller.travellerGender"
+            @input="handleUpdate"
+          />
           <label class="ewt-form-label">Email</label>
           <input
             type="email"

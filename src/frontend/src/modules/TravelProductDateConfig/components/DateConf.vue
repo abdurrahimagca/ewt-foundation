@@ -114,7 +114,18 @@ onMounted(async () => {
       v-if="dateConfigData?.dateRange && dateConfigData?.isDateRange"
       class="ewt-content"
     >
-      <DateRange :dateRange="dateConfigData.dateRange" />
+      <div class="ewt-card">
+        <label class="ewt-form-label">
+          <i class="fa-solid fa-clock"> Padding (Days) </i>
+        </label>
+        <input
+          type="number"
+          class="ewt-input"
+          v-model="dateConfigData.dateRange.padding"
+          min="0"
+        />
+        <DateRange :dateRange="dateConfigData.dateRange" />
+      </div>
     </div>
     <div
       v-if="dateConfigData?.staticDate && dateConfigData?.isStaticDate"

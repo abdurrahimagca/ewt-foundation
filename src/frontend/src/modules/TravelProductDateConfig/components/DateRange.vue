@@ -1,10 +1,8 @@
 <script lang="ts" setup>
 import { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
 import { computed } from "vue";
-import { useSw } from "@/modules/shared/composables/useSw";
 import { DateRangeType } from "../types/dateType";
 import DateRangeInput from "./DateRangeInput.vue";
-import MeetingPoint from "./MeetingPoint.vue";
 
 const props = defineProps<{
   dateRange: Entity<"ce_date_range"> | null;
@@ -13,8 +11,6 @@ const props = defineProps<{
 const emit = defineEmits<{
   (e: "update:dateRange", value: Entity<"ce_date_range"> | null): void;
 }>();
-
-const { createSwEntity } = useSw();
 
 const durationInDays = computed({
   get: () => props.dateRange?.dateRangeData?.durationInDays ?? 0,
@@ -41,25 +37,6 @@ const updateRange = (value: DateRangeType["dateRange"]) => {
   }
 
   emit("update:dateRange", props.dateRange);
-};
-
-const addMeetingPoint = async () => {
-  if (!props.dateRange) {
-    return;
-  }
-  const meetingPoint = await createSwEntity("ce_meeting_point");
-  if (!meetingPoint) {
-    throw new Error("Failed to create meeting point");
-  }
-  props.dateRange.meetingPoint = meetingPoint;
-  emit("update:dateRange", props.dateRange);
-};
-
-const onMeetingPointUpdate = (meetingPoint: Entity<"ce_meeting_point">) => {
-  if (props.dateRange) {
-    props.dateRange.meetingPoint = meetingPoint;
-    emit("update:dateRange", props.dateRange);
-  }
 };
 </script>
 
@@ -121,6 +98,14 @@ const onMeetingPointUpdate = (meetingPoint: Entity<"ce_meeting_point">) => {
           </div>
         </div>
       </div>
+      <div class="ewt-card">
+        <div class="ewt-card-header">
+          <h4 class="ewt-card-title">
+            <i class="fa-solid fa-clock"></i>
+            Padding
+          </h4>
+        </div>
+      </div>
 
       <!-- Date Ranges -->
       <div class="ewt-card">
@@ -137,27 +122,7 @@ const onMeetingPointUpdate = (meetingPoint: Entity<"ce_meeting_point">) => {
           />
         </div>
       </div>
-      <div class="ewt-card">
-        <div class="ewt-card-header">
-          <h4 class="ewt-card-title">
-            <i class="fa-solid fa-map-pin"></i>
-            Meeting Point
-          </h4>
-        </div>
-        <button
-          v-if="!dateRange?.meetingPoint"
-          class="ewt-button ewt-button--primary"
-          @click="addMeetingPoint"
-        >
-          <i class="fa-solid fa-plus"></i>
-          Add Meeting Point
-        </button>
-        <MeetingPoint
-          v-if="dateRange?.meetingPoint"
-          :meetingPoint="dateRange.meetingPoint"
-          @update:meetingPoint="onMeetingPointUpdate"
-        />
-      </div>
+      
     </div>
   </div>
 </template>
