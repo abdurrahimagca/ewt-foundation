@@ -115,15 +115,7 @@ onMounted(async () => {
       class="ewt-content"
     >
       <div class="ewt-card">
-        <label class="ewt-form-label">
-          <i class="fa-solid fa-clock"> Padding (Days) </i>
-        </label>
-        <input
-          type="number"
-          class="ewt-input"
-          v-model="dateConfigData.dateRange.padding"
-          min="0"
-        />
+      
         <DateRange :dateRange="dateConfigData.dateRange" />
       </div>
     </div>

@@ -105,6 +105,15 @@ const updateRange = (value: DateRangeType["dateRange"]) => {
             Padding
           </h4>
         </div>
+        <div class="ewt-card-body">
+          <p>Padding in days</p>
+          <input
+            type="number"
+            class="ewt-input"
+            v-model="dateRange.padding"
+            min="0"
+          />
+        </div>
       </div>
 
       <!-- Date Ranges -->
@@ -122,7 +131,6 @@ const updateRange = (value: DateRangeType["dateRange"]) => {
           />
         </div>
       </div>
-      
     </div>
   </div>
 </template>
