@@ -255,6 +255,8 @@ declare namespace EntitySchema {
     meetingPointOptionData?: Record<string, unknown> | null;
     onSelectAddProductId?: string | null;
     onSelectAddProduct?: Entity<"product"> | null;
+    suggestProductId?: string | null;
+    suggestProduct?: Entity<"product"> | null;
   }
   interface ce_order_meeting_point_info {
     id: string;

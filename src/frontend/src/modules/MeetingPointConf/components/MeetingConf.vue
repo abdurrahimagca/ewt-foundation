@@ -15,7 +15,7 @@ const emit = defineEmits<{
   ): void;
 }>();
 
-const handleProductUpdate = (value: Entity<"product"> | null) => {
+const handleOnSelectAddProductUpdate = (value: Entity<"product"> | null) => {
   if (!props.meetingPointOption) return;
 
   // Update the entity properties directly
@@ -35,6 +35,13 @@ const handleMeetingPointDataUpdate = (value: MeetingPointData) => {
   >;
 
   emit("update:meetingPointOption", props.meetingPointOption);
+};
+
+const handleSuggestProductUpdate = (value: Entity<"product"> | null) => {
+  if (!props.meetingPointOption) return;
+
+  props.meetingPointOption.suggestProduct = value;
+  props.meetingPointOption.suggestProductId = value?.id || null;
 };
 </script>
 
@@ -62,7 +69,19 @@ const handleMeetingPointDataUpdate = (value: MeetingPointData) => {
         </p>
         <ProductSelector
           :modelValue="meetingPointOption?.onSelectAddProduct"
-          @update:modelValue="handleProductUpdate"
+          @update:modelValue="handleOnSelectAddProductUpdate"
+        />
+      </div>
+    </div>
+    <div class="ewt-form-col">
+      <div class="section-card">
+        <label class="ewt-form-label">Suggest product</label>
+        <p class="section-hint">
+          When a meeting point is selected, this product will be suggested.
+        </p>
+        <ProductSelector
+          :modelValue="meetingPointOption?.suggestProduct"
+          @update:modelValue="handleSuggestProductUpdate"
         />
       </div>
     </div>

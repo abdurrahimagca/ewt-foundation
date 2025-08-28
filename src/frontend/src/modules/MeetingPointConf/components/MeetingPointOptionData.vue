@@ -127,7 +127,11 @@ const removeOptionLanguage = (optionIndex: number, langIndex: number) => {
 
 // Change input type
 const changeInputType = (
-  newType: "select" | "manual_input" | "open_street_maps_iframe_options",
+  newType:
+    | "select"
+    | "manual_input"
+    | "open_street_maps_iframe_options"
+    | "form_input",
 ) => {
   if (newType === "select") {
     localData.value.meeting_point_option_data = {
@@ -140,6 +144,12 @@ const changeInputType = (
       input_type: "open_street_maps_iframe_options",
       content: localData.value.meeting_point_option_data.content,
       options: [],
+    };
+  } else if (newType === "form_input") {
+    localData.value.meeting_point_option_data = {
+      input_type: "form_input",
+      content: localData.value.meeting_point_option_data.content,
+      fields: [],
     };
   } else {
     localData.value.meeting_point_option_data = {
@@ -210,6 +220,60 @@ const formatCoordinates = (mapPoint: {
 }) => {
   return `${mapPoint.latitude.toFixed(6)}, ${mapPoint.longitude.toFixed(6)}`;
 };
+
+// Form field methods
+const addFormField = () => {
+  if (localData.value.meeting_point_option_data.input_type === "form_input") {
+    localData.value.meeting_point_option_data.fields.push({
+      name: [
+        {
+          langCode: "en-GB",
+          title: "",
+        },
+      ],
+      type: "text",
+      required: false,
+      placeholder: [
+        {
+          langCode: "en-GB",
+          title: "",
+        },
+      ],
+    });
+    emitUpdate();
+  }
+};
+
+const removeFormField = (index: number) => {
+  if (localData.value.meeting_point_option_data.input_type === "form_input") {
+    localData.value.meeting_point_option_data.fields.splice(index, 1);
+    emitUpdate();
+  }
+};
+
+const addFieldLanguage = (fieldIndex: number, type: "name" | "placeholder") => {
+  if (localData.value.meeting_point_option_data.input_type === "form_input") {
+    localData.value.meeting_point_option_data.fields[fieldIndex][type].push({
+      langCode: "es-ES",
+      title: "",
+    });
+    emitUpdate();
+  }
+};
+
+const removeFieldLanguage = (
+  fieldIndex: number,
+  langIndex: number,
+  type: "name" | "placeholder",
+) => {
+  if (localData.value.meeting_point_option_data.input_type === "form_input") {
+    localData.value.meeting_point_option_data.fields[fieldIndex][type].splice(
+      langIndex,
+      1,
+    );
+    emitUpdate();
+  }
+};
 </script>
 
 <template>
@@ -257,6 +321,19 @@ const formatCoordinates = (mapPoint: {
           @click="changeInputType('open_street_maps_iframe_options')"
         >
           Map Points
+        </button>
+        <button
+          type="button"
+          :class="[
+            'segment',
+            {
+              active:
+                localData.meeting_point_option_data.input_type === 'form_input',
+            },
+          ]"
+          @click="changeInputType('form_input')"
+        >
+          Form Input
         </button>
       </div>
     </div>
@@ -475,6 +552,156 @@ const formatCoordinates = (mapPoint: {
         </div>
       </div>
     </div>
+
+    <!-- Form Fields Section (only for form_input type) -->
+    <div
+      v-if="localData.meeting_point_option_data.input_type === 'form_input'"
+      class="card form-fields-section"
+    >
+      <div class="card-header">
+        <h4>Form Fields</h4>
+        <button @click="addFormField" class="btn btn-primary">
+          Add form field
+        </button>
+      </div>
+
+      <div
+        v-for="(field, fieldIndex) in localData.meeting_point_option_data
+          .fields"
+        :key="fieldIndex"
+        class="form-field-group"
+      >
+        <div class="row header">
+          <span>Field {{ fieldIndex + 1 }}</span>
+          <button @click="removeFormField(fieldIndex)" class="btn btn-ghost">
+            Remove field
+          </button>
+        </div>
+
+        <!-- Field Type and Required -->
+        <div class="row two-cols">
+          <div class="form-group">
+            <label>Field Type</label>
+            <select v-model="field.type" @change="emitUpdate">
+              <option value="text">Text</option>
+              <option value="number">Number</option>
+              <option value="email">Email</option>
+              <option value="tel">Phone</option>
+              <option value="date">Date</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label>
+              <input
+                v-model="field.required"
+                @change="emitUpdate"
+                type="checkbox"
+                style="margin-right: 8px"
+              />
+              Required field
+            </label>
+          </div>
+        </div>
+
+        <!-- Field Names -->
+        <div class="field-section">
+          <div class="section-header">
+            <h5>Field Names</h5>
+            <button
+              @click="addFieldLanguage(fieldIndex, 'name')"
+              class="btn btn-sm"
+            >
+              Add language
+            </button>
+          </div>
+          <div
+            v-for="(name, nameIndex) in field.name"
+            :key="nameIndex"
+            class="field-language-item"
+          >
+            <div class="row header small">
+              <span>Name {{ nameIndex + 1 }}</span>
+              <button
+                @click="removeFieldLanguage(fieldIndex, nameIndex, 'name')"
+                class="btn btn-ghost btn-sm"
+              >
+                Remove
+              </button>
+            </div>
+            <div class="row two-cols">
+              <div class="form-group">
+                <label>Language</label>
+                <select v-model="name.langCode" @change="emitUpdate">
+                  <option value="en-GB">English (GB)</option>
+                  <option value="es-ES">Spanish (ES)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Field Name</label>
+                <input
+                  v-model="name.title"
+                  @input="emitUpdate"
+                  type="text"
+                  placeholder="Enter field name"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+
+        <!-- Field Placeholders -->
+        <div class="field-section">
+          <div class="section-header">
+            <h5>Field Placeholders</h5>
+            <button
+              @click="addFieldLanguage(fieldIndex, 'placeholder')"
+              class="btn btn-sm"
+            >
+              Add language
+            </button>
+          </div>
+          <div
+            v-for="(placeholder, placeholderIndex) in field.placeholder"
+            :key="placeholderIndex"
+            class="field-language-item"
+          >
+            <div class="row header small">
+              <span>Placeholder {{ placeholderIndex + 1 }}</span>
+              <button
+                @click="
+                  removeFieldLanguage(
+                    fieldIndex,
+                    placeholderIndex,
+                    'placeholder',
+                  )
+                "
+                class="btn btn-ghost btn-sm"
+              >
+                Remove
+              </button>
+            </div>
+            <div class="row two-cols">
+              <div class="form-group">
+                <label>Language</label>
+                <select v-model="placeholder.langCode" @change="emitUpdate">
+                  <option value="en-GB">English (GB)</option>
+                  <option value="es-ES">Spanish (ES)</option>
+                </select>
+              </div>
+              <div class="form-group">
+                <label>Placeholder Text</label>
+                <input
+                  v-model="placeholder.title"
+                  @input="emitUpdate"
+                  type="text"
+                  placeholder="Enter placeholder text"
+                />
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
   </div>
 </template>
 
@@ -667,5 +894,53 @@ const formatCoordinates = (mapPoint: {
   font-family: monospace;
   color: #059669;
   font-weight: 500;
+}
+
+/* Form fields specific styles */
+.form-fields-section {
+  margin-top: 20px;
+}
+
+.form-field-group {
+  border: 1px dashed #e5e7eb;
+  border-radius: 8px;
+  padding: 16px;
+  margin-bottom: 16px;
+  background: #fafafa;
+}
+
+.field-section {
+  margin-top: 16px;
+  background: #ffffff;
+  border: 1px solid #e5e7eb;
+  border-radius: 6px;
+  padding: 12px;
+}
+
+.section-header {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  margin-bottom: 12px;
+}
+
+.section-header h5 {
+  margin: 0;
+  font-size: 14px;
+  font-weight: 600;
+  color: #374151;
+}
+
+.field-language-item {
+  border: 1px solid #f3f4f6;
+  border-radius: 4px;
+  padding: 8px;
+  margin-bottom: 8px;
+  background: #f9fafb;
+}
+
+.btn-sm {
+  padding: 4px 8px;
+  font-size: 12px;
 }
 </style>

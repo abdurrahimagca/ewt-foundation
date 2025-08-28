@@ -16,6 +16,7 @@ const ASSOCIATIONS = [
   "genericBundles.parentStream",
   "genericBundles.bundleStream",
   "meetingPointOptions",
+  "meetingPointOptions.suggestProduct",
   "meetingPointOptions.onSelectAddProduct",
   "noAccommodationConfig",
 ];

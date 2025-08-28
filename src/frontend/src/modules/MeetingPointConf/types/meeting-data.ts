@@ -22,6 +22,34 @@ export const meetingPointDataSchema = z.object({
       ),
     }),
     z.object({
+      input_type: z.literal("form_input"),
+      content: z.array(
+        z.object({
+          langCode: z.enum(["en-GB", "es-ES"]),
+          title: z.string(),
+          description: z.string(),
+        }),
+      ),
+      fields: z.array(
+        z.object({
+          name: z.array(
+            z.object({
+              langCode: z.enum(["en-GB", "es-ES"]),
+              title: z.string(),
+            }),
+          ),
+          type: z.enum(["text", "number", "email", "tel", "date"]),
+          required: z.boolean(),
+          placeholder: z.array(
+            z.object({
+              langCode: z.enum(["en-GB", "es-ES"]),
+              title: z.string(),
+            }),
+          ),
+        }),
+      ),
+    }),
+    z.object({
       input_type: z.literal("open_street_maps_iframe_options"),
       content: z.array(
         z.object({

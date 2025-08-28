@@ -152,6 +152,7 @@
         <entity name="ce_meeting_point_option">
         <fields>
             <json name="meeting_point_option_data" store-api-aware="true" />
+            <one-to-one name="suggest_product" reference="product" store-api-aware="true" on-delete="set-null" />
             <one-to-one name="on_select_add_product" reference="product" store-api-aware="true" on-delete="set-null" />
         </fields>
     </entity>
