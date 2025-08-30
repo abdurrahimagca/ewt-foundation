@@ -95,28 +95,28 @@ const handleCreateHotelBundle = async () => {
       </div>
     </div>
     <div class="">
-    <label class="ewt-form-label">Additional Pre Night Product</label>
-    <ProductSelector
-      v-model="swData.additionalPreNightProduct"
-      @update:modelValue="
-        (s) => {
-          if (s && swData) {
-            swData.additionalPreNightProduct = s;
-            swData.additionalPreNightProductId = s.id;
+      <label class="ewt-form-label">Additional Pre Night Product</label>
+      <ProductSelector
+        v-model="swData.additionalPreNightProduct"
+        @update:modelValue="
+          (s) => {
+            if (swData) {
+              swData.additionalPreNightProduct = s;
+              swData.additionalPreNightProductId = s?.id || null;
+            }
           }
-        }
-      "
-    />
-    <label class="ewt-form-label">Additional Post Night Product</label>
-    <ProductSelector
-      v-model="swData.additionalPostNightProduct"
-      @update:modelValue="
-        (s) => {
-          if (s && swData) {
-            swData.additionalPostNightProduct = s;
-            swData.additionalPostNightProductId = s.id;
+        "
+      />
+      <label class="ewt-form-label">Additional Post Night Product</label>
+      <ProductSelector
+        v-model="swData.additionalPostNightProduct"
+        @update:modelValue="
+          (s) => {
+            if (swData) {
+              swData.additionalPostNightProduct = s;
+              swData.additionalPostNightProductId = s?.id || null;
+            }
           }
-        }
         "
       />
     </div>

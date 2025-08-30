@@ -135,9 +135,9 @@ const store = useTravelProductConfig();
         v-model="swData.supplementProduct"
         @update:modelValue="
           (s) => {
-            if (s && swData) {
+            if (swData) {
               swData.supplementProduct = s;
-              swData.supplementProductId = s.id;
+              swData.supplementProductId = s?.id || null;
             }
           }
         "
