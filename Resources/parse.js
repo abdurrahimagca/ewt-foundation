@@ -4,6 +4,7 @@ import dotenv from "dotenv";
 import { createWriteStream } from "fs";
 import archiver from "archiver";
 import path from "path";
+import { fileURLToPath } from "url";
 
 // Get env file from command line argument
 const envFile = process.argv[2];
@@ -21,7 +22,10 @@ async function createZipArchive() {
   await fs.mkdir("temp/EwtFoundation/Resources", { recursive: true });
 
   // Read and process the manifest template
-  const manifestTemplate = await fs.readFile("manifest.prexml", "utf-8");
+  const __filename = fileURLToPath(import.meta.url);
+  const __dirname = path.dirname(__filename);
+  const manifestPath = path.join(__dirname, "manifest.prexml");
+  const manifestTemplate = await fs.readFile(manifestPath, "utf-8");
 
   let manifestContent = manifestTemplate;
   Object.entries(process.env).forEach(([key, value]) => {

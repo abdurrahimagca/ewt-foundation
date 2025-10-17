@@ -25,6 +25,13 @@ onMounted(() => {
       parent: "sw-catalogue",
     });
 
+    ui.menu.addMenuItem({
+      label: "Reservation Configuration",
+      displaySearchBar: true,
+      displaySmartBar: true,
+      locationId: "ce-reservation-configuration-view",
+      parent: "sw-catalogue",
+    });
     ui.tabs("sw-product-detail").addTabItem({
       label: "Tour Date Config",
       componentSectionId: "ce-tour-date-view",

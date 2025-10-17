@@ -1,6 +1,10 @@
 <script setup>
 import { ref, onMounted } from "vue";
 import { location } from "@shopware-ag/meteor-admin-sdk";
+import Main from "./modules/TravelProductConfig/Main.vue";
+import TourDateConfig from "./modules/TravelProductDateConfig/components/DateConf.vue";
+import CmsConnection from "./modules/TravelProductCmsConnection/components/StrapiConnection.vue";
+import ReservationConf from "./modules/ReservationConf/Index.vue";
 import Location from "./Location.vue";
 import TravelOrderInfo from "./modules/TravelOrderInfo/components/TravelOrderInfo.vue";
 const showTravelOrder = ref(false);
@@ -9,10 +13,7 @@ const showProductView = ref(false);
 const showTravelProductConfig = ref(false);
 const showTourDateConfig = ref(false);
 const showCmsConnection = ref(false);
-import Main from "./modules/TravelProductConfig/Main.vue";
-import TourDateConfig from "./modules/TravelProductDateConfig/components/DateConf.vue";
-import CmsConnection from "./modules/TravelProductCmsConnection/components/StrapiConnection.vue";
-
+const showReservationConf = ref(false);
 onMounted(() => {
   console.log("All locations check:");
   console.log(
@@ -34,7 +35,7 @@ onMounted(() => {
   showTravelProductConfig.value = location.is("ewtf-travel-product-config");
   showTourDateConfig.value = location.is("ce-tour-date-view-tab-card");
   showCmsConnection.value = location.is("ce-cms-connection-view-tab-card");
-
+  showReservationConf.value = location.is("ce-reservation-configuration-view");
   if (showLocation.value) {
     location.startAutoResizer();
   }
@@ -60,6 +61,7 @@ onMounted(() => {
       <Main v-if="showTravelProductConfig" />
       <TourDateConfig v-if="showTourDateConfig" />
       <CmsConnection v-if="showCmsConnection" />
+      <ReservationConf v-if="showReservationConf" />
     </div>
   </div>
 </template>

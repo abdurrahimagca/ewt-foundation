@@ -180,5 +180,18 @@
             <int name="duration_in_days" store-api-aware="true" />
         </fields>
     </entity>
+    <!--  reservation configuration -->
+    <entity name="ce_reservation_configuration">
+        <fields>
+            <bool name="is_active" store-api-aware="true" />
+            <one-to-one name="reservation_product" reference="product" store-api-aware="true" on-delete="set-null" />
+            <one-to-one name="apply_to_product_stream" reference="product_stream" store-api-aware="true" on-delete="set-null" />
+            <int name="cancellable_day_before_reservation" store-api-aware="true" />       
+            <bool name="add_per_adult" store-api-aware="true" />
+            <bool name="add_per_child" store-api-aware="true" />
+            <bool name="add_per_infant" store-api-aware="true" />
+        </fields>
+    </entity>
+    
 
 </entities>

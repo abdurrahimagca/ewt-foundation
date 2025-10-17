@@ -24,6 +24,7 @@ declare namespace EntitySchema {
     ce_meeting_point_option: ce_meeting_point_option;
     ce_order_meeting_point_info: ce_order_meeting_point_info;
     ce_no_accommodation_config: ce_no_accommodation_config;
+    ce_reservation_configuration: ce_reservation_configuration;
   }
 
   interface order {
@@ -275,4 +276,17 @@ interface ce_no_accommodation_config {
   maxInfants?: number | null;
   maxTotalPersons?: number | null;
   minTotalPersons?: number | null;
+}
+
+interface ce_reservation_configuration {
+  id: string;
+  isActive?: boolean | null;
+  reservationProductId?: string | null;
+  reservationProduct?: Entity<"product"> | null;
+  applyToProductStreamId?: string | null;
+  applyToProductStream?: Entity<"product_stream"> | null;
+  cancellableDayBeforeReservation?: number | null;
+  addPerAdult?: boolean | null;
+  addPerChild?: boolean | null;
+  addPerInfant?: boolean | null;
 }
