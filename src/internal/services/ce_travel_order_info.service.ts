@@ -68,10 +68,6 @@ class CeTravelOrderInfoService {
     customerId: string,
   ): Promise<void> {
     try {
-      await this.orderService.validateOrderBelongToCustomerByCustomerId(
-        data.map((item) => item.orderId),
-        customerId,
-      );
       await this.ensureNoDuplicateOrderTravelInfo(
         data.map((item) => item.orderId),
       );
@@ -92,10 +88,6 @@ class CeTravelOrderInfoService {
     customerId: string,
   ): Promise<void> {
     try {
-      await this.orderService.validateOrderBelongToCustomerByCustomerId(
-        [orderId],
-        customerId,
-      );
 
       const repository = new CeTravelOrderInfoRepository(
         this.client,
@@ -113,10 +105,6 @@ class CeTravelOrderInfoService {
     customerId: string,
   ): Promise<void> {
     try {
-      await this.orderService.validateOrderBelongToCustomerByCustomerId(
-        payload.map((item) => item.orderId),
-        customerId,
-      );
       const repository = new CeTravelOrderInfoRepository(
         this.client,
         new Criteria(),

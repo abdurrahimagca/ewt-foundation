@@ -91,7 +91,7 @@ const ceTravelOrderInfoBaseSchema = z.object({
   order: z.custom<Order>().optional(),
   metadata: z.record(z.unknown()).optional(),
   travellers: z.array(ceTravellerBaseSchema),
-  emergencyContactInfo: ceEmergencyContactInformationBaseSchema,
+  emergencyContactInfo: ceEmergencyContactInformationBaseSchema.optional(),
   flightInfo: z.array(ceFlightInfoBaseSchema).optional(),
   roomProductDetailedInfo: z.array(ceRoomProductDetailedInfoBaseSchema),
 });

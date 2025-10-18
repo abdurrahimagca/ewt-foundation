@@ -1,6 +1,9 @@
 import { HttpClient } from "@shopware-ag/app-server-sdk";
 import { Order } from "../types/order.type.js";
-import { EntityRepository, EntitySearchResult } from "@shopware-ag/app-server-sdk/helper/admin-api";
+import {
+  EntityRepository,
+  EntitySearchResult,
+} from "@shopware-ag/app-server-sdk/helper/admin-api";
 import { Criteria } from "@shopware-ag/app-server-sdk/helper/criteria";
 
 class OrderRepository {

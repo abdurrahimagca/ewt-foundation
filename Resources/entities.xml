@@ -1,5 +1,11 @@
 <?xml version="1.0" encoding="utf-8" ?>
 <entities xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/shopware/trunk/src/Core/System/CustomEntity/Xml/entity-1.0.xsd">
+    <entity name="ce_order_reservation_payment">
+      <fields>
+        <one-to-one name="order" reference="order" store-api-aware="true" on-delete="set-null"/>
+        <decimal name="reservation_amount" store-api-aware="true" /> 
+      </fields>
+    </entity>
     <entity name="ce_travel_order_info">
         <fields> 
             <text name="order_tour_product_type" store-api-aware="true" />
@@ -22,7 +28,7 @@
     <entity name="ce_custom_date_information">
         <fields>
             <json name="custom_date_information" store-api-aware="true" />
-            <json name="pick_up_information" store-api-aware="true" />
+            <!-- <json name="pick_up_information" store-api-aware="true" /> -->
         </fields>
     </entity>
     <entity name="ce_traveller">
