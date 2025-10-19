@@ -3,12 +3,10 @@
     <entity name="ce_order_reservation_payment">
       <fields>
         <one-to-one name="order" reference="order" store-api-aware="true" on-delete="set-null"/>
-        <float name="reservation_amount" store-api-aware="true" />
-        <float name="remaining_balance" store-api-aware="true" />
+        <float name="deposit_amount" store-api-aware="true" /> 
         <bool name="deposit_paid" store-api-aware="true" />
         <date name="deposit_paid_at" store-api-aware="true" />
-        <date name="reservation_expires_at" store-api-aware="true" />
-        <text name="status" store-api-aware="true" />
+        <date name="deposit_expires_at" store-api-aware="true" />
         <json name="metadata" store-api-aware="true" />
       </fields>
     </entity>

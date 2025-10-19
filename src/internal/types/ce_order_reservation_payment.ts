@@ -9,12 +9,10 @@ export const ceOrderReservationPaymentSchema = z.object({
   id: shopwareId,
   orderId: shopwareId,
   order: z.custom<Order>().optional(),
-  reservationAmount: z.number().positive("Reservation amount must be positive"),
-  remainingBalance: z.number().min(0, "Remaining balance must be zero or positive").optional(),
+  depositAmount: z.number().positive("Deposit amount must be positive"),
   depositPaid: z.boolean().optional(),
   depositPaidAt: z.string().datetime().optional(),
-  reservationExpiresAt: z.string().datetime().optional(),
-  status: z.string().min(1).optional(),
+  depositExpiresAt: z.string().datetime().optional(),
   metadata: z.record(z.unknown()).optional(),
 });
 
