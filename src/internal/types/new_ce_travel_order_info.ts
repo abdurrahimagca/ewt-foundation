@@ -84,6 +84,17 @@ export const ceRoomProductDetailedInfoUpdateInformationSchema =
   });
 
 /**
+ * Base schema for meeting point information
+ */
+const customDateInformationBaseSchema = z.object({
+  customDateInformation: z.record(z.unknown())
+});
+
+const ceOrderMeetingPointInfoBaseSchema = z.object({
+  meetingPointOptionId: shopwareId,
+  meetingPointOptionManualInput: z.string().optional(),});
+
+/**
  * Base schema for travel order information
  */
 const ceTravelOrderInfoBaseSchema = z.object({
@@ -94,6 +105,8 @@ const ceTravelOrderInfoBaseSchema = z.object({
   emergencyContactInfo: ceEmergencyContactInformationBaseSchema.optional(),
   flightInfo: z.array(ceFlightInfoBaseSchema).optional(),
   roomProductDetailedInfo: z.array(ceRoomProductDetailedInfoBaseSchema),
+  customDateInformation: customDateInformationBaseSchema.optional(),
+  orderMeetingPointInfo: ceOrderMeetingPointInfoBaseSchema.optional(),
 });
 
 export const ceTravelOrderInfoInsertInformationSchema = z.array(
