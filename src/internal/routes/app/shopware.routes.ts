@@ -41,8 +41,18 @@ SHOPWARE_ROUTE.post("/app/ping", async () => {
 
 //**CE ROUTES */
 import TRAVEL_ORDER_INFO from "./ce_travel_order_info.routes.js";
+import CE_RESERVATION from "./ce_reservation.routes.js";
 SHOPWARE_ROUTE.route("/ce", TRAVEL_ORDER_INFO);
+SHOPWARE_ROUTE.route("/app/ce", TRAVEL_ORDER_INFO);
+SHOPWARE_ROUTE.route("/ce", CE_RESERVATION);
+SHOPWARE_ROUTE.route("/app/ce", CE_RESERVATION);
 //**END OF CE ROUTES */
+
+//**PAYMENT ROUTES */
+import PAYMENT from "./payment.routes.js";
+SHOPWARE_ROUTE.route("/payment", PAYMENT);
+SHOPWARE_ROUTE.route("/app/payment", PAYMENT);
+//**END OF PAYMENT ROUTES */
 
 //**STRAPI ROUTES */
 import STRAPI from "./strapi.routes.js";

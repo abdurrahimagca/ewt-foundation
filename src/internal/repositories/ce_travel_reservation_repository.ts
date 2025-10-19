@@ -30,4 +30,28 @@ export class CeTravelReservationRepository extends EntityRepository<CeOrderReser
     const result = await this.repository.search(criteria);
     return result.first();
   }
+
+  async updateReservationByOrderId(
+    orderId: string,
+    update: Partial<CeOrderReservationPaymentType>,
+  ): Promise<CeOrderReservationPaymentType | null> {
+    const existing = await this.getReservationByOrderId(orderId);
+    if (!existing) {
+      return null;
+    }
+    const sanitized = Object.fromEntries(
+      Object.entries(update).filter(([, value]) => value !== undefined),
+    ) as Partial<CeOrderReservationPaymentType>;
+    if (Object.keys(sanitized).length === 0) {
+      return existing;
+    }
+    await this.repository.upsert([
+      {
+        id: existing.id,
+        orderId: existing.orderId,
+        ...sanitized,
+      } as CeOrderReservationPaymentType,
+    ]);
+    return { ...existing, ...sanitized };
+  }
 }

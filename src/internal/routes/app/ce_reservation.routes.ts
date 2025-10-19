@@ -20,7 +20,7 @@ CE_RESERVATION.post("/reservation-payment", async (c) => {
       return c.json({ error: "Order ID is required" }, 422);
     }
     const service = new ReservationPaymentService(shop);
-    const body = c.body;
+    const body = await c.req.json();
     const parseResult = ceOrderReservationPaymentSchema.safeParse(body);
     if (!parseResult.success) {
       return c.json(

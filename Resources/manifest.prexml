@@ -1,5 +1,5 @@
 <?xml version="1.0" encoding="UTF-8" ?>
-<manifest xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/shopware/master/src/Core/Framework/App/Manifest/Schema/manifest-2.0.xsd">
+<manifest xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:noNamespaceSchemaLocation="https://raw.githubusercontent.com/shopware/shopware/trunk/src/Core/Framework/App/Manifest/Schema/manifest-3.0.xsd">
     <meta>
         <name>{{app_name}}</name>
         <label>{{app_label}}</label>
@@ -65,4 +65,13 @@
             </fields>
         </custom-field-set>
     </custom-fields>
+    <payments>
+        <payment-method>
+            <identifier>mockPos</identifier>
+            <name>Mock POS</name>
+            <description>Simulated point-of-sale capture flow for testing.</description>
+            <pay-url>{{base_url}}/app/payment/mock-pos/pay</pay-url>
+            <finalize-url>{{base_url}}/app/payment/mock-pos/finalize</finalize-url>
+        </payment-method>
+    </payments>
 </manifest>
