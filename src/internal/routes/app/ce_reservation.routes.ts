@@ -14,7 +14,6 @@ CE_RESERVATION.use("/*", nextGuard);
 CE_RESERVATION.post("/reservation-payment", async (c) => {
   try {
     const shop = c.get("shop");
-    const customerId = c.get("customerId");
     const orderId = c.req.query("orderId");
     if (!orderId) {
       return c.json({ error: "Order ID is required" }, 422);
@@ -34,21 +33,5 @@ CE_RESERVATION.post("/reservation-payment", async (c) => {
     return c.json({ error: "Internal server error" }, 500);
   }
 });
-CE_RESERVATION.get("/reservation-payment", async (c) => {
-  try {
-    const shop = c.get("shop");
-    const orderId = c.req.query("orderId");
-    if (!orderId) {
-      return c.json({ error: "Order ID is required" }, 422);
-    }
-    const service = new ReservationPaymentService(shop);
-    const reservation = await service.getReservationByOrderId(orderId);
-    if (!reservation) {
-      return c.json({ error: "Reservation not found" }, 404);
-    }
-    return c.json(reservation, 200);
-  } catch (error) {
-    return c.json({ error: "Internal server error" }, 500);
-  }
-});
+
 export default CE_RESERVATION;

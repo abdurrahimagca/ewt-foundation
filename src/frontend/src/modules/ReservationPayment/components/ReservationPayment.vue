@@ -2,16 +2,14 @@
 import { ref, onMounted, watch, computed } from "vue";
 import { data } from "@shopware-ag/meteor-admin-sdk";
 import type { Entity } from "@shopware-ag/meteor-admin-sdk/es/_internals/data/Entity";
-import EntityCollection from "@shopware-ag/meteor-admin-sdk/es/_internals/data/EntityCollection";
 import { useSw } from "@/modules/shared/composables/useSw";
 
 const orderId = ref<string | undefined>(undefined);
 const reservation = ref<Entity<"ce_order_reservation_payment"> | null>(null);
-const transactions = ref<EntityCollection<"order_transaction"> | null>(null);
 const isLoading = ref(false);
 const error = ref<string | null>(null);
 
-const { fetchSwEntity, fetchSwEntityCollection } = useSw();
+const { fetchSwEntity } = useSw();
 
 const refreshData = async () => {
   if (!orderId.value) {
@@ -32,23 +30,6 @@ const refreshData = async () => {
       reservationCriteria,
     );
 
-    const transactionCriteria = new data.Classes.Criteria();
-    transactionCriteria.addFilter({
-      type: "equals",
-      field: "orderId",
-      value: orderId.value,
-    });
-    transactionCriteria.addAssociation("paymentMethod");
-    transactionCriteria.addAssociation("stateMachineState");
-    transactionCriteria.addSorting({
-      field: "createdAt",
-      order: "ASC",
-      naturalSorting: true,
-    });
-    transactions.value = await fetchSwEntityCollection(
-      "order_transaction",
-      transactionCriteria,
-    );
 
     error.value = null;
   } catch (err) {
@@ -135,30 +116,7 @@ const reservationStatus = computed(() => reservation.value?.status ?? "n/a");
           </div>
         </section>
 
-        <section class="ewt-summary-card">
-          <h3>Transactions</h3>
-          <table class="ewt-table">
-            <thead>
-              <tr>
-                <th>ID</th>
-                <th>Amount</th>
-                <th>Payment Method</th>
-                <th>Status</th>
-              </tr>
-            </thead>
-            <tbody>
-              <tr v-if="!transactions || transactions.length === 0">
-                <td colspan="4">No transactions found.</td>
-              </tr>
-              <tr v-for="tx in transactions" :key="tx.id">
-                <td>{{ tx.id }}</td>
-                <td>{{ tx.amount?.totalPrice ?? "-" }}</td>
-                <td>{{ tx.paymentMethod?.name ?? "-" }}</td>
-                <td>{{ tx.stateMachineState?.technicalName ?? "unknown" }}</td>
-              </tr>
-            </tbody>
-          </table>
-        </section>
+     
       </div>
     </div>
   </div>

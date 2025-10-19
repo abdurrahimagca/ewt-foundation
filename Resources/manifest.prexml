@@ -65,13 +65,5 @@
             </fields>
         </custom-field-set>
     </custom-fields>
-    <payments>
-        <payment-method>
-            <identifier>mockPos</identifier>
-            <name>Mock POS</name>
-            <description>Simulated point-of-sale capture flow for testing.</description>
-            <pay-url>{{base_url}}/app/payment/mock-pos/pay</pay-url>
-            <finalize-url>{{base_url}}/app/payment/mock-pos/finalize</finalize-url>
-        </payment-method>
-    </payments>
+    
 </manifest>

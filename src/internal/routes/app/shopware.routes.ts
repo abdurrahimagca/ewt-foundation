@@ -48,12 +48,6 @@ SHOPWARE_ROUTE.route("/ce", CE_RESERVATION);
 SHOPWARE_ROUTE.route("/app/ce", CE_RESERVATION);
 //**END OF CE ROUTES */
 
-//**PAYMENT ROUTES */
-import PAYMENT from "./payment.routes.js";
-SHOPWARE_ROUTE.route("/payment", PAYMENT);
-SHOPWARE_ROUTE.route("/app/payment", PAYMENT);
-//**END OF PAYMENT ROUTES */
-
 //**STRAPI ROUTES */
 import STRAPI from "./strapi.routes.js";
 SHOPWARE_ROUTE.route("/strapi", STRAPI);

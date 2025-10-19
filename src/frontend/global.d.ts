@@ -26,9 +26,7 @@ declare namespace EntitySchema {
     ce_no_accommodation_config: ce_no_accommodation_config;
     ce_reservation_configuration: ce_reservation_configuration;
     ce_order_reservation_payment: ce_order_reservation_payment;
-    order_transaction: order_transaction;
-    payment_method: payment_method;
-    state_machine_state: state_machine_state;
+  
   }
 
   interface order {
@@ -306,24 +304,4 @@ interface ce_order_reservation_payment {
   reservationExpiresAt: string;
   status: string;
   metadata?: Record<string, unknown>;
-}
-interface order_transaction {
-  id: string;
-  orderId: string;
-  order?: Entity<"order">;
-  amount: {
-    totalPrice: number;
-    unitPrice: number;
-    quantity: number;
-  };
-  paymentMethod?: Entity<"payment_method">;
-  stateMachineState?: Entity<"state_machine_state">;
-}
-interface payment_method {
-  id: string;
-  name: string;
-}
-interface state_machine_state {
-  id: string;
-  name: string;
 }
