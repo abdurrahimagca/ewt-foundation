@@ -44,6 +44,26 @@
         <permission>currency:read</permission>
         <permission>country:read</permission>
         <permission>customer:read</permission>
+    <permission>order_transaction:read</permission>
+    <permission>order_transaction:create</permission>
+    <permission>order_transaction:update</permission>
+    <permission>order_transaction:delete</permission>
+    <permission>order_transaction:write</permission>
+    <permission>state_machine_state:read</permission>
+    <permission>state_machine_state:create</permission>
+    <permission>state_machine_state:update</permission>
+    <permission>state_machine_state:delete</permission>
+    <permission>state_machine_state:write</permission>
+    <permission>state_machine:read</permission>
+    <permission>state_machine:create</permission>
+    <permission>state_machine:update</permission>
+    <permission>state_machine:delete</permission>
+    <permission>state_machine:write</permission>
+    <permission>state_machine_transition:read</permission>
+    <permission>state_machine_transition:create</permission>
+    <permission>state_machine_transition:update</permission>
+    <permission>state_machine_transition:delete</permission>
+    <permission>state_machine_transition:write</permission>
     </permissions>
     <custom-fields>
         <custom-field-set>

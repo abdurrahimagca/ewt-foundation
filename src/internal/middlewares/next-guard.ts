@@ -16,11 +16,6 @@ export const nextGuard = async (c: Context, next: Next) => {
     if (!decoded) {
         return c.json({ error: "Invalid token" }, 401);
     }
-    const customerId = c.get("customerId");
-    const tokenCustomerId = decoded.customerId;
-    if (tokenCustomerId !== customerId) {
-        return c.json({ error: "You are not authorized to access this resource" }, 403);
-    }
     const requester = decoded.requester;
     const allowedRequesters = process.env.ALLOWED_REQUESTERS?.split(",") || [];
     if (!allowedRequesters.includes(requester as string)) {
