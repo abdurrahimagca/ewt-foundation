@@ -1,7 +1,36 @@
+export type OrderTransaction = {
+  id: string;
+  orderId: string;
+  amount: {
+   unitPrice: number;
+   totalPrice: number;
+   quantity: number;
+  };
+  paymentMethodId?: string;
+};
+
+export type OrderTransactionCapture = {
+  id: string;
+  orderId: string;
+  amount: {
+    unitPrice: number;
+    totalPrice: number;
+    quantity: number;
+  };
+};
+
+type OrderPrice = {
+  totalPrice: number;
+  positionPrice?: number;
+  taxStatus?: string;
+  rawTotal?: number;
+};
+
 export type Order = {
   id: string;
   versionId: string;
   orderNumber: string;
+  price?: OrderPrice;
   orderCustomer: {
     /** Unique identity of order customer */
     id: string;

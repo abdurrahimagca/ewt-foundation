@@ -17,6 +17,19 @@ onMounted(() => {
       },
     });
 
+    ui.tabs("sw-order-detail").addTabItem({
+      label: "Reservation Payments",
+      componentSectionId: "ce-reservation-payment-view",
+    });
+    ui.componentSection.add({
+      component: "card",
+      positionId: "ce-reservation-payment-view",
+      props: {
+        title: "Reservation Payments",
+        locationId: "ce-reservation-payment-view-tab-card",
+      },
+    });
+
     ui.menu.addMenuItem({
       label: "Travel Product Config",
       displaySearchBar: true,

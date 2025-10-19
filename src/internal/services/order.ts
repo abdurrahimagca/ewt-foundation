@@ -18,6 +18,8 @@ class OrderService {
       type: "equals",
       value: orderId,
     });
+    criteria.addAssociation("transactions");
+    criteria.addAssociation("transactions.stateMachineState");
     const result = await this.repository.search(criteria);
     return result.first();
   }

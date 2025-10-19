@@ -39,11 +39,9 @@ async function createZipArchive() {
   // Write manifest.xml to temp directory
   await fs.writeFile("temp/EwtFoundation/manifest.xml", manifestContent);
 
-  // Create a dummy entities.xml (you should replace this with your actual entities.xml content)
-  await fs.writeFile(
-    "temp/EwtFoundation/Resources/entities.xml",
-    "<entities></entities>",
-  );
+  const entitiesSourcePath = path.join(__dirname, "entities.xml");
+  const entitiesTargetPath = "temp/EwtFoundation/Resources/entities.xml";
+  await fs.copyFile(entitiesSourcePath, entitiesTargetPath);
 
   // Create zip file
   const output = createWriteStream(outputName);

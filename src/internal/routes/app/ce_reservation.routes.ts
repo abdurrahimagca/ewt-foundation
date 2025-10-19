@@ -2,7 +2,7 @@ import { Hono } from "hono";
 import { apiShopTransformMw } from "../../middlewares/storefront-api.js";
 import { nextGuard } from "../../middlewares/next-guard.js";
 import { orderGuard } from "../../middlewares/order-guard.js";
-import { ReservationPaymentService } from "../../services/payment/reservation_payment.js";
+import { ReservationPaymentService } from "../../services/reservation.js";
 import { ceOrderReservationPaymentSchema } from "src/internal/types/ce_order_reservation_payment.js";
 
 const CE_RESERVATION = new Hono();

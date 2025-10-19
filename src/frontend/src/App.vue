@@ -7,6 +7,7 @@ import CmsConnection from "./modules/TravelProductCmsConnection/components/Strap
 import ReservationConf from "./modules/ReservationConf/Index.vue";
 import Location from "./Location.vue";
 import TravelOrderInfo from "./modules/TravelOrderInfo/components/TravelOrderInfo.vue";
+import ReservationPayment from "./modules/ReservationPayment/components/ReservationPayment.vue";
 const showTravelOrder = ref(false);
 const showLocation = ref(false);
 const showProductView = ref(false);
@@ -14,6 +15,7 @@ const showTravelProductConfig = ref(false);
 const showTourDateConfig = ref(false);
 const showCmsConnection = ref(false);
 const showReservationConf = ref(false);
+const showReservationPayment = ref(false);
 onMounted(() => {
   console.log("All locations check:");
   console.log(
@@ -36,6 +38,9 @@ onMounted(() => {
   showTourDateConfig.value = location.is("ce-tour-date-view-tab-card");
   showCmsConnection.value = location.is("ce-cms-connection-view-tab-card");
   showReservationConf.value = location.is("ce-reservation-configuration-view");
+  showReservationPayment.value = location.is(
+    "ce-reservation-payment-view-tab-card",
+  );
   if (showLocation.value) {
     location.startAutoResizer();
   }
@@ -58,6 +63,7 @@ onMounted(() => {
     <div class="ewt-main-content">
       <Location v-if="showLocation" />
       <TravelOrderInfo v-if="showTravelOrder" />
+      <ReservationPayment v-if="showReservationPayment" />
       <Main v-if="showTravelProductConfig" />
       <TourDateConfig v-if="showTourDateConfig" />
       <CmsConnection v-if="showCmsConnection" />
