@@ -1,0 +1,28 @@
+services:
+  ewt-foundation:
+    build:
+      context: .
+      dockerfile: Dockerfile
+    image: ${DOCKER_REGISTRY}/${DOCKER_IMAGE}:${IMAGE_TAG}
+    container_name: ${CONTAINER_NAME}
+    restart: unless-stopped
+    security_opt:
+      - no-new-privileges:true
+    deploy:
+      resources:
+        limits:
+          cpus: "1.0"
+          memory: 1G
+        reservations:
+          memory: 200M
+    expose:
+      - ${PORT}
+    environment:
+      NODE_ENV: ${NODE_ENV}
+      PORT: ${PORT}
+      HOST: ${HOST}
+    env_file:
+      - .env
+    volumes:
+      - ./src/data:/app/src/data
+    user: "1000:1000"
